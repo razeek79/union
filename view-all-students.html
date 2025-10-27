@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>View All Students - الأبطال</title>
+    <link rel="stylesheet" href="sc.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" /></a>
+        <button class="navbar-toggler" style="width: 60px;" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="main.html">Home</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="students-info.html">Students Info</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Students Council</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Teachers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Follow us</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="text-center mb-5" style="font-family: Almarai; color: #02244e;">All Students</h1>
+            </div>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="row mb-4">
+            <div class="col-12 col-md-6">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Search by CIC No. or Name..." style="font-family: Almarai;">
+                </div>
+            </div>
+            <div class="col-12 col-md-6 text-right">
+                <button class="btn btn-primary" onclick="refreshStudents()" style="font-family: Almarai;">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Students Count -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-users"></i>
+                    <strong>Total Students:</strong> <span id="studentCount">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header Row -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card students-card">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-2 text-center">
+                                <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">Index</h5>
+                            </div>
+                            <div class="col-5 text-center">
+                                <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">CIC No.</h5>
+                            </div>
+                            <div class="col-5 text-center">
+                                <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">Name</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Students List -->
+        <div class="row" id="studentsList">
+            <!-- Students will be loaded here dynamically -->
+        </div>
+
+        <!-- No Students Message -->
+        <div class="row" id="noStudentsMessage" style="display: none;">
+            <div class="col-12 text-center">
+                <div class="card students-card">
+                    <div class="card-body">
+                        <i class="fas fa-user-slash" style="font-size: 4rem; color: #6c757d; margin-bottom: 1rem;"></i>
+                        <h3 style="font-family: Almarai; color: #6c757d;">No Students Found</h3>
+                        <p style="font-family: Almarai; color: #6c757d;">No students have been added yet. Add some students to get started!</p>
+                        <a href="manage-students.html" class="btn btn-primary btn-lg" style="font-family: Almarai;">
+                            <i class="fas fa-plus"></i> Add Students
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <a href="students-info.html" class="btn btn-secondary btn-lg" style="font-family: Almarai;">
+                    <i class="fas fa-arrow-left"></i> Back to Students Info
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script>
+        // Function to get students from localStorage
+        function getStudents() {
+            const students = localStorage.getItem('students');
+            return students ? JSON.parse(students) : [];
+        }
+
+        // Function to display students
+        function displayStudents(students = null) {
+            const studentsToShow = students || getStudents();
+            const studentsList = document.getElementById('studentsList');
+            const noStudentsMessage = document.getElementById('noStudentsMessage');
+            const studentCount = document.getElementById('studentCount');
+
+            // Update count
+            studentCount.textContent = studentsToShow.length;
+
+            if (studentsToShow.length === 0) {
+                studentsList.innerHTML = '';
+                noStudentsMessage.style.display = 'block';
+                return;
+            }
+
+            noStudentsMessage.style.display = 'none';
+            studentsList.innerHTML = '';
+
+            studentsToShow.forEach((student, index) => {
+                const studentBar = document.createElement('div');
+                studentBar.className = 'col-12 mb-3';
+                studentBar.innerHTML = `
+                    <div class="card students-card">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-2 text-center">
+                                    <h5 style="font-family: Almarai; color: #02244e; margin: 0;">${index + 1}</h5>
+                                </div>
+                                <div class="col-5 text-center">
+                                    <h5 style="font-family: Almarai; color: #02244e; margin: 0;">${student.cicNo}</h5>
+                                </div>
+                                <div class="col-5 text-center">
+                                    <h5 style="font-family: Almarai; color: #02244e; margin: 0;">${student.name}</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                studentsList.appendChild(studentBar);
+            });
+        }
+
+        // Function to search students
+        function searchStudents() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const allStudents = getStudents();
+            
+            if (searchTerm === '') {
+                displayStudents(allStudents);
+            } else {
+                const filteredStudents = allStudents.filter(student => 
+                    student.name.toLowerCase().includes(searchTerm) || 
+                    student.cicNo.toLowerCase().includes(searchTerm)
+                );
+                displayStudents(filteredStudents);
+            }
+        }
+
+        // Function to refresh students
+        function refreshStudents() {
+            displayStudents();
+            document.getElementById('searchInput').value = '';
+        }
+
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            displayStudents();
+            
+            // Add search functionality
+            document.getElementById('searchInput').addEventListener('input', searchStudents);
+        });
+    </script>
+</body>
+
+</html>

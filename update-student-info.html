@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Update Student Info - الأبطال</title>
+    <link rel="stylesheet" href="sc.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" /></a>
+        <button class="navbar-toggler" style="width: 60px;" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="main.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="students-info.html">Students Info</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="update-student-info.html">Update Info<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Students Council</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Teachers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Follow us</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <!-- Login Form -->
+        <div id="loginSection">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card students-card">
+                        <div class="card-body">
+                            <div class="text-center mb-4">
+                                <div class="students-icon mb-3">
+                                    <i class="fas fa-lock" style="font-size: 3rem; color: #02244e;"></i>
+                                </div>
+                                <h3 class="card-title" style="font-family: Almarai; color: #02244e;">Access Required</h3>
+                                <p class="text-muted">Please login to update student information</p>
+                            </div>
+                            
+                            <form id="loginForm">
+                                <div class="form-group">
+                                    <label for="username" style="font-family: Almarai; color: #02244e;">Username</label>
+                                    <input type="text" class="form-control" id="username" placeholder="Enter your username" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="password" style="font-family: Almarai; color: #02244e;">Password</label>
+                                    <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
+                                </div>
+                                
+                                <div class="alert alert-info" role="alert">
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Access Levels:</strong><br>
+                                    • Students: Use your name as username<br>
+                                    • Mentor: Basheer Wafy<br>
+                                    • Admin: Razeek Fariz
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary btn-lg btn-block" style="font-family: Almarai;">
+                                    <i class="fas fa-sign-in-alt"></i> Login
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Back Button -->
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <a href="students-info.html" class="btn btn-secondary btn-lg" style="font-family: Almarai;">
+                        <i class="fas fa-arrow-left"></i> Back to Students Info
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Management Interface (Hidden by default) -->
+        <div id="studentManagementSection" style="display: none;">
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="text-center mb-5" style="font-family: Almarai; color: #02244e;">Update Student Information</h1>
+                    <div class="text-center mb-3">
+                        <span class="badge badge-success" style="font-family: Almarai; font-size: 1rem;">
+                            <i class="fas fa-user-check"></i> Logged in as: <span id="loggedInUser"></span>
+                        </span>
+                        <button class="btn btn-outline-danger btn-sm ml-3" onclick="logout()" style="font-family: Almarai;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search and Filter Section -->
+            <div class="row mb-4">
+                <div class="col-12 col-md-6">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search by CIC No. or Name..." style="font-family: Almarai;">
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 text-right">
+                    <button class="btn btn-primary" onclick="refreshStudents()" style="font-family: Almarai;">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Students Count -->
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-users"></i>
+                        <strong>Total Students:</strong> <span id="studentCount">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Header Row -->
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="card students-card">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-2 text-center">
+                                    <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">Index</h5>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">CIC No.</h5>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">Name</h5>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">Action</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students List -->
+            <div class="row" id="studentsList">
+                <!-- Students will be loaded here dynamically -->
+            </div>
+
+            <!-- No Students Message -->
+            <div class="row" id="noStudentsMessage" style="display: none;">
+                <div class="col-12 text-center">
+                    <div class="card students-card">
+                        <div class="card-body">
+                            <i class="fas fa-user-slash" style="font-size: 4rem; color: #6c757d; margin-bottom: 1rem;"></i>
+                            <h3 style="font-family: Almarai; color: #6c757d;">No Students Found</h3>
+                            <p style="font-family: Almarai; color: #6c757d;">No students have been added yet. Add some students to get started!</p>
+                            <a href="manage-students.html" class="btn btn-primary btn-lg" style="font-family: Almarai;">
+                                <i class="fas fa-plus"></i> Add Students
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Back Button -->
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <a href="students-info.html" class="btn btn-secondary btn-lg" style="font-family: Almarai;">
+                        <i class="fas fa-arrow-left"></i> Back to Students Info
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script>
+        // Authentication system
+        let currentUser = null;
+        let userRole = null;
+
+        // Function to get students from localStorage
+        function getStudents() {
+            const students = localStorage.getItem('students');
+            return students ? JSON.parse(students) : [];
+        }
+
+        // Function to get student passwords from localStorage
+        function getStudentPasswords() {
+            const passwords = localStorage.getItem('studentPasswords');
+            return passwords ? JSON.parse(passwords) : {};
+        }
+
+        // Function to authenticate user
+        function authenticateUser(username, password) {
+            const students = getStudents();
+            const studentPasswords = getStudentPasswords();
+            
+            // Check for mentor
+            if (username === 'Basheer Wafy' && password === '12345678') {
+                return { success: true, user: username, role: 'mentor' };
+            }
+            
+            // Check for admin
+            if (username === 'Razeek Fariz' && password === '25808129') {
+                return { success: true, user: username, role: 'admin' };
+            }
+            
+            // Check for student
+            const student = students.find(s => s.name.toLowerCase() === username.toLowerCase());
+            if (student) {
+                const studentPassword = studentPasswords[student.cicNo];
+                if (studentPassword && studentPassword === password) {
+                    return { success: true, user: username, role: 'student', studentData: student };
+                }
+            }
+            
+            return { success: false, message: 'Invalid username or password' };
+        }
+
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                alert('Please enter both username and password.');
+                return;
+            }
+            
+            const authResult = authenticateUser(username, password);
+            
+            if (authResult.success) {
+                currentUser = authResult.user;
+                userRole = authResult.role;
+                
+                // Show student management interface
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('studentManagementSection').style.display = 'block';
+                
+                // Update logged in user display
+                document.getElementById('loggedInUser').textContent = `${currentUser} (${userRole})`;
+                
+                // Load students
+                displayStudents();
+                
+                alert(`Welcome ${currentUser}!\n\nAccess Level: ${userRole.charAt(0).toUpperCase() + userRole.slice(1)}`);
+            } else {
+                alert(`Login Failed!\n\n${authResult.message}\n\nPlease check your credentials and try again.`);
+            }
+        });
+
+        // Logout function
+        function logout() {
+            currentUser = null;
+            userRole = null;
+            
+            // Show login form
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('studentManagementSection').style.display = 'none';
+            
+            // Clear form
+            document.getElementById('loginForm').reset();
+        }
+
+        // Function to display students
+        function displayStudents(students = null) {
+            const studentsToShow = students || getStudents();
+            const studentsList = document.getElementById('studentsList');
+            const noStudentsMessage = document.getElementById('noStudentsMessage');
+            const studentCount = document.getElementById('studentCount');
+
+            // Update count
+            studentCount.textContent = studentsToShow.length;
+
+            if (studentsToShow.length === 0) {
+                studentsList.innerHTML = '';
+                noStudentsMessage.style.display = 'block';
+                return;
+            }
+
+            noStudentsMessage.style.display = 'none';
+            studentsList.innerHTML = '';
+
+            studentsToShow.forEach((student, index) => {
+                const studentBar = document.createElement('div');
+                studentBar.className = 'col-12 mb-3';
+                
+                // Determine if user can edit this student
+                let canEdit = false;
+                if (userRole === 'admin' || userRole === 'mentor') {
+                    canEdit = true; // Admin and mentor can edit all students
+                } else if (userRole === 'student' && currentUser.toLowerCase() === student.name.toLowerCase()) {
+                    canEdit = true; // Students can only edit their own info
+                }
+                
+                studentBar.innerHTML = `
+                    <div class="card students-card">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-2 text-center">
+                                    <h5 style="font-family: Almarai; color: #02244e; margin: 0;">${index + 1}</h5>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <h5 style="font-family: Almarai; color: #02244e; margin: 0;">${student.cicNo}</h5>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <h5 style="font-family: Almarai; color: #02244e; margin: 0;">${student.name}</h5>
+                                </div>
+                                <div class="col-3 text-center">
+                                    ${canEdit ? 
+                                        `<button class="btn btn-warning btn-sm" onclick="editStudent('${student.cicNo}')" style="font-family: Almarai;">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>` :
+                                        `<span class="text-muted" style="font-family: Almarai;">No Access</span>`
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                studentsList.appendChild(studentBar);
+            });
+        }
+
+        // Function to search students
+        function searchStudents() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const allStudents = getStudents();
+            
+            if (searchTerm === '') {
+                displayStudents(allStudents);
+            } else {
+                const filteredStudents = allStudents.filter(student => 
+                    student.name.toLowerCase().includes(searchTerm) || 
+                    student.cicNo.toLowerCase().includes(searchTerm)
+                );
+                displayStudents(filteredStudents);
+            }
+        }
+
+        // Function to refresh students
+        function refreshStudents() {
+            displayStudents();
+            document.getElementById('searchInput').value = '';
+        }
+
+        // Function to edit student
+        function editStudent(cicNo) {
+            const students = getStudents();
+            const student = students.find(s => s.cicNo === cicNo);
+            
+            if (!student) {
+                alert(`Error: Student with CIC No.: ${cicNo} not found!`);
+                return;
+            }
+            
+            alert(`Edit functionality for student: ${student.name}\nCIC No.: ${cicNo}\n\nThis will be implemented with a form to edit all student details.\n\nAccess Level: ${userRole.charAt(0).toUpperCase() + userRole.slice(1)}`);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add search functionality
+            document.getElementById('searchInput').addEventListener('input', searchStudents);
+        });
+    </script>
+</body>
+
+</html>

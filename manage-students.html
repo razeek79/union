@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Students - الأبطال</title>
+    <link rel="stylesheet" href="sc.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" /></a>
+        <button class="navbar-toggler" style="width: 60px;" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="main.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="students-info.html">Students Info</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="manage-students.html">Manage Students<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Students Council</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Teachers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Follow us</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="text-center mb-5" style="font-family: Almarai; color: #02244e;">Manage Students</h1>
+            </div>
+        </div>
+
+        <!-- Add Student Section -->
+        <div class="row mb-5">
+            <div class="col-12 col-md-6">
+                <div class="card h-100 students-card">
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <div class="students-icon mb-3">
+                                <i class="fas fa-user-plus" style="font-size: 3rem; color: #28a745;"></i>
+                            </div>
+                            <h3 class="card-title" style="font-family: Almarai; color: #02244e;">Add New Student</h3>
+                        </div>
+                        
+                        <form id="addStudentForm">
+                            <div class="form-group">
+                                <label for="cicNo" style="font-family: Almarai; color: #02244e;">CIC No.</label>
+                                <input type="text" class="form-control" id="cicNo" placeholder="Enter CIC Number" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="studentName" style="font-family: Almarai; color: #02244e;">Student Name</label>
+                                <input type="text" class="form-control" id="studentName" placeholder="Enter student name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="studentPassword" style="font-family: Almarai; color: #02244e;">Create Password</label>
+                                <input type="password" class="form-control" id="studentPassword" placeholder="Enter password for student login" required>
+                                <small class="form-text text-muted">Password must be at least 6 characters long</small>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-success btn-lg btn-block" style="font-family: Almarai;">
+                                <i class="fas fa-plus"></i> Add Student
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Remove Student Section -->
+            <div class="col-12 col-md-6">
+                <div class="card h-100 students-card">
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <div class="students-icon mb-3">
+                                <i class="fas fa-user-minus" style="font-size: 3rem; color: #dc3545;"></i>
+                            </div>
+                            <h3 class="card-title" style="font-family: Almarai; color: #02244e;">Remove Student</h3>
+                        </div>
+                        
+                        <form id="removeStudentForm">
+                            <div class="form-group">
+                                <label for="removeStudentName" style="font-family: Almarai; color: #02244e;">Student Name to Remove</label>
+                                <input type="text" class="form-control" id="removeStudentName" placeholder="Enter student name" required>
+                            </div>
+                            
+                            <div class="alert alert-warning" role="alert">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Warning:</strong> This action cannot be undone. Please make sure you have the correct student name.
+                            </div>
+                            
+                            <button type="submit" class="btn btn-danger btn-lg btn-block" style="font-family: Almarai;">
+                                <i class="fas fa-trash"></i> Remove Student
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="row">
+            <div class="col-12 text-center">
+                <a href="students-info.html" class="btn btn-primary btn-lg" style="font-family: Almarai;">
+                    <i class="fas fa-arrow-left"></i> Back to Students Info
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script>
+        // Function to get students from localStorage
+        function getStudents() {
+            const students = localStorage.getItem('students');
+            return students ? JSON.parse(students) : [];
+        }
+
+        // Function to save students to localStorage
+        function saveStudents(students) {
+            localStorage.setItem('students', JSON.stringify(students));
+        }
+
+        // Function to get student passwords from localStorage
+        function getStudentPasswords() {
+            const passwords = localStorage.getItem('studentPasswords');
+            return passwords ? JSON.parse(passwords) : {};
+        }
+
+        // Function to save student passwords to localStorage
+        function saveStudentPasswords(passwords) {
+            localStorage.setItem('studentPasswords', JSON.stringify(passwords));
+        }
+
+        // Add Student Form Handler
+        document.getElementById('addStudentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const cicNo = document.getElementById('cicNo').value;
+            const name = document.getElementById('studentName').value;
+            const password = document.getElementById('studentPassword').value;
+            
+            // Get existing students and passwords
+            const students = getStudents();
+            const studentPasswords = getStudentPasswords();
+            
+            // Check if CIC No. already exists
+            const existingStudent = students.find(student => student.cicNo === cicNo);
+            if (existingStudent) {
+                alert(`Error: A student with CIC No. ${cicNo} already exists!\n\nName: ${existingStudent.name}`);
+                return;
+            }
+            
+            // Validate password
+            if (password.length < 6) {
+                alert(`Error: Password must be at least 6 characters long.\n\nPlease choose a stronger password.`);
+                return;
+            }
+            
+            // Create new student object with comprehensive information
+            const newStudent = {
+                id: Date.now(), // Simple ID generation
+                cicNo: cicNo,
+                name: name,
+                addedDate: new Date().toLocaleDateString(),
+                // Additional fields for future editing
+                email: '',
+                phone: '',
+                address: '',
+                dateOfBirth: '',
+                grade: '',
+                parentName: '',
+                parentPhone: '',
+                emergencyContact: '',
+                medicalInfo: '',
+                notes: ''
+            };
+            
+            // Add to students array
+            students.push(newStudent);
+            
+            // Save student password
+            studentPasswords[cicNo] = password;
+            
+            // Save to localStorage
+            saveStudents(students);
+            saveStudentPasswords(studentPasswords);
+            
+            alert(`Student Added Successfully!\n\nCIC No.: ${cicNo}\nName: ${name}\nPassword: Created\n\nStudent can now login with their CIC No. and password.`);
+            
+            // Reset form
+            this.reset();
+        });
+
+        // Remove Student Form Handler
+        document.getElementById('removeStudentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const studentName = document.getElementById('removeStudentName').value;
+            
+            // Get existing students
+            const students = getStudents();
+            
+            // Find student to remove (case-insensitive search)
+            const studentIndex = students.findIndex(student => 
+                student.name.toLowerCase() === studentName.toLowerCase()
+            );
+            
+            if (studentIndex === -1) {
+                alert(`Error: No student found with name: ${studentName}`);
+                return;
+            }
+            
+            const studentToRemove = students[studentIndex];
+            
+            // Ask for confirmation before removing
+            if (confirm(`Are you sure you want to remove this student?\n\nName: ${studentToRemove.name}\nCIC No.: ${studentToRemove.cicNo}\n\nThis action cannot be undone.`)) {
+                // Remove student from array
+                students.splice(studentIndex, 1);
+                
+                // Save updated students to localStorage
+                saveStudents(students);
+                
+                alert(`Student "${studentToRemove.name}" has been removed successfully.`);
+                
+                // Reset form
+                this.reset();
+            } else {
+                // User cancelled, do nothing
+                console.log('Student removal cancelled by user');
+            }
+        });
+    </script>
+</body>
+
+</html>

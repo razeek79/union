@@ -1,0 +1,184 @@
+@import url('https://fonts.googleapis.com/css2?family=Bree+Serif&family=Caveat:wght@400;700&family=Lobster&family=Monoton&family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display+SC:ital,wght@0,400;0,700;1,700&family=Playfair+Display:ital,wght@0,400;0,700;1,700&family=Roboto:ital,wght@0,400;0,700;1,400;1,700&family=Source+Sans+Pro:ital,wght@0,400;0,700;1,700&family=Work+Sans:ital,wght@0,400;0,700;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Abel&family=Archivo:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=Asap:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=Barlow:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=Cabin:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=EB+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=Fira+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=Merriweather:ital,wght@0,400;0,700;1,400;1,700&family=Mukta:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=Mulish:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=Noto+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Quicksand:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=Rokkitt:ital,wght@0,400;0,700;1,400;1,700&family=Signika:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=Titillium+Web:ital,wght@0,400;0,700;1,400;1,700&family=Zilla+Slab:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Almarai:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Aref+Ruqaa:ital,wght@0,400;0,700;1,400;1,700&family=Baloo+Bhaijaan+2:wght@400;500;600;700;800&family=Cairo:ital,wght@0,200;0,300;0,400;0,600;0,700;0,800;1,200;1,300;1,400;1,600;1,700;1,800&family=Changa:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=El+Messiri:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Harmattan:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans+Arabic:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Jomhuria&family=Katibeh&family=Lateef&family=Lalezar&family=Markazi+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Mada:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,900&family=Mirza:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Noto+Sans+Arabic:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Readex+Pro:ital,wght@0,160;0,300;0,400;0,700;0,800;1,160;1,300;1,400;1,700;1,800&family=Reem+Kufi:wght@400;500;600;700&family=Rakkas&family=Scheherazade+New:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Tajawal:ital,wght@0,200;0,300;0,400;0,500;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,700;1,800;1,900&family=Vazirmatn:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Kufam:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
+
+/* Fullscreen intro */
+#intro {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    z-index: 9999;
+}
+
+/* Smooth fade out effect */
+.fade-out {
+    opacity: 0;
+    transition: opacity 1s ease-out;
+    pointer-events: none;
+}
+
+.intro-img {
+    height: 200px;
+}
+
+
+
+.intro-heading {
+    font-family: Almarai;
+    font-size: 44px;
+    font-weight: bold;
+    color: #02244e;
+    text-align: center;
+}
+.navimg {
+    height: 40px;
+}
+/* Login styles */
+.login-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(2, 36, 78, 0.1);
+    border-radius: 8px;
+}
+
+.login-tabs {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: #f0f0f0;
+    cursor: pointer;
+}
+
+.tab-btn.active {
+    background: #02244e;
+    color: white;
+}
+
+.login-form {
+    padding: 20px 0;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #02244e;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background: #02244e;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #033266;
+}
+
+/* Student Details styles */
+.student-details-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(2, 36, 78, 0.1);
+    border-radius: 8px;
+}
+
+.details-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px 0;
+}
+
+@media (max-width: 600px) {
+    .details-form {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Students Info Page Styles */
+.students-card {
+    border: 2px solid #02244e;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(2, 36, 78, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.students-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(2, 36, 78, 0.2);
+}
+
+.students-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-primary {
+    background-color: #02244e;
+    border-color: #02244e;
+    font-family: Almarai;
+    font-weight: bold;
+}
+
+.btn-primary:hover {
+    background-color: #033266;
+    border-color: #033266;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    font-family: Almarai;
+    font-weight: bold;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #212529;
+    font-family: Almarai;
+    font-weight: bold;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+    border-color: #d39e00;
+    color: #212529;
+}

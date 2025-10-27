@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>الأبطال - Main Page</title>
+    <link rel="stylesheet" href="sc.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" /></a>
+            <button class="navbar-toggler" type="button" style="width: 60px;" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="main.html">Home<span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="students-info.html">Students Info</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Explore Our Menu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Teachers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Follow us</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="text-center mb-5" style="font-family: Almarai; color: #02244e;">Welcome to AL ABTHAL</h1>
+                <p class="text-center lead" style="font-family: Almarai; color: #02244e;">Our platform for student management and information</p>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-12 col-md-6 mb-4">
+                <div class="card h-100 students-card">
+                    <div class="card-body text-center">
+                        <div class="students-icon mb-3">
+                            <i class="fas fa-graduation-cap" style="font-size: 3rem; color: #02244e;"></i>
+                        </div>
+                        <h3 class="card-title" style="font-family: Almarai; color: #02244e;">Student Management</h3>
+                        <p class="card-text">Manage student information, view records, and update details</p>
+                        <a href="students-info.html" class="btn btn-primary btn-lg">Go to Students Info</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-12 col-md-6 mb-4">
+                <div class="card h-100 students-card">
+                    <div class="card-body text-center">
+                        <div class="students-icon mb-3">
+                            <i class="fas fa-chart-line" style="font-size: 3rem; color: #02244e;"></i>
+                        </div>
+                        <h3 class="card-title" style="font-family: Almarai; color: #02244e;">Progress Tracking</h3>
+                        <p class="card-text">Monitor student progress and academic performance</p>
+                        <button class="btn btn-success btn-lg" onclick="alert('Progress tracking coming soon!')">View Progress</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</body>
+
+</html>
