@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Student Progress - الأبطال</title>
+    <link rel="stylesheet" href="sc.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" /></a>
+        <button class="navbar-toggler" style="width: 60px;" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="main.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="students-info.html">Students Info</a></li>
+                <li class="nav-item active"><a class="nav-link" href="students-progress.html">Students Progress</a></li>
+                <li class="nav-item"><a class="nav-link" href="council.html">Our Council</a></li>
+                <li class="nav-item"><a class="nav-link" href="follow-us.html">Follow us</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5" style="margin-top: 100px !important;">
+        
+        <div id="loginSection">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card students-card">
+                        <div class="card-body">
+                            <div class="text-center mb-4">
+                                <div class="students-icon mb-3">
+                                    <i class="fas fa-chart-line" style="font-size: 3rem; color: #02244e;"></i>
+                                </div>
+                                <h3 class="card-title" style="color: #02244e;">Manage Progress Login</h3>
+                                <p class="text-muted">Students: Enter CIC No.<br>Officials: Enter Username</p>
+                            </div>
+
+                            <form id="loginFormPage">
+                                <div class="form-group">
+                                    <label style="color: #02244e;">Username</label>
+                                    <input type="text" class="form-control" id="pageUsername" placeholder="Username / CIC No." required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label style="color: #02244e;">Password</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="pagePassword" placeholder="Password" required>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('pagePassword')">
+                                                <i class="fas fa-eye" id="pagePassword-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-lg btn-block">Login</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <a href="students-progress.html" class="btn btn-secondary">Back</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="mainContent" style="display: none;">
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="text-center mb-3" style="font-family: Almarai; color: #02244e;">Manage Student Progress</h1>
+                    <div class="text-center mb-4">
+                        <span class="badge badge-success p-2" id="loggedInUser"></span>
+                        <button class="btn btn-sm btn-outline-danger ml-2" onclick="logout()">Logout</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-12 col-md-8">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Search by CIC No. or Name..." style="font-family: Almarai;">
+                </div>
+                <div class="col-12 col-md-4 text-right mt-2 mt-md-0">
+                    <button class="btn btn-primary btn-block" onclick="refreshStudents()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="fas fa-users"></i> <strong>Total Students:</strong> <span id="studentCount">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="card students-card">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-2 text-center">
+                                    <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">SL No.</h5>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">CIC No.</h5>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">Name</h5>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">Action</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" id="studentsList">
+                <div class="col-12 text-center text-muted">Loading...</div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <a href="students-progress.html" class="btn btn-secondary btn-lg">Back to Students Progress</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const supabaseUrl = 'https://ewpmkjqcjnhtxyfqgiba.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3cG1ranFjam5odHh5ZnFnaWJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzMTUyOTMsImV4cCI6MjA3Nzg5MTI5M30.i1ivEtua8fCktdit_DASxQigFg2Kb8NLn0WLLQ3LFmI';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let studentsCache = [];
+
+        // --- 1. SMART LOGIN LOGIC ---
+        document.getElementById('loginFormPage').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('pageUsername').value.trim();
+            const password = document.getElementById('pagePassword').value;
+
+            try {
+                // A. Chief Admin Check
+                if (username === 'Razeek Fariz') {
+                    const { data, error } = await supabase.auth.signInWithPassword({ email: 'razeekfariz1@gmail.com', password });
+                    if (error) throw error;
+                    return setupSession(username, 'chief_admin');
+                }
+
+                // B. Try as STUDENT first (Redirects Immediately)
+                const cleanName = username.replace(/\s+/g, '').toLowerCase();
+                let { data: stuData, error: stuError } = await supabase.auth.signInWithPassword({ email: cleanName + '@student.com', password });
+                
+                if (!stuError) {
+                    alert(`Welcome Student ${username}! Redirecting...`);
+                    window.location.href = `edit-student-progress.html?cicNo=${username}`; 
+                    return;
+                }
+
+                // C. Try as OFFICIAL (Show Dashboard)
+                let { data: offData, error: offError } = await supabase.auth.signInWithPassword({ email: cleanName + '@official.com', password });
+                
+                if (!offError) {
+                    const { data: official } = await supabase.from('officials').select('role').eq('id', offData.user.id).single();
+                    return setupSession(username, official ? official.role : 'official');
+                }
+
+                throw new Error("Invalid username or password");
+
+            } catch (err) {
+                alert("Login Failed: " + err.message);
+            }
+        });
+
+        function setupSession(name, role) {
+            localStorage.setItem('mgmtUser', name);
+            localStorage.setItem('mgmtUserRole', role);
+
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('loggedInUser').textContent = `${name} (${role})`;
+            
+            refreshStudents();
+        }
+
+        // --- 2. ADMIN VIEW (Matches Screenshot 25 Layout) ---
+        async function refreshStudents() {
+            document.getElementById('studentsList').innerHTML = '<div class="col-12 text-center text-muted">Loading students...</div>';
+            
+            const { data, error } = await supabase
+                .from('students')
+                .select('cic_no, full_name')
+                .order('cic_no');
+
+            if (error) {
+                document.getElementById('studentsList').innerHTML = '<div class="text-danger text-center">Error loading data</div>';
+                return;
+            }
+
+            studentsCache = data || [];
+            renderStudentList(studentsCache);
+        }
+
+        function renderStudentList(list) {
+            const container = document.getElementById('studentsList');
+            document.getElementById('studentCount').textContent = list.length;
+
+            if (list.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center text-muted">No students found.</div>';
+                return;
+            }
+
+            let html = '';
+            list.forEach((s, index) => {
+                html += `
+                <div class="col-12 mb-2">
+                    <div class="card students-card">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                
+                                <div class="col-2 text-center">
+                                    <h5 style="font-family: Almarai; color: #02244e; margin:0;">${index + 1}</h5>
+                                </div>
+
+                                <div class="col-3 text-center">
+                                    <h5 style="font-family: Almarai; color: #02244e; margin:0;">${s.cic_no}</h5>
+                                </div>
+
+                                <div class="col-4 text-center">
+                                    <h5 style="font-family: Almarai; color: #02244e; margin:0;">${s.full_name}</h5>
+                                </div>
+
+                                <div class="col-3 text-center">
+                                    <button class="btn btn-warning btn-block" onclick="window.location.href='edit-student-progress.html?cicNo=${s.cic_no}'" style="font-weight:bold; font-family: Almarai;">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            const filtered = studentsCache.filter(s => 
+                s.cic_no.toLowerCase().includes(term) || 
+                s.full_name.toLowerCase().includes(term)
+            );
+            renderStudentList(filtered);
+        });
+
+        window.logout = async function() {
+            await supabase.auth.signOut();
+            localStorage.removeItem('mgmtUser');
+            localStorage.removeItem('mgmtUserRole');
+            location.reload();
+        };
+
+        window.togglePassword = function(id) {
+            const input = document.getElementById(id);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        };
+
+        // On Load: Check if already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = localStorage.getItem('mgmtUser');
+            if (user) {
+                const role = localStorage.getItem('mgmtUserRole');
+                setupSession(user, role);
+            }
+        });
+    </script>
+</body>
+</html>

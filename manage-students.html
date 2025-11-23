@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Students - الأبطال</title>
+    <link rel="stylesheet" href="sc.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" /></a>
+    </nav>
+
+    <div class="container mt-5" style="margin-top: 100px !important;">
+        <div id="loginSection">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card students-card">
+                        <div class="card-body">
+                            <div class="text-center mb-4">
+                                <h3 class="card-title" style="font-family: Almarai; color: #02244e;">Mentor Access Required</h3>
+                                <p class="text-muted">Only Mentor and Admin can manage students</p>
+                            </div>
+                            
+                            <form id="loginForm">
+                                <div class="form-group">
+                                    <label>Username</label>
+                                    <input type="text" class="form-control" id="username" placeholder="Enter your username" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Password</label>
+                                    <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg btn-block">Login</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <a href="students-info.html" class="btn btn-secondary btn-lg">Back to Students Info</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="studentManagementSection" style="display: none;">
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="text-center mb-5" style="font-family: Almarai; color: #02244e;">Manage Students</h1>
+                    <div class="text-center mb-3">
+                        <span class="badge badge-success" style="font-size: 1rem;">
+                            Logged in as: <span id="loggedInUser"></span>
+                        </span>
+                        <button class="btn btn-outline-danger btn-sm ml-3" onclick="logout()">Logout</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-5">
+                <div class="col-12 col-md-6">
+                    <div class="card h-100 students-card">
+                        <div class="card-body">
+                            <h3 class="card-title text-center mb-4" style="color: #02244e;">Add New Student</h3>
+                            <form id="addStudentForm">
+                                <div class="form-group">
+                                    <label>CIC No.</label>
+                                    <input type="text" class="form-control" id="cicNo" placeholder="Enter CIC Number" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Student Name</label>
+                                    <input type="text" class="form-control" id="studentName" placeholder="Enter student name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Create Password</label>
+                                    <input type="password" class="form-control" id="studentPassword" placeholder="Enter password" required>
+                                    <small class="form-text text-muted">Must be at least 6 characters</small>
+                                </div>
+                                <button type="submit" class="btn btn-success btn-lg btn-block">Add Student</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <div class="card h-100 students-card">
+                        <div class="card-body">
+                            <h3 class="card-title text-center mb-4" style="color: #02244e;">Remove Student</h3>
+                            <form id="removeStudentForm">
+                                <div class="form-group">
+                                    <label>Student Name to Remove</label>
+                                    <input type="text" class="form-control" id="removeStudentName" placeholder="Enter student name" required>
+                                </div>
+                                <button type="submit" class="btn btn-danger btn-lg btn-block">Remove Student</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-12 text-center">
+                    <a href="students-info.html" class="btn btn-primary btn-lg">Back to Students Info</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 2. Initialize Supabase
+        const supabaseUrl = 'https://ewpmkjqcjnhtxyfqgiba.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3cG1ranFjam5odHh5ZnFnaWJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzMTUyOTMsImV4cCI6MjA3Nzg5MTI5M30.i1ivEtua8fCktdit_DASxQigFg2Kb8NLn0WLLQ3LFmI';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+        let userRole = null;
+
+        // Helper: Get Correct Email for Login
+        function getLoginEmail(username) {
+            const cleanName = username.trim();
+            // Special case for Chief Admin
+            if (cleanName === 'Razeek Fariz') {
+                return 'razeekfariz1@gmail.com';
+            }
+            // Default pattern for other officials (e.g. Basheer Wafy -> basheerwafy@official.com)
+            return cleanName.replace(/\s+/g, '').toLowerCase() + '@official.com';
+        }
+
+        // 3. LOGIN HANDLER
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const email = getLoginEmail(username);
+
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+
+            if (error) {
+                alert('Login Failed: ' + error.message);
+                return;
+            }
+
+            // Verify Role in Officials Table
+            const { data: officialData, error: roleError } = await supabase
+                .from('officials')
+                .select('role')
+                .eq('id', data.user.id)
+                .single();
+
+            if (roleError || !officialData) {
+                alert('Access Denied: You are not listed in the officials database.');
+                await supabase.auth.signOut();
+                return;
+            }
+
+            // Success!
+            currentUser = username;
+            userRole = officialData.role;
+            
+            // Save session for other pages
+            localStorage.setItem('mgmtUser', currentUser);
+            localStorage.setItem('mgmtUserRole', userRole);
+
+            // Show UI
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('studentManagementSection').style.display = 'block';
+            document.getElementById('loggedInUser').textContent = `${currentUser} (${userRole})`;
+            
+            alert(`Welcome ${currentUser}!`);
+        });
+
+        // 4. LOGOUT HANDLER
+        function logout() {
+            currentUser = null;
+            userRole = null;
+            localStorage.removeItem('mgmtUser');
+            localStorage.removeItem('mgmtUserRole');
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('studentManagementSection').style.display = 'none';
+            document.getElementById('loginForm').reset();
+        }
+
+        // 5. ADD STUDENT HANDLER
+        document.getElementById('addStudentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const cicNo = document.getElementById('cicNo').value.trim();
+            const name = document.getElementById('studentName').value.trim();
+            const password = document.getElementById('studentPassword').value;
+
+            if (password.length < 6) return alert('Password must be 6+ chars');
+
+            // Create Student Login
+            const { data, error } = await supabase.auth.signUp({
+                email: cicNo.toLowerCase() + '@student.com',
+                password: password
+            });
+
+            if (error) return alert("Error: " + error.message);
+
+            // Create Student Profile
+            const { error: dbError } = await supabase
+                .from('students')
+                .insert([{ id: data.user.id, cic_no: cicNo, full_name: name }]);
+
+            if (dbError) return alert("Error saving profile: " + dbError.message);
+
+            alert("Student Added Successfully!");
+            this.reset();
+        });
+
+        // 6. REMOVE STUDENT HANDLER
+        document.getElementById('removeStudentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const studentName = document.getElementById('removeStudentName').value.trim();
+            
+            if (!confirm(`Remove ${studentName}? This only hides them from the list, it does not delete their login.`)) return;
+
+            const { error } = await supabase
+                .from('students')
+                .delete()
+                .eq('full_name', studentName);
+
+            if (error) alert("Error: " + error.message);
+            else {
+                alert("Student removed.");
+                this.reset();
+            }
+        });
+
+        // 7. Check Session on Load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedUser = localStorage.getItem('mgmtUser');
+            const savedRole = localStorage.getItem('mgmtUserRole');
+            
+            if(savedUser && (savedRole === 'admin' || savedRole === 'mentor' || savedRole === 'chief_admin')) {
+                currentUser = savedUser;
+                userRole = savedRole;
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('studentManagementSection').style.display = 'block';
+                document.getElementById('loggedInUser').textContent = `${currentUser} (${userRole})`;
+            }
+        });
+    </script>
+</body>
+</html>

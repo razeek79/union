@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Extra Skills - الأبطال</title>
+    <link rel="stylesheet" href="sc.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" /></a>
+        <button class="navbar-toggler" style="width: 60px;" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="main.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="students-info.html">Students Info</a></li>
+                <li class="nav-item active"><a class="nav-link" href="students-progress.html">Students Progress</a></li>
+                <li class="nav-item"><a class="nav-link" href="council.html">Our Council</a></li>
+                <li class="nav-item"><a class="nav-link" href="follow-us.html">Follow us</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5" style="margin-top: 100px !important;">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="text-center mb-5" style="font-family: Almarai; color: #02244e;">Edit Extra Skills</h1>
+                <h2 class="text-center mb-5" style="font-family: Almarai; color: #02244e;" id="studentNameTitle">Loading...</h2>
+            </div>
+        </div>
+
+        <!-- Add Skill Form -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card students-card">
+                    <div class="card-body">
+                        <h3 class="card-title mb-4" style="font-family: Almarai; color: #02244e;">Add New Skill</h3>
+                        <form id="addSkillForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label style="font-family: Almarai; color: #02244e; font-weight: bold;">Skill / Talent</label>
+                                        <input type="text" class="form-control" id="skillInput" placeholder="e.g. Public Speaking, Coding" required style="font-family: Almarai;">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label style="font-family: Almarai; color: #02244e; font-weight: bold;">Certificate (Optional)</label>
+                                        <input type="text" class="form-control" id="certificateInput" placeholder="Institution or Name" style="font-family: Almarai;">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label>&nbsp;</label>
+                                    <button type="submit" class="btn btn-success btn-block" style="font-family: Almarai;">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skills List Header -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card students-card">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-2 text-center"><h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">SL No.</h5></div>
+                            <div class="col-5 text-center"><h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">Skill</h5></div>
+                            <div class="col-3 text-center"><h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">Certificate</h5></div>
+                            <div class="col-2 text-center"><h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">Action</h5></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skills List -->
+        <div class="row" id="skillsList">
+            <!-- Dynamic Content -->
+        </div>
+
+        <!-- No Skills Message -->
+        <div class="row" id="noSkillsMessage" style="display: none;">
+            <div class="col-12 text-center">
+                <div class="card students-card">
+                    <div class="card-body">
+                        <i class="fas fa-star" style="font-size: 4rem; color: #6c757d; margin-bottom: 1rem;"></i>
+                        <h3 class="mt-3" style="font-family: Almarai; color: #6c757d;">No Skills Added</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <a href="#" class="btn btn-secondary btn-lg" id="backBtn" style="font-family: Almarai;">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://ewpmkjqcjnhtxyfqgiba.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3cG1ranFjam5odHh5ZnFnaWJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzMTUyOTMsImV4cCI6MjA3Nzg5MTI5M30.i1ivEtua8fCktdit_DASxQigFg2Kb8NLn0WLLQ3LFmI';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentStudentId = null;
+
+        function getQueryParam(key) {
+            return new URLSearchParams(window.location.search).get(key);
+        }
+
+        // 1. Load Student Info
+        async function loadData() {
+            const cicNo = getQueryParam('cicNo');
+            if (!cicNo) return alert("Missing CIC No.");
+
+            const { data: student, error } = await supabase
+                .from('students')
+                .select('id, full_name, cic_no')
+                .eq('cic_no', cicNo)
+                .single();
+
+            if (error || !student) {
+                document.getElementById('studentNameTitle').textContent = "Student Not Found";
+                return;
+            }
+
+            currentStudentId = student.id;
+            document.getElementById('studentNameTitle').textContent = `${student.full_name} (${student.cic_no})`;
+            document.getElementById('backBtn').href = `edit-student-progress.html?cicNo=${student.cic_no}`;
+
+            loadSkills();
+        }
+
+        // 2. Fetch Skills
+        async function loadSkills() {
+            const { data: list, error } = await supabase
+                .from('extra_skills')
+                .select('*')
+                .eq('student_id', currentStudentId)
+                .order('created_at', { ascending: true });
+
+            if (error) {
+                alert("Error loading data: " + error.message);
+                return;
+            }
+
+            renderSkills(list || []);
+        }
+
+        function renderSkills(list) {
+            const container = document.getElementById('skillsList');
+            container.innerHTML = '';
+
+            if (list.length === 0) {
+                document.getElementById('noSkillsMessage').style.display = 'block';
+                return;
+            }
+            document.getElementById('noSkillsMessage').style.display = 'none';
+
+            list.forEach((item, index) => {
+                container.innerHTML += `
+                <div class="col-12 mb-3">
+                    <div class="card students-card">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-2 text-center"><h5>${index + 1}</h5></div>
+                                <div class="col-5 text-center"><h5>${item.skill}</h5></div>
+                                <div class="col-3 text-center"><h5>${item.certificate || '-'}</h5></div>
+                                <div class="col-2 text-center">
+                                    <button class="btn btn-danger btn-sm" onclick="deleteSkill('${item.id}')">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+        }
+
+        // 3. Add Skill
+        document.getElementById('addSkillForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const skill = document.getElementById('skillInput').value.trim();
+            const certificate = document.getElementById('certificateInput').value.trim();
+
+            if (!skill) return alert("Please enter a skill.");
+
+            const { error } = await supabase
+                .from('extra_skills')
+                .insert([{
+                    student_id: currentStudentId,
+                    skill: skill,
+                    certificate: certificate
+                }]);
+
+            if (error) alert("Error adding: " + error.message);
+            else {
+                this.reset();
+                loadSkills();
+            }
+        });
+
+        // 4. Delete Skill
+        window.deleteSkill = async function(id) {
+            if (!confirm("Delete this skill?")) return;
+
+            const { error } = await supabase
+                .from('extra_skills')
+                .delete()
+                .eq('id', id);
+
+            if (error) alert("Error deleting: " + error.message);
+            else loadSkills();
+        };
+
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+
+</html>

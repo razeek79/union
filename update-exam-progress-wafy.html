@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wafy Results - Update Exam Progress</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .big-bar {
+            border-radius: 16px;
+            background: #f5f7fa;
+            box-shadow: 0 2px 12px rgba(41,94,148,0.12);
+            padding: 36px 24px;
+            font-size: 2rem;
+            color: #02244e;
+            text-align: center;
+            margin-bottom: 32px;
+            cursor: pointer;
+            font-family: Almarai, Arial, sans-serif;
+            transition: box-shadow .2s, background .2s;
+        }
+        .big-bar:hover {
+            background: #e1eafd;
+            box-shadow: 0 4px 28px rgba(41,94,148,0.18);
+        }
+        .container-bar {
+            margin: 80px auto 0 auto;
+            max-width: 600px;
+        }
+        h1 {
+            color: #02244e;
+            font-family: Almarai, Arial, sans-serif;
+            margin-bottom: 40px;
+            margin-top: 70px;
+        }
+        .sem-buttons {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 18px;
+        }
+        .sem-button {
+            font-size: 1.2rem;
+            min-width: 140px;
+        }
+    </style>
+    <script>
+      function goTo(path) {
+        window.location.href = path+window.location.search;
+      }
+    </script>
+</head>
+<body>
+<div class="container container-bar text-center">
+    <h1>Wafy Results</h1>
+    <div class="big-bar" onclick="document.getElementById('thamheediyya-opts').style.display = (document.getElementById('thamheediyya-opts').style.display==='block')?'none':'block'">
+      Thamheediyya
+      <div class="sem-buttons" id="thamheediyya-opts" style="display:none">
+        <button class="btn btn-primary sem-button" onclick="goTo('update-exam-wafy-thamheediyya-sem1.html')">Sem 1</button>
+        <button class="btn btn-primary sem-button" onclick="goTo('update-exam-wafy-thamheediyya-sem2.html')">Sem 2</button>
+        <button class="btn btn-primary sem-button" onclick="goTo('update-exam-wafy-thamheediyya-sem3.html')">Sem 3</button>
+        <button class="btn btn-primary sem-button" onclick="goTo('update-exam-wafy-thamheediyya-sem4.html')">Sem 4</button>
+      </div>
+    </div>
+    <div class="big-bar" onclick="document.getElementById('aliya-opts').style.display = (document.getElementById('aliya-opts').style.display==='block')?'none':'block'">
+      Aliya
+      <div class="sem-buttons" id="aliya-opts" style="display:none">
+        <button class="btn btn-success sem-button" onclick="goTo('update-exam-wafy-aliya-sem1.html')">Sem 1</button>
+        <button class="btn btn-success sem-button" onclick="goTo('update-exam-wafy-aliya-sem2.html')">Sem 2</button>
+        <button class="btn btn-success sem-button" onclick="goTo('update-exam-wafy-aliya-sem3.html')">Sem 3</button>
+        <button class="btn btn-success sem-button" onclick="goTo('update-exam-wafy-aliya-sem4.html')">Sem 4</button>
+        <button class="btn btn-success sem-button" onclick="goTo('update-exam-wafy-aliya-sem5.html')">Sem 5</button>
+        <button class="btn btn-success sem-button" onclick="goTo('update-exam-wafy-aliya-sem6.html')">Sem 6</button>
+      </div>
+    </div>
+    <div class="mt-5">
+        <a href="update-exam-progress.html" class="btn btn-secondary btn-lg">Back</a>
+    </div>
+</div>
+    <script src="exam-access.js"></script>
+    <script src="exam-access-guard.js"></script>
+</body>
+</html>
+

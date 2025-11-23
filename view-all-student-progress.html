@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>View All Student Progress - الأبطال</title>
+    <link rel="stylesheet" href="sc.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" /></a>
+        <button class="navbar-toggler" style="width: 60px;" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="main.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="students-info.html">Students Info</a></li>
+                <li class="nav-item active"><a class="nav-link" href="students-progress.html">Students Progress</a></li>
+                <li class="nav-item"><a class="nav-link" href="council.html">Our Council</a></li>
+                <li class="nav-item"><a class="nav-link" href="follow-us.html">Follow us</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5" style="margin-top: 100px !important;">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="text-center mb-5" style="font-family: Almarai; color: #02244e;">All Students Progress</h1>
+            </div>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="row mb-4">
+            <div class="col-12 col-md-6">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Search by CIC No. or Name..." style="font-family: Almarai;">
+                </div>
+            </div>
+            <div class="col-12 col-md-6 text-right">
+                <button class="btn btn-primary" onclick="refreshStudents()" style="font-family: Almarai;">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Students Count -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-users"></i>
+                    <strong>Total Students:</strong> <span id="studentCount">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header Row -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card students-card">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-2 text-center">
+                                <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">SL No.</h5>
+                            </div>
+                            <div class="col-3 text-center">
+                                <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">CIC No.</h5>
+                            </div>
+                            <div class="col-5 text-center">
+                                <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">Name</h5>
+                            </div>
+                            <div class="col-2 text-center">
+                                <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">Action</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Students List -->
+        <div class="row" id="studentsList">
+            <div class="col-12 text-center text-muted">Loading...</div>
+        </div>
+
+        <!-- No Students Message -->
+        <div class="row" id="noStudentsMessage" style="display: none;">
+            <div class="col-12 text-center">
+                <div class="card students-card">
+                    <div class="card-body">
+                        <i class="fas fa-user-slash" style="font-size: 4rem; color: #6c757d; margin-bottom: 1rem;"></i>
+                        <h3 style="font-family: Almarai; color: #6c757d;">No Students Found</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <a href="students-progress.html" class="btn btn-secondary btn-lg" style="font-family: Almarai;">
+                    <i class="fas fa-arrow-left"></i> Back to Students Progress
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://ewpmkjqcjnhtxyfqgiba.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3cG1ranFjam5odHh5ZnFnaWJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzMTUyOTMsImV4cCI6MjA3Nzg5MTI5M30.i1ivEtua8fCktdit_DASxQigFg2Kb8NLn0WLLQ3LFmI';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let studentsCache = [];
+
+        async function fetchStudents() {
+            document.getElementById('studentsList').innerHTML = '<div class="col-12 text-center text-muted">Loading...</div>';
+            
+            const { data, error } = await supabase
+                .from('students')
+                .select('cic_no, full_name')
+                .order('cic_no');
+
+            if (error) {
+                document.getElementById('studentsList').innerHTML = '<div class="text-danger text-center">Error loading data</div>';
+                return;
+            }
+
+            studentsCache = data || [];
+            displayStudents(studentsCache);
+        }
+
+        function displayStudents(list) {
+            const container = document.getElementById('studentsList');
+            const noMsg = document.getElementById('noStudentsMessage');
+            document.getElementById('studentCount').textContent = list.length;
+
+            if (list.length === 0) {
+                container.innerHTML = '';
+                noMsg.style.display = 'block';
+                return;
+            }
+
+            noMsg.style.display = 'none';
+            container.innerHTML = '';
+
+            list.forEach((s, index) => {
+                container.innerHTML += `
+                <div class="col-12 mb-2">
+                    <div class="card students-card">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-2 text-center"><h5>${index + 1}</h5></div>
+                                <div class="col-3 text-center"><h5>${s.cic_no}</h5></div>
+                                <div class="col-5 text-center"><h5>${s.full_name}</h5></div>
+                                <div class="col-2 text-center">
+                                    <a href="view-student-progress.html?cicNo=${s.cic_no}" class="btn btn-info btn-sm" style="font-family: Almarai;">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+        }
+
+        function searchStudents() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = studentsCache.filter(s => 
+                s.cic_no.toLowerCase().includes(term) || 
+                s.full_name.toLowerCase().includes(term)
+            );
+            displayStudents(filtered);
+        }
+
+        window.refreshStudents = function() {
+            fetchStudents();
+            document.getElementById('searchInput').value = '';
+        };
+
+        document.getElementById('searchInput').addEventListener('input', searchStudents);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', fetchStudents);
+    </script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disable Bars for Students</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body { background: #f7f9fa; }
+        .main-card {
+            margin-top: 80px;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(2,36,78,0.10);
+            padding: 35px 28px;
+            max-width: 590px;
+        }
+        .section-bar {
+            background: #dde4f3;
+            border-radius: 14px;
+            font-size: 1.45rem;
+            font-weight: 700;
+            padding: 15px 15px 8px 18px;
+            margin: 33px 0 14px 0;
+            color: #02244e;
+            box-shadow: 0 2px 10px rgba(41,94,148,0.07);
+            letter-spacing: 1px;
+        }
+        .bar-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 0;
+            border-bottom: 1px solid #eaecf3;
+        }
+        .bar-row:last-child { border-bottom: none; }
+        .bar-label {
+            font-size: 1.15rem;
+            color: #16386a;
+            font-family: Almarai, Arial, sans-serif;
+            font-weight: 600;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 26px;
+        }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            border-radius: 26px;
+            transition: .4s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #02244e;
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container d-flex justify-content-center align-items-start" style="min-height: 100vh;">
+        <div class="main-card bg-white mt-5 shadow">
+            <h2 class="mb-4 text-center">Disable Bars for Students</h2>
+            <div id="barsList"></div>
+            <a href="chief-admin-main.html" class="btn btn-secondary btn-block mt-4">Back to Dashboard</a>
+        </div>
+    </div>
+    <script>
+        // Grouped bars structure as in main nav
+        const groupedBars = [
+            {
+                section: 'Main',
+                bars: [ { key: 'home', label: 'Home' } ]
+            },
+            {
+                section: 'Student',
+                bars: [
+                    { key: 'students-info', label: 'Students Info' },
+                    { key: 'students-progress', label: 'Students Progress' },
+                    { key: 'edit-exam-progress', label: 'Edit Exam Progress' }
+                ]
+            },
+            {
+                section: 'Others',
+                bars: [
+                    { key: 'our-council', label: 'Our Council' },
+                    { key: 'follow-us', label: 'Follow us' }
+                ]
+            }
+        ];
+
+        function getDisabledBars(){
+            const v = localStorage.getItem('disabledBars');
+            return v ? JSON.parse(v) : [];
+        }
+        function saveDisabledBars(l){
+            localStorage.setItem('disabledBars', JSON.stringify(l));
+        }
+        function renderBars(){
+            const disabled = getDisabledBars();
+            let html = '';
+            groupedBars.forEach(group => {
+                html += `<div class='section-bar'>${group.section}</div>\n`;
+                group.bars.forEach(bar => {
+                    const isDisabled = disabled.includes(bar.key);
+                    html += `<div class="bar-row">
+                        <span class="bar-label">${bar.label}</span>
+                        <label class="switch">
+                            <input type="checkbox" data-bar="${bar.key}" ${isDisabled ? '' : 'checked'}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>`;
+                });
+            });
+            document.getElementById('barsList').innerHTML = html;
+
+            document.querySelectorAll('.switch input').forEach(input => {
+                input.addEventListener('change', function() {
+                    const bar = this.getAttribute('data-bar');
+                    let disabled = getDisabledBars();
+                    if (this.checked) {
+                        // enable bar
+                        disabled = disabled.filter(k=>k!==bar);
+                    } else {
+                        // disable bar
+                        if(!disabled.includes(bar)) disabled.push(bar);
+                    }
+                    saveDisabledBars(disabled);
+                });
+            });
+        }
+        renderBars();
+    </script>
+</body>
+</html>
