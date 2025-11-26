@@ -7,6 +7,7 @@
     <title>Manage Student Progress - الأبطال</title>
     <link rel="stylesheet" href="sc.css" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
@@ -15,6 +16,7 @@
 </head>
 
 <body>
+    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
         <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" /></a>
         <button class="navbar-toggler" style="width: 60px;" type="button" data-toggle="collapse" data-target="#navbarNav">
@@ -33,6 +35,7 @@
 
     <div class="container mt-5" style="margin-top: 100px !important;">
         
+        <!-- Login Section -->
         <div id="loginSection">
             <div class="row justify-content-center">
                 <div class="col-12 col-md-6 col-lg-4">
@@ -78,6 +81,7 @@
             </div>
         </div>
 
+        <!-- Main Content (Only Visible to Officials) -->
         <div id="mainContent" style="display: none;">
             <div class="row">
                 <div class="col-12">
@@ -89,6 +93,7 @@
                 </div>
             </div>
 
+            <!-- Search and Refresh -->
             <div class="row mb-4">
                 <div class="col-12 col-md-8">
                     <input type="text" class="form-control" id="searchInput" placeholder="Search by CIC No. or Name..." style="font-family: Almarai;">
@@ -100,6 +105,7 @@
                 </div>
             </div>
 
+            <!-- Count -->
             <div class="row mb-3">
                 <div class="col-12">
                     <div class="alert alert-info">
@@ -108,6 +114,7 @@
                 </div>
             </div>
 
+            <!-- Header Row -->
             <div class="row mb-3">
                 <div class="col-12">
                     <div class="card students-card">
@@ -119,10 +126,10 @@
                                 <div class="col-3 text-center">
                                     <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">CIC No.</h5>
                                 </div>
-                                <div class="col-4 text-center">
+                                <div class="col-5 text-center">
                                     <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">Name</h5>
                                 </div>
-                                <div class="col-3 text-center">
+                                <div class="col-2 text-center">
                                     <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">Action</h5>
                                 </div>
                             </div>
@@ -131,10 +138,12 @@
                 </div>
             </div>
 
+            <!-- Students List -->
             <div class="row" id="studentsList">
                 <div class="col-12 text-center text-muted">Loading...</div>
             </div>
 
+            <!-- Back Button -->
             <div class="row mt-4">
                 <div class="col-12 text-center">
                     <a href="students-progress.html" class="btn btn-secondary btn-lg">Back to Students Progress</a>
@@ -142,10 +151,17 @@
             </div>
         </div>
     </div>
+
+    <!-- Quick Admin Access -->
+    <div class="rk-logo" id="rkLogo" title="Admin Panel">RK</div>
+
     <script>
         const supabaseUrl = 'https://ewpmkjqcjnhtxyfqgiba.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3cG1ranFjam5odHh5ZnFnaWJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzMTUyOTMsImV4cCI6MjA3Nzg5MTI5M30.i1ivEtua8fCktdit_DASxQigFg2Kb8NLn0WLLQ3LFmI';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // *** SECRET SUFFIX ***
+        const PASSWORD_SUFFIX = "_ALABTHAL";
 
         let studentsCache = [];
 
@@ -165,7 +181,12 @@
 
                 // B. Try as STUDENT first (Redirects Immediately)
                 const cleanName = username.replace(/\s+/g, '').toLowerCase();
-                let { data: stuData, error: stuError } = await supabase.auth.signInWithPassword({ email: cleanName + '@student.com', password });
+                
+                // Try login with SUFFIX
+                let { data: stuData, error: stuError } = await supabase.auth.signInWithPassword({ 
+                    email: cleanName + '@student.com', 
+                    password: password + PASSWORD_SUFFIX 
+                });
                 
                 if (!stuError) {
                     alert(`Welcome Student ${username}! Redirecting...`);
@@ -173,8 +194,11 @@
                     return;
                 }
 
-                // C. Try as OFFICIAL (Show Dashboard)
-                let { data: offData, error: offError } = await supabase.auth.signInWithPassword({ email: cleanName + '@official.com', password });
+                // C. Try as OFFICIAL (Show Dashboard) - NO Suffix for Officials
+                let { data: offData, error: offError } = await supabase.auth.signInWithPassword({ 
+                    email: cleanName + '@official.com', 
+                    password: password 
+                });
                 
                 if (!offError) {
                     const { data: official } = await supabase.from('officials').select('role').eq('id', offData.user.id).single();
@@ -199,7 +223,7 @@
             refreshStudents();
         }
 
-        // --- 2. ADMIN VIEW (Matches Screenshot 25 Layout) ---
+        // --- 2. ADMIN VIEW ---
         async function refreshStudents() {
             document.getElementById('studentsList').innerHTML = '<div class="col-12 text-center text-muted">Loading students...</div>';
             
@@ -231,27 +255,22 @@
                 html += `
                 <div class="col-12 mb-2">
                     <div class="card students-card">
-                        <div class="card-body">
+                        <div class="card-body py-2">
                             <div class="row align-items-center">
-                                
                                 <div class="col-2 text-center">
                                     <h5 style="font-family: Almarai; color: #02244e; margin:0;">${index + 1}</h5>
                                 </div>
-
                                 <div class="col-3 text-center">
                                     <h5 style="font-family: Almarai; color: #02244e; margin:0;">${s.cic_no}</h5>
                                 </div>
-
-                                <div class="col-4 text-center">
+                                <div class="col-5 text-center">
                                     <h5 style="font-family: Almarai; color: #02244e; margin:0;">${s.full_name}</h5>
                                 </div>
-
-                                <div class="col-3 text-center">
-                                    <button class="btn btn-warning btn-block" onclick="window.location.href='edit-student-progress.html?cicNo=${s.cic_no}'" style="font-weight:bold; font-family: Almarai;">
+                                <div class="col-2 text-center">
+                                    <button class="btn btn-warning btn-sm" onclick="window.location.href='edit-student-progress.html?cicNo=${s.cic_no}'" style="font-family: Almarai; min-width: 80px; padding: 4px 0;">
                                         <i class="fas fa-edit"></i> Edit
                                     </button>
                                 </div>
-
                             </div>
                         </div>
                     </div>
@@ -288,6 +307,10 @@
                 const role = localStorage.getItem('mgmtUserRole');
                 setupSession(user, role);
             }
+        });
+
+        document.getElementById('rkLogo').addEventListener('click', function() {
+            window.location.href = 'rk-login.html';
         });
     </script>
 </body>

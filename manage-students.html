@@ -80,7 +80,7 @@
                                 <div class="form-group">
                                     <label>Create Password</label>
                                     <input type="password" class="form-control" id="studentPassword" placeholder="Enter password" required>
-                                    <small class="form-text text-muted">Must be at least 4 characters</small>
+                                    <small class="form-text text-muted">Min 4 chars (System will secure it)</small>
                                 </div>
                                 <button type="submit" class="btn btn-success btn-lg btn-block">Add Student</button>
                             </form>
@@ -113,22 +113,21 @@
     </div>
 
     <script>
-        // 2. Initialize Supabase
         const supabaseUrl = 'https://ewpmkjqcjnhtxyfqgiba.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3cG1ranFjam5odHh5ZnFnaWJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzMTUyOTMsImV4cCI6MjA3Nzg5MTI5M30.i1ivEtua8fCktdit_DASxQigFg2Kb8NLn0WLLQ3LFmI';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+        // *** SECRET SUFFIX for 4-char passwords ***
+        // We append this to any student password to satisfy Supabase's 6-char limit.
+        // The student types "1234", we send "1234_ALABTHAL"
+        const PASSWORD_SUFFIX = "_ALABTHAL"; 
+
         let currentUser = null;
         let userRole = null;
 
-        // Helper: Get Correct Email for Login
         function getLoginEmail(username) {
             const cleanName = username.trim();
-            // Special case for Chief Admin
-            if (cleanName === 'Razeek Fariz') {
-                return 'razeekfariz1@gmail.com';
-            }
-            // Default pattern for other officials (e.g. Basheer Wafy -> basheerwafy@official.com)
+            if (cleanName === 'Razeek Fariz') return 'razeekfariz1@gmail.com';
             return cleanName.replace(/\s+/g, '').toLowerCase() + '@official.com';
         }
 
@@ -149,7 +148,6 @@
                 return;
             }
 
-            // Verify Role in Officials Table
             const { data: officialData, error: roleError } = await supabase
                 .from('officials')
                 .select('role')
@@ -162,15 +160,10 @@
                 return;
             }
 
-            // Success!
             currentUser = username;
             userRole = officialData.role;
-            
-            // Save session for other pages
             localStorage.setItem('mgmtUser', currentUser);
             localStorage.setItem('mgmtUserRole', userRole);
-
-            // Show UI
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('studentManagementSection').style.display = 'block';
             document.getElementById('loggedInUser').textContent = `${currentUser} (${userRole})`;
@@ -178,7 +171,6 @@
             alert(`Welcome ${currentUser}!`);
         });
 
-        // 4. LOGOUT HANDLER
         function logout() {
             currentUser = null;
             userRole = null;
@@ -194,34 +186,40 @@
             e.preventDefault();
             const cicNo = document.getElementById('cicNo').value.trim();
             const name = document.getElementById('studentName').value.trim();
-            const password = document.getElementById('studentPassword').value;
+            let password = document.getElementById('studentPassword').value;
 
+            // Check 4 chars
             if (password.length < 4) return alert('Password must be 4+ characters');
+
+            // *** APPLY SUFFIX ***
+            const finalPassword = password + PASSWORD_SUFFIX;
 
             const email = cicNo.toLowerCase() + '@student.com';
 
-            // Create Student Login
+            // 1. Check if exists via RPC
+            const { data: existingUsers, error: checkError } = await supabase.rpc('get_user_by_email', { email: email });
+
+            if (!checkError && existingUsers && existingUsers.length > 0) {
+                alert("Error: This CIC No. login already exists.");
+                return;
+            }
+
+            // 2. Create Student Login
             const { data, error } = await supabase.auth.signUp({
                 email: email,
-                password: password
+                password: finalPassword // Send padded password
             });
 
             if (error) {
-                 // DETECT ZOMBIE USER (Exists in Auth but not in Table)
                  if (error.message.includes("already registered") || error.message.includes("User already exists")) {
-                      alert(`Error: The Login for CIC No. ${cicNo} already exists in the system.\n\nSOLUTION:\n1. Go to Supabase Dashboard > Authentication.\n2. Find user '${email}'.\n3. Delete that user.\n4. Try adding again.`);
+                      alert(`Error: Login for ${cicNo} exists. Please delete the user from Auth dashboard.`);
                  } else {
                       alert("Error creating login: " + error.message);
                  }
                  return;
             }
             
-            if (!data.user) {
-                 alert("Error: User creation failed silently.");
-                 return;
-            }
-
-            // Create Student Profile
+            // 3. Create Profile
             const { error: dbError } = await supabase
                 .from('students')
                 .insert([{ id: data.user.id, cic_no: cicNo, full_name: name }]);
@@ -231,7 +229,7 @@
                  return;
             }
 
-            alert("Student Added Successfully!");
+            alert(`Student Added! (Password: ${password})`);
             this.reset();
         });
 
@@ -240,7 +238,7 @@
             e.preventDefault();
             const studentName = document.getElementById('removeStudentName').value.trim();
             
-            if (!confirm(`Remove ${studentName}? This only hides them from the list, it does not delete their login.`)) return;
+            if (!confirm(`Remove ${studentName}?`)) return;
 
             const { error } = await supabase
                 .from('students')
@@ -254,7 +252,6 @@
             }
         });
 
-        // 7. Check Session on Load
         document.addEventListener('DOMContentLoaded', function() {
             const savedUser = localStorage.getItem('mgmtUser');
             const savedRole = localStorage.getItem('mgmtUserRole');

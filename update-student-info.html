@@ -92,6 +92,23 @@
                 <div class="row mb-2">
                     <div class="col-12"><div class="alert alert-info">Total Students: <span id="studentCount">0</span></div></div>
                 </div>
+
+                <!-- Header Row for Alignment -->
+                <div class="row mb-2">
+                    <div class="col-12">
+                        <div class="card students-card">
+                            <div class="card-body py-2 px-3">
+                                <div class="row align-items-center font-weight-bold" style="color: #02244e;">
+                                    <div class="col-3 col-md-2 text-center">CIC No.</div>
+                                    <div class="col-6 col-md-8 text-left">Name</div>
+                                    <div class="col-3 col-md-2 text-center">Action</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- List Container -->
                 <div id="studentsList" class="row"></div>
             </div>
 
@@ -189,6 +206,9 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3cG1ranFjam5odHh5ZnFnaWJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzMTUyOTMsImV4cCI6MjA3Nzg5MTI5M30.i1ivEtua8fCktdit_DASxQigFg2Kb8NLn0WLLQ3LFmI';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+        // *** SECRET SUFFIX (Matches what you set in manage-students.html) ***
+        const PASSWORD_SUFFIX = "_ALABTHAL";
+
         let currentUser = null;
         let userRole = null;
         let currentStudentData = null;
@@ -235,17 +255,26 @@
         });
 
         async function performSmartLogin(username, password) {
+            // 1. Chief Admin (Uses normal 6+ char password)
             if (username === 'Razeek Fariz') {
                 const { data, error } = await supabase.auth.signInWithPassword({ email: 'razeekfariz1@gmail.com', password });
                 if (error) throw error;
                 return data.user;
             }
+
+            // 2. Try as STUDENT first (Use SUFFIX here!)
             const cleanName = username.replace(/\s+/g, '').toLowerCase();
-            let { data, error } = await supabase.auth.signInWithPassword({ email: cleanName + '@student.com', password });
+            
+            // Try with the padded password for students
+            let { data, error } = await supabase.auth.signInWithPassword({ 
+                email: cleanName + '@student.com', 
+                password: password + PASSWORD_SUFFIX 
+            });
             
             if (!error) return data.user;
 
-            ({ data, error } = await supabase.auth.signInWithPassword({ email: cleanName + '@official.com', password }));
+            // 3. If failed, try as OFFICIAL (Uses normal 6+ char password)
+            ({ data, error } = await supabase.auth.signInWithPassword({ email: cleanName + '@official.com', password: password }));
             
             if (error) throw new Error("Invalid username or password");
             return data.user;
@@ -312,14 +341,23 @@
                 html += `
                 <div class="col-12 mb-2">
                     <div class="card students-card">
-                        <div class="card-body py-2 pl-3 pr-3 d-flex justify-content-between align-items-center">
-                            <div style="font-family: Almarai; font-size: 1.1rem; display: flex; align-items: center; flex-grow: 1;">
-                                <span class="badge badge-primary mr-3" style="font-size: 0.95rem; min-width: 70px; text-align: center;">${s.cic_no}</span>
-                                <strong style="color: #02244e;">${s.full_name}</strong>
+                        <div class="card-body py-2 px-3">
+                            <div class="row align-items-center">
+                                <!-- Col 1: CIC Badge -->
+                                <div class="col-3 col-md-2 text-center">
+                                    <span class="badge badge-primary" style="font-size: 0.95rem; display:block; width:100%;">${s.cic_no}</span>
+                                </div>
+                                <!-- Col 2: Name -->
+                                <div class="col-6 col-md-8 text-left">
+                                    <strong style="color: #02244e; font-size: 1.1rem;">${s.full_name}</strong>
+                                </div>
+                                <!-- Col 3: Edit Button (Small) -->
+                                <div class="col-3 col-md-2 text-center">
+                                    <button class="btn btn-sm btn-warning" onclick="openEditModal('${s.cic_no}')" style="font-family: Almarai; width: 100%; font-size: 0.85rem; padding: 5px 0;">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                </div>
                             </div>
-                            <button class="btn btn-sm btn-warning" style="width: 150px;" onclick="openEditModal('${s.cic_no}')" style="font-family: Almarai; font-size: 0.85rem; padding: 4px 12px; min-width: 80px;">
-                                <i class="fas fa-edit mr-1"></i> Edit
-                            </button>
                         </div>
                     </div>
                 </div>`;
