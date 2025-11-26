@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Upload Results - الأبطال</title>
+    <link rel="stylesheet" href="sc.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Supabase & Excel Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <style>
+        .step-card {
+            border: 1px solid #e0e0e0;
+            border-left: 5px solid #02244e;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #fff;
+        }
+        .step-num {
+            background: #02244e; color: white; width: 30px; height: 30px;
+            border-radius: 50%; display: inline-block; text-align: center;
+            line-height: 30px; font-weight: bold; margin-right: 10px;
+        }
+        .log-area {
+            background: #1e1e1e; color: #0f0; font-family: monospace;
+            padding: 15px; border-radius: 5px; height: 200px; overflow-y: auto;
+            font-size: 0.9rem; display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" /></a>
+    </nav>
+
+    <div class="container" style="margin-top: 100px; max-width: 900px;">
+        <h2 class="text-center mb-4" style="color: #02244e; font-family: Almarai;">Bulk Upload Results</h2>
+
+        <!-- Step 1: Select Semester -->
+        <div class="step-card">
+            <h4><span class="step-num">1</span> Select Target Semester</h4>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Course Type</label>
+                        <select id="courseType" class="form-control" onchange="updateSemesterOptions()">
+                            <option value="">-- Select Course --</option>
+                            <option value="wafy">Wafy (Thamheediyya / Aliya)</option>
+                            <option value="degree">Degree</option>
+                            <option value="highersec">Higher Secondary</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Semester</label>
+                        <select id="semesterSelect" class="form-control" disabled>
+                            <option value="">-- Select Course First --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Download Template -->
+        <div class="step-card">
+            <h4><span class="step-num">2</span> Prepare Data</h4>
+            <p class="text-muted">Download the correct Excel template for the selected semester. <br><strong>Important:</strong> Do not change the column headers.</p>
+            <button class="btn btn-info" onclick="downloadTemplate()">
+                <i class="fas fa-download"></i> Download Excel Template
+            </button>
+        </div>
+
+        <!-- Step 3: Upload -->
+        <div class="step-card">
+            <h4><span class="step-num">3</span> Upload & Process</h4>
+            <div class="custom-file mb-3">
+                <input type="file" class="custom-file-input" id="excelFile" accept=".xlsx, .xls" onchange="updateFileName()">
+                <label class="custom-file-label" for="excelFile" id="fileLabel">Choose Excel file...</label>
+            </div>
+            <button class="btn btn-success btn-block btn-lg" onclick="processBulkUpload()">
+                <i class="fas fa-cloud-upload-alt"></i> Start Bulk Upload
+            </button>
+        </div>
+
+        <!-- Log Output -->
+        <div class="log-area" id="consoleLog"></div>
+        
+        <div class="text-center mt-4 mb-5">
+            <a href="update-exam-progress.html" class="btn btn-secondary">Back to Exam Menu</a>
+        </div>
+    </div>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script>
+        // --- CONFIGURATION ---
+        const CONFIG = {
+            wafy: {
+                columns: ["CIC No", "Subject", "CE Mark", "CE Max", "TE Mark", "TE Max", "Total", "Max", "Status", "Exam Mode"],
+                keys:    ["cic_no", "subject", "ce_mark", "ce_max", "te_mark", "te_max", "total", "max", "status", "exam_mode"],
+                sems: [
+                    {k: 'wafy_thamheediyya_sem1', v: 'Thamheediyya Sem 1'}, {k: 'wafy_thamheediyya_sem2', v: 'Thamheediyya Sem 2'},
+                    {k: 'wafy_thamheediyya_sem3', v: 'Thamheediyya Sem 3'}, {k: 'wafy_thamheediyya_sem4', v: 'Thamheediyya Sem 4'},
+                    {k: 'wafy_aliya_sem1', v: 'Aliya Sem 1'}, {k: 'wafy_aliya_sem2', v: 'Aliya Sem 2'},
+                    {k: 'wafy_aliya_sem3', v: 'Aliya Sem 3'}, {k: 'wafy_aliya_sem4', v: 'Aliya Sem 4'},
+                    {k: 'wafy_aliya_sem5', v: 'Aliya Sem 5'}, {k: 'wafy_aliya_sem6', v: 'Aliya Sem 6'},
+                    {k: 'wafy_aliya_sem7', v: 'Aliya Sem 7'}, {k: 'wafy_aliya_sem8', v: 'Aliya Sem 8'}
+                ]
+            },
+            degree: {
+                columns: ["CIC No", "Subject", "Credits", "Grade", "Credit Point", "Status"],
+                keys:    ["cic_no", "subject", "credits", "grade", "credit_point", "status"],
+                sems: [
+                    {k: 'degree_sem1', v: 'Degree Sem 1'}, {k: 'degree_sem2', v: 'Degree Sem 2'},
+                    {k: 'degree_sem3', v: 'Degree Sem 3'}, {k: 'degree_sem4', v: 'Degree Sem 4'},
+                    {k: 'degree_sem5', v: 'Degree Sem 5'}, {k: 'degree_sem6', v: 'Degree Sem 6'}
+                ]
+            },
+            highersec: {
+                columns: ["CIC No", "Subject", "CE Mark", "CE Max", "TE Mark", "TE Max", "Total", "Max"],
+                keys:    ["cic_no", "subject", "ce_mark", "ce_max", "te_mark", "te_max", "total", "max"],
+                sems: [
+                    {k: 'highersec_plus1', v: 'Plus One'}, {k: 'highersec_plus2', v: 'Plus Two'}
+                ]
+            }
+        };
+
+        // --- SUPABASE ---
+        const supabaseUrl = 'https://ewpmkjqcjnhtxyfqgiba.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3cG1ranFjam5odHh5ZnFnaWJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzMTUyOTMsImV4cCI6MjA3Nzg5MTI5M30.i1ivEtua8fCktdit_DASxQigFg2Kb8NLn0WLLQ3LFmI';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // --- UI FUNCTIONS ---
+        function updateSemesterOptions() {
+            const type = document.getElementById('courseType').value;
+            const semSelect = document.getElementById('semesterSelect');
+            semSelect.innerHTML = '<option value="">-- Select Semester --</option>';
+            
+            if (type && CONFIG[type]) {
+                CONFIG[type].sems.forEach(sem => {
+                    semSelect.innerHTML += `<option value="${sem.k}">${sem.v}</option>`;
+                });
+                semSelect.disabled = false;
+            } else {
+                semSelect.disabled = true;
+            }
+        }
+
+        function updateFileName() {
+            const input = document.getElementById('excelFile');
+            const label = document.getElementById('fileLabel');
+            label.textContent = input.files[0] ? input.files[0].name : 'Choose Excel file...';
+        }
+
+        function log(msg, type="info") {
+            const box = document.getElementById('consoleLog');
+            box.style.display = 'block';
+            const color = type === 'error' ? 'red' : (type === 'success' ? '#00ff00' : '#ccc');
+            box.innerHTML += `<div style="color:${color}">> ${msg}</div>`;
+            box.scrollTop = box.scrollHeight;
+        }
+
+        // --- TEMPLATE DOWNLOAD ---
+        function downloadTemplate() {
+            const type = document.getElementById('courseType').value;
+            if (!type) return alert("Please select a Course Type first.");
+
+            const headers = CONFIG[type].columns;
+            // Create a dummy workbook
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet([headers, ["W001 (Sample)", "Fiqh (Sample)", "20", "20", "80", "80", "100", "100", "Passed", "R"]]);
+            XLSX.utils.book_append_sheet(wb, ws, "Template");
+            XLSX.writeFile(wb, `${type}_bulk_upload_template.xlsx`);
+        }
+
+        // --- PROCESSING LOGIC ---
+        async function processBulkUpload() {
+            const type = document.getElementById('courseType').value;
+            const semesterKey = document.getElementById('semesterSelect').value;
+            const fileInput = document.getElementById('excelFile');
+
+            if (!type || !semesterKey) return alert("Please select Course and Semester.");
+            if (!fileInput.files.length) return alert("Please upload a file.");
+
+            document.getElementById('consoleLog').innerHTML = ''; // Clear logs
+            log("Starting process...");
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rawData = XLSX.utils.sheet_to_json(sheet);
+
+                    if (rawData.length === 0) return log("Error: File is empty.", "error");
+
+                    log(`Read ${rawData.length} rows. Grouping by CIC No...`);
+
+                    // 1. Group Data by CIC No
+                    const groupedData = {};
+                    let processedCount = 0;
+
+                    rawData.forEach(row => {
+                        // Normalize keys (remove spaces, lowercase)
+                        const cleanRow = {};
+                        let cic = "";
+                        
+                        // Map Excel headers to our internal keys
+                        // We look for headers like "CIC No", "Subject", etc.
+                        Object.keys(row).forEach(key => {
+                            const val = String(row[key]).trim();
+                            const lowerKey = key.toLowerCase().replace(/[\s_.]/g, ''); // cicno, cemark
+                            
+                            // Find matching config key
+                            // Example: config col "CE Mark" -> key "ce_mark"
+                            // We map based on index or smart guess? Smart guess is better.
+                            if (lowerKey.includes('cic')) cic = val;
+                            
+                            // Map data fields
+                            const configCols = CONFIG[type].columns;
+                            const configKeys = CONFIG[type].keys;
+                            
+                            const colIndex = configCols.findIndex(c => c.toLowerCase().replace(/[\s_.]/g, '') === lowerKey);
+                            if (colIndex > -1) {
+                                cleanRow[configKeys[colIndex]] = val;
+                            }
+                        });
+
+                        if (cic) {
+                            if (!groupedData[cic]) groupedData[cic] = [];
+                            // Don't save CIC inside the JSON array (redundant), but save everything else
+                            delete cleanRow.cic_no; 
+                            groupedData[cic].push(cleanRow);
+                        }
+                    });
+
+                    const cicList = Object.keys(groupedData);
+                    log(`Found ${cicList.length} unique students.`);
+
+                    // 2. Fetch ALL Student UUIDs (One big query is faster than 100 small ones)
+                    log("Fetching student IDs from database...");
+                    const { data: studentsDB, error: stuError } = await supabase
+                        .from('students')
+                        .select('id, cic_no')
+                        .in('cic_no', cicList);
+
+                    if (stuError) throw stuError;
+
+                    // Create a Map: CIC -> UUID
+                    const studentMap = {};
+                    studentsDB.forEach(s => studentMap[s.cic_no] = s.id);
+
+                    // 3. Prepare Bulk Insert Data
+                    const upsertPayload = [];
+                    const missingStudents = [];
+
+                    for (const cic of cicList) {
+                        const uuid = studentMap[cic];
+                        if (uuid) {
+                            upsertPayload.push({
+                                student_id: uuid,
+                                semester_key: semesterKey,
+                                results_data: groupedData[cic]
+                            });
+                        } else {
+                            missingStudents.push(cic);
+                        }
+                    }
+
+                    if (missingStudents.length > 0) {
+                        log(`Warning: ${missingStudents.length} CIC Nos not found in DB (Skipped): ${missingStudents.join(', ')}`, "error");
+                    }
+
+                    // 4. Upload to Supabase
+                    if (upsertPayload.length > 0) {
+                        log(`Uploading ${upsertPayload.length} student records...`);
+                        
+                        // We process in chunks of 50 to be safe
+                        const chunkSize = 50;
+                        for (let i = 0; i < upsertPayload.length; i += chunkSize) {
+                            const chunk = upsertPayload.slice(i, i + chunkSize);
+                            
+                            // First DELETE existing (to ensure clean slate)
+                            const studentIds = chunk.map(x => x.student_id);
+                            await supabase.from('semester_results')
+                                .delete()
+                                .eq('semester_key', semesterKey)
+                                .in('student_id', studentIds);
+
+                            // Then INSERT
+                            const { error: insertError } = await supabase
+                                .from('semester_results')
+                                .insert(chunk);
+
+                            if (insertError) {
+                                log(`Error uploading chunk ${i}: ${insertError.message}`, "error");
+                            } else {
+                                log(`Processed students ${i+1} to ${i + chunk.length} - OK`, "success");
+                            }
+                        }
+                        log("Bulk Upload Complete!", "success");
+                        alert("Upload Complete!");
+                    } else {
+                        log("No valid data to upload.", "error");
+                    }
+
+                } catch (err) {
+                    log("Critical Error: " + err.message, "error");
+                    console.error(err);
+                }
+            };
+            reader.readAsArrayBuffer(fileInput.files[0]);
+        }
+    </script>
+</body>
+</html>

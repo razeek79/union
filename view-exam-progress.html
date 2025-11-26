@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Exam Progress</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { background: #f9f9f9; font-family: Almarai, Arial, sans-serif; }
+        h1, h2, h3 { color: #02244e; }
+        .section-bar {
+            background: #dde4f3; border-radius: 14px; font-size: 1.5rem; font-weight: 700;
+            padding: 20px; margin: 30px 0 20px 0; text-align: center; color: #02244e;
+            box-shadow: 0 3px 12px rgba(41,94,148,0.11); cursor: pointer; transition: transform 0.2s;
+        }
+        .section-bar:hover { transform: scale(1.02); }
+        .group-bar {
+            background: #f1f5fb; border-radius: 9px; font-size: 1.2rem; font-weight: 600;
+            padding: 15px; margin: 15px 0; color: #1d3d6d; cursor: pointer;
+        }
+        .option-btn { margin: 5px; min-width: 120px; }
+        .result-card {
+            background: #fff; border-radius: 12px; padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: 20px;
+        }
+        .back-nav { margin: 20px 0; font-size: 1rem; }
+        
+        /* Custom Styles for Marks */
+        .mark-low { color: #dc3545; font-weight: bold; } /* Red for low marks */
+        .percentage-col { font-weight: bold; color: #02244e; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" style="height:40px;" /></a>
+</nav>
+
+<div class="container" style="margin-top: 100px; max-width: 1100px;">
+    <h1 class="text-center mb-4">View Exam Progress</h1>
+    <h4 id="studentNameTitle" class="text-center mb-5 text-muted">Loading...</h4>
+    
+    <div id="navContainer"></div>
+    <div id="resultsContainer"></div>
+    
+    <div class="mt-5 text-center">
+        <a href="javascript:history.back()" class="btn btn-secondary btn-lg">Back</a>
+    </div>
+</div>
+
+<script>
+    const supabaseUrl = 'https://ewpmkjqcjnhtxyfqgiba.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3cG1ranFjam5odHh5ZnFnaWJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzMTUyOTMsImV4cCI6MjA3Nzg5MTI5M30.i1ivEtua8fCktdit_DASxQigFg2Kb8NLn0WLLQ3LFmI';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    let currentStudentId = null;
+    let currentCicNo = null;
+
+    // 1. Navigation Structure
+    const resultSections = [
+        {
+            section: 'Wafy Results',
+            groups: [
+                {
+                    group: 'Thamheediyya',
+                    keys: [
+                        { key: 'wafy_thamheediyya_sem1', label: 'Sem 1' },
+                        { key: 'wafy_thamheediyya_sem2', label: 'Sem 2' },
+                        { key: 'wafy_thamheediyya_sem3', label: 'Sem 3' },
+                        { key: 'wafy_thamheediyya_sem4', label: 'Sem 4' },
+                    ]
+                },
+                {
+                    group: 'Aliya',
+                    keys: [
+                        { key: 'wafy_aliya_sem1', label: 'Sem 1' },
+                        { key: 'wafy_aliya_sem2', label: 'Sem 2' },
+                        { key: 'wafy_aliya_sem3', label: 'Sem 3' },
+                        { key: 'wafy_aliya_sem4', label: 'Sem 4' },
+                        { key: 'wafy_aliya_sem5', label: 'Sem 5' },
+                        { key: 'wafy_aliya_sem6', label: 'Sem 6' },
+                        { key: 'wafy_aliya_sem7', label: 'Sem 7' },
+                        { key: 'wafy_aliya_sem8', label: 'Sem 8' }
+                    ]
+                }
+            ]
+        },
+        {
+            section: 'Higher Secondary & UG Results',
+            groups: [
+                {
+                    group: 'Higher Secondary',
+                    keys: [
+                        { key: 'highersec_plus1', label: 'Plus One' },
+                        { key: 'highersec_plus2', label: 'Plus Two' }
+                    ]
+                },
+                {
+                    group: 'Degree',
+                    keys: [
+                        { key: 'degree_sem1', label: 'Sem 1' },
+                        { key: 'degree_sem2', label: 'Sem 2' },
+                        { key: 'degree_sem3', label: 'Sem 3' },
+                        { key: 'degree_sem4', label: 'Sem 4' },
+                        { key: 'degree_sem5', label: 'Sem 5' },
+                        { key: 'degree_sem6', label: 'Sem 6' }
+                    ]
+                }
+            ]
+        }
+    ];
+
+    // 2. STRICT COLUMN DEFINITIONS (This fixes the disorder)
+    const COLUMN_CONFIGS = {
+        wafy: [
+            { key: 'subject', label: 'Subject' },
+            { key: 'ce_mark', label: 'CE Mark' },
+            { key: 'ce_max', label: 'CE Max' },
+            { key: 'te_mark', label: 'TE Mark' },
+            { key: 'te_max', label: 'TE Max' },
+            { key: 'total', label: 'Total' },
+            { key: 'max', label: 'Max' },
+            { key: 'status', label: 'Status' },
+            { key: 'exam_mode', label: 'Exam Mode' },
+            { key: 'percentage', label: 'Percentage' } // Custom Calculated Column
+        ],
+        degree: [
+            { key: 'subject', label: 'Subject' },
+            { key: 'credits', label: 'Credits' },
+            { key: 'grade', label: 'Grade' },
+            { key: 'credit_point', label: 'Credit Point' },
+            { key: 'status', label: 'Status' }
+        ],
+        highersec: [
+            { key: 'subject', label: 'Subject' },
+            { key: 'ce_mark', label: 'CE Mark' },
+            { key: 'ce_max', label: 'CE Max' },
+            { key: 'te_mark', label: 'TE Mark' },
+            { key: 'te_max', label: 'TE Max' },
+            { key: 'total', label: 'Total' },
+            { key: 'max', label: 'Max' }
+        ]
+    };
+
+    // 3. Initialize
+    async function init() {
+        const params = new URLSearchParams(window.location.search);
+        currentCicNo = params.get('cicNo');
+
+        if (!currentCicNo) {
+            alert("Missing Student ID");
+            return;
+        }
+
+        const { data: student, error } = await supabase
+            .from('students')
+            .select('id, full_name, cic_no')
+            .eq('cic_no', currentCicNo)
+            .single();
+
+        if (error || !student) {
+            document.getElementById('studentNameTitle').innerText = "Student Not Found";
+            return;
+        }
+
+        currentStudentId = student.id;
+        document.getElementById('studentNameTitle').innerText = `Results for ${student.full_name} (${student.cic_no})`;
+        
+        renderMainSections();
+    }
+
+    // 4. Navigation UI
+    function renderMainSections() {
+        const nav = document.getElementById('navContainer');
+        document.getElementById('resultsContainer').innerHTML = '';
+        nav.innerHTML = '';
+
+        resultSections.forEach((section, idx) => {
+            const btn = document.createElement('div');
+            btn.className = 'section-bar';
+            btn.textContent = section.section;
+            btn.onclick = () => renderGroups(idx);
+            nav.appendChild(btn);
+        });
+    }
+
+    function renderGroups(secIdx) {
+        const nav = document.getElementById('navContainer');
+        nav.innerHTML = `<div class='back-nav'><a href='#' onclick='renderMainSections();return false;'>&larr; Back to Main Sections</a></div>`;
+        
+        const section = resultSections[secIdx];
+        
+        section.groups.forEach((group, grpIdx) => {
+            const groupDiv = document.createElement('div');
+            groupDiv.innerHTML = `<div class='group-bar'>${group.group}</div>`;
+            
+            const btnContainer = document.createElement('div');
+            btnContainer.className = 'text-center mb-4';
+            
+            group.keys.forEach(sem => {
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-outline-primary option-btn';
+                btn.textContent = sem.label;
+                btn.onclick = () => loadResults(sem.key, sem.label);
+                btnContainer.appendChild(btn);
+            });
+            
+            nav.appendChild(groupDiv);
+            nav.appendChild(btnContainer);
+        });
+    }
+
+    // 5. Load & Render Data
+    async function loadResults(semKey, semLabel) {
+        const container = document.getElementById('resultsContainer');
+        container.innerHTML = '<div class="text-center my-5"><div class="spinner-border text-primary"></div><p>Loading results...</p></div>';
+
+        const { data, error } = await supabase
+            .from('semester_results')
+            .select('results_data')
+            .match({ student_id: currentStudentId, semester_key: semKey })
+            .single();
+
+        container.innerHTML = '';
+
+        if (error || !data || !data.results_data || data.results_data.length === 0) {
+            container.innerHTML = `<div class="alert alert-warning text-center">No results found for ${semLabel}.</div>`;
+            return;
+        }
+
+        // Determine which column config to use based on the semester key string
+        let config = [];
+        let isWafy = false;
+        
+        if (semKey.startsWith('wafy')) {
+            config = COLUMN_CONFIGS.wafy;
+            isWafy = true;
+        } else if (semKey.startsWith('degree')) {
+            config = COLUMN_CONFIGS.degree;
+        } else {
+            config = COLUMN_CONFIGS.highersec;
+        }
+
+        const results = data.results_data;
+        
+        // Build Table HTML
+        let tableHtml = `
+            <div class="result-card">
+                <h4 class="text-center border-bottom pb-3 mb-3">${semLabel} Results</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover text-center">
+                        <thead class="thead-light">
+                            <tr>${config.map(col => `<th>${col.label}</th>`).join('')}</tr>
+                        </thead>
+                        <tbody>
+        `;
+
+        results.forEach(row => {
+            let rowHtml = '<tr>';
+            let percentage = 0;
+            let isFail = false;
+
+            // Helper to find data regardless of case (e.g., 'Total' vs 'total')
+            const getVal = (k) => row[k] || row[k.toLowerCase()] || row[k.replace(/_/g, ' ')] || '';
+
+            // Special Wafy Logic (Percentage & Fail Check)
+            if (isWafy) {
+                const total = parseFloat(getVal('total'));
+                const max = parseFloat(getVal('max') || getVal('max_mark'));
+
+                if (!isNaN(total) && !isNaN(max) && max > 0) {
+                    percentage = (total / max) * 100;
+                }
+
+                // If percentage < 45%, mark as fail
+                if (percentage < 45) isFail = true;
+            }
+
+            // Render Cells Strictly according to Config
+            config.forEach(col => {
+                if (col.key === 'percentage') {
+                    // Render Percentage Column (Wafy only)
+                    const pText = percentage > 0 ? percentage.toFixed(1) + '%' : '-';
+                    rowHtml += `<td class="percentage-col ${isFail ? 'mark-low' : ''}">${pText}</td>`;
+                } else {
+                    // Render Normal Data
+                    let val = getVal(col.key);
+                    
+                    // Highlight Total marks if failed (Wafy only)
+                    if (isWafy && col.key === 'total' && isFail) {
+                        rowHtml += `<td class="mark-low">${val}</td>`;
+                    } else {
+                        rowHtml += `<td>${val}</td>`;
+                    }
+                }
+            });
+            
+            rowHtml += '</tr>';
+            tableHtml += rowHtml;
+        });
+
+        tableHtml += `</tbody></table></div></div>`;
+        container.innerHTML = tableHtml;
+        container.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Disable Bars - Chief Admin</title>
+    <link rel="stylesheet" href="sc.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Toggle Switch CSS -->
+    <style>
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .disabled-row {
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" /></a>
+    </nav>
+
+    <div class="container" style="margin-top: 100px;">
+        <h2 class="text-center mb-4" style="color: #02244e;">Manage Student Access</h2>
+        <div class="alert alert-info text-center">
+            Toggle switches <strong>OFF</strong> to hide/disable features for students. <br>
+            (Admins/Officials will still see them).
+        </div>
+
+        <div class="card students-card">
+            <div class="card-body">
+                <div id="settingsList" class="list-group list-group-flush">
+                    <div class="text-center py-5"><div class="spinner-border text-primary"></div> Loading settings...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="chief-admin-main.html" class="btn btn-secondary btn-lg">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        // 1. Initialize Supabase
+        const supabaseUrl = 'https://ewpmkjqcjnhtxyfqgiba.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3cG1ranFjam5odHh5ZnFnaWJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzMTUyOTMsImV4cCI6MjA3Nzg5MTI5M30.i1ivEtua8fCktdit_DASxQigFg2Kb8NLn0WLLQ3LFmI';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // 2. Security Check (Chief Admin Only)
+        const role = localStorage.getItem('mgmtUserRole');
+        if (role !== 'chief_admin') {
+            alert('Access Restricted: Chief Admin Only');
+            window.location.href = 'rk-login.html';
+        }
+
+        // 3. Load Settings
+        async function loadSettings() {
+            const { data, error } = await supabase
+                .from('app_settings')
+                .select('*')
+                .order('id'); // Keep consistent order
+
+            if (error) {
+                alert("Error loading settings: " + error.message);
+                return;
+            }
+
+            renderSettings(data);
+        }
+
+        // 4. Render Toggle List
+        function renderSettings(settings) {
+            const container = document.getElementById('settingsList');
+            container.innerHTML = '';
+
+            settings.forEach(setting => {
+                const isChecked = setting.value ? 'checked' : '';
+                const statusText = setting.value ? 'Enabled' : 'Disabled';
+                const statusColor = setting.value ? 'text-success' : 'text-danger';
+
+                const item = document.createElement('div');
+                item.className = 'list-group-item d-flex justify-content-between align-items-center py-3';
+                item.innerHTML = `
+                    <div>
+                        <h5 class="mb-1" style="color: #02244e;">${setting.label}</h5>
+                        <small class="${statusColor} font-weight-bold" id="status-${setting.key}">${statusText}</small>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" ${isChecked} onchange="toggleSetting('${setting.key}', this)">
+                        <span class="slider"></span>
+                    </label>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // 5. Toggle Logic
+        async function toggleSetting(key, checkbox) {
+            const newValue = checkbox.checked;
+            const statusLabel = document.getElementById(`status-${key}`);
+            
+            // Update UI immediately for responsiveness
+            statusLabel.textContent = newValue ? 'Enabled' : 'Disabled';
+            statusLabel.className = newValue ? 'text-success font-weight-bold' : 'text-danger font-weight-bold';
+
+            // Update Database
+            const { error } = await supabase
+                .from('app_settings')
+                .update({ value: newValue })
+                .eq('key', key);
+
+            if (error) {
+                alert("Failed to save setting: " + error.message);
+                checkbox.checked = !newValue; // Revert UI
+            }
+        }
+
+        loadSettings();
+    </script>
+</body>
+</html>

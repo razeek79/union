@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Update Student Info - الأبطال</title>
+    <link rel="stylesheet" href="sc.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" /></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="main.html">Home</a></li>
+                <li class="nav-item active"><a class="nav-link" href="students-info.html">Students Info</a></li>
+                <li class="nav-item"><a class="nav-link" href="students-progress.html">Students Progress</a></li>
+                <li class="nav-item"><a class="nav-link" href="council.html">Our Council</a></li>
+                <li class="nav-item"><a class="nav-link" href="follow-us.html">Follow us</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5" style="margin-top: 100px !important;">
+        <!-- Login Section -->
+        <div id="loginSection">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card students-card">
+                        <div class="card-body">
+                            <div class="text-center mb-4">
+                                <h3 class="card-title" style="color: #02244e;">Update Info Login</h3>
+                                <p class="text-muted">Students: Enter CIC No.<br>Officials: Enter Username</p>
+                            </div>
+                            <form id="loginForm">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="username" placeholder="Username / CIC No." required>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="password" placeholder="Password" required>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password')">
+                                                <i class="fas fa-eye" id="password-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block">Login</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <a href="students-info.html" class="btn btn-secondary">Back</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Management Interface -->
+        <div id="studentManagementSection" style="display: none;">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="text-center mb-4" style="color: #02244e;">Student Information</h2>
+                    <div class="text-center mb-4">
+                        <span class="badge badge-success p-2" id="loggedInUser"></span>
+                        <button class="btn btn-sm btn-outline-danger ml-2" onclick="logout()">Logout</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADMIN VIEW: List of All Students -->
+            <div id="adminTools" style="display: none;">
+                <div class="row mb-3">
+                    <div class="col-md-8"><input type="text" id="searchInput" class="form-control" placeholder="Search students..."></div>
+                    <div class="col-md-4"><button class="btn btn-primary btn-block" onclick="refreshStudents()">Refresh List</button></div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-12"><div class="alert alert-info">Total Students: <span id="studentCount">0</span></div></div>
+                </div>
+                <div id="studentsList" class="row"></div>
+            </div>
+
+            <!-- STUDENT VIEW: Own Details Form -->
+            <div id="studentOwnDetails" style="display: none;">
+                <div class="card students-card">
+                    <div class="card-body">
+                        <h4 class="text-center mb-4">Your Profile</h4>
+                        <form id="studentDetailsForm">
+                            <div class="row">
+                                <div class="col-md-6 form-group"><label>CIC No.</label><input type="text" id="studentCicNo" class="form-control" readonly></div>
+                                <div class="col-md-6 form-group"><label>Name</label><input type="text" id="studentName" class="form-control" required></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 form-group"><label>Admission No.</label><input type="text" id="admissionNo" class="form-control"></div>
+                                <div class="col-md-6 form-group"><label>Date of Birth</label><input type="date" id="dob" class="form-control"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 form-group"><label>Email ID</label><input type="email" id="emailId" class="form-control" placeholder="example@email.com"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 form-group"><label>Name of Guardian</label><input type="text" id="guardianName" class="form-control"></div>
+                                <div class="col-md-6 form-group"><label>Occupation</label><input type="text" id="occupation" class="form-control"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 form-group"><label>Phone No.</label><input type="text" id="phoneNo" class="form-control"></div>
+                                <div class="col-md-6 form-group"><label>Address</label><textarea id="address" class="form-control" rows="1"></textarea></div>
+                            </div>
+                            
+                            <!-- LEAVES SECTION -->
+                            <hr>
+                            <h5 class="text-muted mb-3">Leave Record</h5>
+                            <div class="row">
+                                <div class="col-md-6 form-group"><label>Total Leaves</label><input type="number" id="totalLeaves" class="form-control"></div>
+                                <div class="col-md-6 form-group"><label>Medical Leaves</label><input type="number" id="medicalLeaves" class="form-control"></div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-block mt-3">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal (For Admins) -->
+    <div class="modal fade" id="editStudentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Student</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="editStudentForm">
+                        <div class="row">
+                            <div class="col-md-6 form-group"><label>CIC No.</label><input type="text" id="editCicNo" class="form-control" readonly></div>
+                            <div class="col-md-6 form-group"><label>Name</label><input type="text" id="editName" class="form-control" required></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 form-group"><label>Admission No.</label><input type="text" id="editAdmissionNo" class="form-control"></div>
+                            <div class="col-md-6 form-group"><label>Date of Birth</label><input type="date" id="editDob" class="form-control"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 form-group"><label>Email ID</label><input type="email" id="editEmailId" class="form-control"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 form-group"><label>Name of Guardian</label><input type="text" id="editGuardianName" class="form-control"></div>
+                            <div class="col-md-6 form-group"><label>Occupation</label><input type="text" id="editOccupation" class="form-control"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 form-group"><label>Phone No.</label><input type="text" id="editPhoneNo" class="form-control"></div>
+                            <div class="col-md-6 form-group"><label>Address</label><textarea id="editAddress" class="form-control" rows="1"></textarea></div>
+                        </div>
+
+                        <!-- LEAVES SECTION (Admin Modal) -->
+                        <hr>
+                        <h5 class="text-muted mb-3">Leave Record</h5>
+                        <div class="row">
+                            <div class="col-md-6 form-group"><label>Total Leaves</label><input type="number" id="editTotalLeaves" class="form-control"></div>
+                            <div class="col-md-6 form-group"><label>Medical Leaves</label><input type="number" id="editMedicalLeaves" class="form-control"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveStudentDetails()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://ewpmkjqcjnhtxyfqgiba.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3cG1ranFjam5odHh5ZnFnaWJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzMTUyOTMsImV4cCI6MjA3Nzg5MTI5M30.i1ivEtua8fCktdit_DASxQigFg2Kb8NLn0WLLQ3LFmI';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+        let userRole = null;
+        let currentStudentData = null;
+        let studentsCache = [];
+        let editingCicNo = null;
+
+        // --- HELPER: UPDATE LEAVES ---
+        async function updateLeaves(studentId, total, medical) {
+            const { data: existing } = await supabase.from('student_leaves').select('id').eq('student_id', studentId).single();
+            
+            if (existing) {
+                await supabase.from('student_leaves').update({ 
+                    total_leaves: total || 0, 
+                    medical_leaves: medical || 0 
+                }).eq('id', existing.id);
+            } else {
+                await supabase.from('student_leaves').insert([{ 
+                    student_id: studentId, 
+                    total_leaves: total || 0, 
+                    medical_leaves: medical || 0 
+                }]);
+            }
+        }
+
+        // --- HELPER: FETCH LEAVES ---
+        async function fetchLeaves(studentId) {
+            const { data, error } = await supabase.from('student_leaves').select('*').eq('student_id', studentId).single();
+            if (error || !data) return { total_leaves: 0, medical_leaves: 0 };
+            return data;
+        }
+
+        // --- SMART LOGIN SYSTEM ---
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            try {
+                const user = await performSmartLogin(username, password);
+                await determineUserRole(user, username);
+            } catch (error) {
+                alert("Login Failed: " + error.message);
+            }
+        });
+
+        async function performSmartLogin(username, password) {
+            if (username === 'Razeek Fariz') {
+                const { data, error } = await supabase.auth.signInWithPassword({ email: 'razeekfariz1@gmail.com', password });
+                if (error) throw error;
+                return data.user;
+            }
+            const cleanName = username.replace(/\s+/g, '').toLowerCase();
+            let { data, error } = await supabase.auth.signInWithPassword({ email: cleanName + '@student.com', password });
+            
+            if (!error) return data.user;
+
+            ({ data, error } = await supabase.auth.signInWithPassword({ email: cleanName + '@official.com', password }));
+            
+            if (error) throw new Error("Invalid username or password");
+            return data.user;
+        }
+
+        async function determineUserRole(user, displayUsername) {
+            const userId = user.id;
+
+            const { data: official } = await supabase.from('officials').select('*').eq('id', userId).single();
+            if (official) {
+                setupSession(official.username, official.role, false, null);
+                return;
+            }
+
+            const { data: student } = await supabase.from('students').select('*').eq('id', userId).single();
+            if (student) {
+                setupSession(student.full_name, 'student', true, student);
+                return;
+            }
+
+            throw new Error("User authenticated but no profile found in database.");
+        }
+
+        function setupSession(name, role, isStudent, studentData) {
+            currentUser = name;
+            userRole = role;
+            currentStudentData = studentData;
+
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('studentManagementSection').style.display = 'block';
+            document.getElementById('loggedInUser').textContent = `${name} (${role})`;
+
+            if (isStudent) {
+                document.getElementById('studentOwnDetails').style.display = 'block';
+                document.getElementById('adminTools').style.display = 'none';
+                loadStudentOwnData();
+            } else {
+                document.getElementById('studentOwnDetails').style.display = 'none';
+                document.getElementById('adminTools').style.display = 'block';
+                refreshStudents();
+            }
+            alert(`Welcome, ${name}!`);
+        }
+
+        // --- ADMIN FUNCTIONS ---
+        async function refreshStudents() {
+            const { data, error } = await supabase.from('students').select('*').order('cic_no');
+            if (error) return alert("Error loading students");
+            studentsCache = data;
+            renderStudentList(data);
+        }
+
+        function renderStudentList(list) {
+            const container = document.getElementById('studentsList');
+            document.getElementById('studentCount').textContent = list.length;
+            
+            if (list.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center text-muted">No students found.</div>';
+                return;
+            }
+
+            let html = '';
+            list.forEach(s => {
+                html += `
+                <div class="col-12 mb-2">
+                    <div class="card students-card">
+                        <div class="card-body py-2 pl-3 pr-3 d-flex justify-content-between align-items-center">
+                            <div style="font-family: Almarai; font-size: 1.1rem; display: flex; align-items: center; flex-grow: 1;">
+                                <span class="badge badge-primary mr-3" style="font-size: 0.95rem; min-width: 70px; text-align: center;">${s.cic_no}</span>
+                                <strong style="color: #02244e;">${s.full_name}</strong>
+                            </div>
+                            <button class="btn btn-sm btn-warning" style="width: 150px;" onclick="openEditModal('${s.cic_no}')" style="font-family: Almarai; font-size: 0.85rem; padding: 4px 12px; min-width: 80px;">
+                                <i class="fas fa-edit mr-1"></i> Edit
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            const filtered = studentsCache.filter(s => 
+                s.cic_no.toLowerCase().includes(term) || 
+                s.full_name.toLowerCase().includes(term)
+            );
+            renderStudentList(filtered);
+        });
+
+        window.openEditModal = async function(cicNo) {
+            editingCicNo = cicNo;
+            const s = studentsCache.find(x => x.cic_no === cicNo);
+            if (!s) return;
+            
+            document.getElementById('editCicNo').value = s.cic_no;
+            document.getElementById('editName').value = s.full_name || '';
+            document.getElementById('editAdmissionNo').value = s.admission_no || '';
+            document.getElementById('editDob').value = s.dob || '';
+            document.getElementById('editEmailId').value = s.email_id || '';
+            document.getElementById('editGuardianName').value = s.guardian_name || '';
+            document.getElementById('editOccupation').value = s.occupation || '';
+            document.getElementById('editAddress').value = s.address || '';
+            document.getElementById('editPhoneNo').value = s.phone_no || '';
+
+            const leaves = await fetchLeaves(s.id);
+            document.getElementById('editTotalLeaves').value = leaves.total_leaves;
+            document.getElementById('editMedicalLeaves').value = leaves.medical_leaves;
+            
+            $('#editStudentModal').modal('show');
+        };
+
+        window.saveStudentDetails = async function() {
+            const updates = {
+                full_name: document.getElementById('editName').value,
+                admission_no: document.getElementById('editAdmissionNo').value,
+                dob: document.getElementById('editDob').value || null,
+                email_id: document.getElementById('editEmailId').value,
+                guardian_name: document.getElementById('editGuardianName').value,
+                occupation: document.getElementById('editOccupation').value,
+                address: document.getElementById('editAddress').value,
+                phone_no: document.getElementById('editPhoneNo').value
+            };
+
+            const { error } = await supabase.from('students').update(updates).eq('cic_no', editingCicNo);
+            
+            if (error) {
+                alert("Error: " + error.message);
+                return;
+            }
+
+            const s = studentsCache.find(x => x.cic_no === editingCicNo);
+            if (s) {
+                const total = document.getElementById('editTotalLeaves').value;
+                const medical = document.getElementById('editMedicalLeaves').value;
+                await updateLeaves(s.id, total, medical);
+            }
+
+            alert("Saved!");
+            $('#editStudentModal').modal('hide');
+            refreshStudents();
+        };
+
+        // --- STUDENT FUNCTIONS ---
+        async function loadStudentOwnData() {
+            if(!currentStudentData) return;
+            document.getElementById('studentCicNo').value = currentStudentData.cic_no;
+            document.getElementById('studentName').value = currentStudentData.full_name;
+            document.getElementById('admissionNo').value = currentStudentData.admission_no || '';
+            document.getElementById('dob').value = currentStudentData.dob || '';
+            document.getElementById('emailId').value = currentStudentData.email_id || '';
+            document.getElementById('guardianName').value = currentStudentData.guardian_name || '';
+            document.getElementById('occupation').value = currentStudentData.occupation || '';
+            document.getElementById('address').value = currentStudentData.address || '';
+            document.getElementById('phoneNo').value = currentStudentData.phone_no || '';
+
+            const leaves = await fetchLeaves(currentStudentData.id);
+            document.getElementById('totalLeaves').value = leaves.total_leaves;
+            document.getElementById('medicalLeaves').value = leaves.medical_leaves;
+        }
+
+        document.getElementById('studentDetailsForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const updates = {
+                full_name: document.getElementById('studentName').value,
+                admission_no: document.getElementById('admissionNo').value,
+                dob: document.getElementById('dob').value || null,
+                email_id: document.getElementById('emailId').value,
+                guardian_name: document.getElementById('guardianName').value,
+                occupation: document.getElementById('occupation').value,
+                address: document.getElementById('address').value,
+                phone_no: document.getElementById('phoneNo').value
+            };
+            
+            const { error } = await supabase.from('students').update(updates).eq('id', currentStudentData.id);
+            
+            if (error) {
+                alert("Error: " + error.message);
+                return;
+            }
+
+            const total = document.getElementById('totalLeaves').value;
+            const medical = document.getElementById('medicalLeaves').value;
+            await updateLeaves(currentStudentData.id, total, medical);
+
+            alert("Profile Updated Successfully!");
+        });
+
+        window.logout = async function() {
+            await supabase.auth.signOut();
+            location.reload();
+        };
+
+        window.togglePassword = function(id) {
+            const input = document.getElementById(id);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        };
+    </script>
+</body>
+
+</html>
