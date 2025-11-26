@@ -80,7 +80,7 @@
                                 <div class="form-group">
                                     <label>Create Password</label>
                                     <input type="password" class="form-control" id="studentPassword" placeholder="Enter password" required>
-                                    <small class="form-text text-muted">Must be at least 6 characters</small>
+                                    <small class="form-text text-muted">Must be at least 4 characters</small>
                                 </div>
                                 <button type="submit" class="btn btn-success btn-lg btn-block">Add Student</button>
                             </form>
@@ -196,22 +196,40 @@
             const name = document.getElementById('studentName').value.trim();
             const password = document.getElementById('studentPassword').value;
 
-            if (password.length < 6) return alert('Password must be 6+ chars');
+            if (password.length < 4) return alert('Password must be 4+ characters');
+
+            const email = cicNo.toLowerCase() + '@student.com';
 
             // Create Student Login
             const { data, error } = await supabase.auth.signUp({
-                email: cicNo.toLowerCase() + '@student.com',
+                email: email,
                 password: password
             });
 
-            if (error) return alert("Error: " + error.message);
+            if (error) {
+                 // DETECT ZOMBIE USER (Exists in Auth but not in Table)
+                 if (error.message.includes("already registered") || error.message.includes("User already exists")) {
+                      alert(`Error: The Login for CIC No. ${cicNo} already exists in the system.\n\nSOLUTION:\n1. Go to Supabase Dashboard > Authentication.\n2. Find user '${email}'.\n3. Delete that user.\n4. Try adding again.`);
+                 } else {
+                      alert("Error creating login: " + error.message);
+                 }
+                 return;
+            }
+            
+            if (!data.user) {
+                 alert("Error: User creation failed silently.");
+                 return;
+            }
 
             // Create Student Profile
             const { error: dbError } = await supabase
                 .from('students')
                 .insert([{ id: data.user.id, cic_no: cicNo, full_name: name }]);
 
-            if (dbError) return alert("Error saving profile: " + dbError.message);
+            if (dbError) {
+                 alert("Error saving profile: " + dbError.message);
+                 return;
+            }
 
             alert("Student Added Successfully!");
             this.reset();
