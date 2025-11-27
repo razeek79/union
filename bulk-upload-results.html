@@ -28,6 +28,9 @@
             padding: 15px; border-radius: 5px; height: 200px; overflow-y: auto;
             font-size: 0.9rem; display: none;
         }
+        .log-success { color: #4caf50; }
+        .log-error { color: #f44336; }
+        .log-warn { color: #ff9800; }
     </style>
 </head>
 <body>
@@ -67,7 +70,7 @@
         <!-- Step 2: Download Template -->
         <div class="step-card">
             <h4><span class="step-num">2</span> Prepare Data</h4>
-            <p class="text-muted">Download the correct Excel template for the selected semester. <br><strong>Important:</strong> Do not change the column headers.</p>
+            <p class="text-muted">Download the template. Ensure <strong>CIC No</strong> is in the first column.</p>
             <button class="btn btn-info" onclick="downloadTemplate()">
                 <i class="fas fa-download"></i> Download Excel Template
             </button>
@@ -92,9 +95,6 @@
             <a href="update-exam-progress.html" class="btn btn-secondary">Back to Exam Menu</a>
         </div>
     </div>
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <script>
         // --- CONFIGURATION ---
@@ -129,7 +129,6 @@
             }
         };
 
-        // --- SUPABASE ---
         const supabaseUrl = 'https://ewpmkjqcjnhtxyfqgiba.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3cG1ranFjam5odHh5ZnFnaWJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzMTUyOTMsImV4cCI6MjA3Nzg5MTI5M30.i1ivEtua8fCktdit_DASxQigFg2Kb8NLn0WLLQ3LFmI';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -159,25 +158,66 @@
         function log(msg, type="info") {
             const box = document.getElementById('consoleLog');
             box.style.display = 'block';
-            const color = type === 'error' ? 'red' : (type === 'success' ? '#00ff00' : '#ccc');
-            box.innerHTML += `<div style="color:${color}">> ${msg}</div>`;
+            const cls = type === 'error' ? 'log-error' : (type === 'success' ? 'log-success' : (type === 'warn' ? 'log-warn' : ''));
+            box.innerHTML += `<div class="${cls}">> ${msg}</div>`;
             box.scrollTop = box.scrollHeight;
         }
 
-        // --- TEMPLATE DOWNLOAD ---
         function downloadTemplate() {
             const type = document.getElementById('courseType').value;
             if (!type) return alert("Please select a Course Type first.");
 
             const headers = CONFIG[type].columns;
-            // Create a dummy workbook
+            const sample = type === 'wafy' 
+                ? ["W001", "Fiqh", "20", "20", "80", "80", "100", "100", "Passed", "R"]
+                : ["W001", "English", "4", "A", "4.0", "Passed"];
+
             const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet([headers, ["W001 (Sample)", "Fiqh (Sample)", "20", "20", "80", "80", "100", "100", "Passed", "R"]]);
+            const ws = XLSX.utils.aoa_to_sheet([headers, sample]);
             XLSX.utils.book_append_sheet(wb, ws, "Template");
-            XLSX.writeFile(wb, `${type}_bulk_upload_template.xlsx`);
+            XLSX.writeFile(wb, `${type}_bulk_template.xlsx`);
         }
 
-        // --- PROCESSING LOGIC ---
+        function calculateWafyTotalRow(rows) {
+            if (rows.some(r => (r.subject||'').toLowerCase() === 'total')) return rows;
+
+            let sumCE = 0, sumCEMax = 0, sumTE = 0, sumTEMax = 0, sumTotal = 0, sumMax = 0;
+            let allPassed = true;
+
+            rows.forEach(row => {
+                // Helper to parse numbers safely, ignoring '-'
+                const getVal = (k) => {
+                    const v = row[k];
+                    return (v && v !== '-') ? parseFloat(v) : 0;
+                };
+
+                sumCE += getVal('ce_mark');
+                sumCEMax += getVal('ce_max');
+                sumTE += getVal('te_mark');
+                sumTEMax += getVal('te_max');
+                sumTotal += getVal('total');
+                sumMax += getVal('max') || getVal('max_mark');
+
+                const s = (row.status || '').trim().toUpperCase();
+                if (s.startsWith('F') || s === 'FAIL') allPassed = false;
+            });
+
+            const totalRow = {
+                subject: 'Total',
+                ce_mark: sumCE.toString(),
+                ce_max: sumCEMax.toString(),
+                te_mark: sumTE.toString(),
+                te_max: sumTEMax.toString(),
+                total: sumTotal.toString(),
+                max: sumMax.toString(),
+                status: allPassed ? 'Passed' : 'Failed',
+                exam_mode: '-'
+            };
+
+            return [...rows, totalRow];
+        }
+
+        // --- CORE PROCESSING ---
         async function processBulkUpload() {
             const type = document.getElementById('courseType').value;
             const semesterKey = document.getElementById('semesterSelect').value;
@@ -186,8 +226,8 @@
             if (!type || !semesterKey) return alert("Please select Course and Semester.");
             if (!fileInput.files.length) return alert("Please upload a file.");
 
-            document.getElementById('consoleLog').innerHTML = ''; // Clear logs
-            log("Starting process...");
+            document.getElementById('consoleLog').innerHTML = '';
+            log("Reading file...");
 
             const reader = new FileReader();
             reader.onload = async function(e) {
@@ -195,46 +235,45 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, {type: 'array'});
                     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const rawData = XLSX.utils.sheet_to_json(sheet);
+                    
+                    // 1. Read with defval: "-" to handle empty cells automatically
+                    const rawData = XLSX.utils.sheet_to_json(sheet, { defval: "-" });
 
                     if (rawData.length === 0) return log("Error: File is empty.", "error");
-
                     log(`Read ${rawData.length} rows. Grouping by CIC No...`);
 
-                    // 1. Group Data by CIC No
                     const groupedData = {};
-                    let processedCount = 0;
 
                     rawData.forEach(row => {
-                        // Normalize keys (remove spaces, lowercase)
                         const cleanRow = {};
                         let cic = "";
-                        
-                        // Map Excel headers to our internal keys
-                        // We look for headers like "CIC No", "Subject", etc.
-                        Object.keys(row).forEach(key => {
-                            const val = String(row[key]).trim();
-                            const lowerKey = key.toLowerCase().replace(/[\s_.]/g, ''); // cicno, cemark
+
+                        Object.keys(row).forEach(header => {
+                            const val = String(row[header]).trim();
+                            const lowerHeader = header.toLowerCase().replace(/[\s_.]/g, '');
                             
-                            // Find matching config key
-                            // Example: config col "CE Mark" -> key "ce_mark"
-                            // We map based on index or smart guess? Smart guess is better.
-                            if (lowerKey.includes('cic')) cic = val;
-                            
-                            // Map data fields
+                            if (lowerHeader.includes('cic')) cic = val;
+
                             const configCols = CONFIG[type].columns;
                             const configKeys = CONFIG[type].keys;
                             
-                            const colIndex = configCols.findIndex(c => c.toLowerCase().replace(/[\s_.]/g, '') === lowerKey);
-                            if (colIndex > -1) {
-                                cleanRow[configKeys[colIndex]] = val;
+                            const idx = configCols.findIndex(c => c.toLowerCase().replace(/[\s_.]/g, '') === lowerHeader);
+                            if (idx > -1) {
+                                cleanRow[configKeys[idx]] = val === "" ? "-" : val; // Ensure empty becomes -
+                            }
+                        });
+
+                        // Ensure all keys exist, default to "-"
+                        const configKeys = CONFIG[type].keys;
+                        configKeys.forEach(k => {
+                            if (k !== 'cic_no' && (cleanRow[k] === undefined || cleanRow[k] === null || cleanRow[k] === "")) {
+                                cleanRow[k] = "-";
                             }
                         });
 
                         if (cic) {
                             if (!groupedData[cic]) groupedData[cic] = [];
-                            // Don't save CIC inside the JSON array (redundant), but save everything else
-                            delete cleanRow.cic_no; 
+                            delete cleanRow.cic_no;
                             groupedData[cic].push(cleanRow);
                         }
                     });
@@ -242,7 +281,6 @@
                     const cicList = Object.keys(groupedData);
                     log(`Found ${cicList.length} unique students.`);
 
-                    // 2. Fetch ALL Student UUIDs (One big query is faster than 100 small ones)
                     log("Fetching student IDs from database...");
                     const { data: studentsDB, error: stuError } = await supabase
                         .from('students')
@@ -251,57 +289,46 @@
 
                     if (stuError) throw stuError;
 
-                    // Create a Map: CIC -> UUID
                     const studentMap = {};
                     studentsDB.forEach(s => studentMap[s.cic_no] = s.id);
 
-                    // 3. Prepare Bulk Insert Data
                     const upsertPayload = [];
-                    const missingStudents = [];
+                    const missing = [];
 
                     for (const cic of cicList) {
                         const uuid = studentMap[cic];
                         if (uuid) {
+                            let studentResults = groupedData[cic];
+
+                            if (type === 'wafy') {
+                                studentResults = calculateWafyTotalRow(studentResults);
+                            }
+
                             upsertPayload.push({
                                 student_id: uuid,
                                 semester_key: semesterKey,
-                                results_data: groupedData[cic]
+                                results_data: studentResults
                             });
                         } else {
-                            missingStudents.push(cic);
+                            missing.push(cic);
                         }
                     }
 
-                    if (missingStudents.length > 0) {
-                        log(`Warning: ${missingStudents.length} CIC Nos not found in DB (Skipped): ${missingStudents.join(', ')}`, "error");
-                    }
+                    if (missing.length > 0) log(`Skipped (Not in DB): ${missing.join(', ')}`, "warn");
 
-                    // 4. Upload to Supabase
                     if (upsertPayload.length > 0) {
                         log(`Uploading ${upsertPayload.length} student records...`);
                         
-                        // We process in chunks of 50 to be safe
                         const chunkSize = 50;
                         for (let i = 0; i < upsertPayload.length; i += chunkSize) {
                             const chunk = upsertPayload.slice(i, i + chunkSize);
+                            const ids = chunk.map(x => x.student_id);
+                            await supabase.from('semester_results').delete().eq('semester_key', semesterKey).in('student_id', ids);
+
+                            const { error } = await supabase.from('semester_results').insert(chunk);
+                            if (error) throw error;
                             
-                            // First DELETE existing (to ensure clean slate)
-                            const studentIds = chunk.map(x => x.student_id);
-                            await supabase.from('semester_results')
-                                .delete()
-                                .eq('semester_key', semesterKey)
-                                .in('student_id', studentIds);
-
-                            // Then INSERT
-                            const { error: insertError } = await supabase
-                                .from('semester_results')
-                                .insert(chunk);
-
-                            if (insertError) {
-                                log(`Error uploading chunk ${i}: ${insertError.message}`, "error");
-                            } else {
-                                log(`Processed students ${i+1} to ${i + chunk.length} - OK`, "success");
-                            }
+                            log(`Batch ${i/chunkSize + 1} uploaded successfully.`, "success");
                         }
                         log("Bulk Upload Complete!", "success");
                         alert("Upload Complete!");
@@ -310,7 +337,7 @@
                     }
 
                 } catch (err) {
-                    log("Critical Error: " + err.message, "error");
+                    log("Error: " + err.message, "error");
                     console.error(err);
                 }
             };

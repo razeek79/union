@@ -3,13 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wafy Exam Ranks</title>
+    <title>Wafy Exam Ranks - الأبطال</title>
     <link rel="stylesheet" href="sc.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <style>
         .rank-bar {
             background: linear-gradient(135deg, #02244e 0%, #1a4b85 100%);
@@ -32,16 +39,32 @@
         }
         .rank-bar i { opacity: 0.7; }
         
-        .rank-1 { background-color: #FFD700; color: #000; font-weight: bold; } /* Gold */
-        .rank-2 { background-color: #C0C0C0; color: #000; font-weight: bold; } /* Silver */
-        .rank-3 { background-color: #CD7F32; color: #fff; font-weight: bold; } /* Bronze */
+        .rank-1 { background-color: #FFD700 !important; color: #000 !important; font-weight: bold; } /* Gold */
+        .rank-2 { background-color: #C0C0C0 !important; color: #000 !important; font-weight: bold; } /* Silver */
+        .rank-3 { background-color: #CD7F32 !important; color: #fff !important; font-weight: bold; } /* Bronze */
         
         .student-row { animation: fadeIn 0.5s; }
         @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+        .modal-header { background-color: #f8f9fa; border-bottom: 2px solid #02244e; }
+        .modal-title { color: #02244e; font-weight: bold; font-family: Almarai, sans-serif; }
+
+        .star-plus {
+            background-color: #28a745;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            vertical-align: middle;
+            display: inline-block;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+        }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
+    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
         <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" /></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
@@ -51,7 +74,9 @@
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item"><a class="nav-link" href="main.html">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="students-info.html">Students Info</a></li>
-                <li class="nav-item active"><a class="nav-link" href="#">Exam Ranks</a></li>
+                <li class="nav-item active"><a class="nav-link" href="students-progress.html">Students Progress</a></li>
+                <li class="nav-item"><a class="nav-link" href="council.html">Our Council</a></li>
+                <li class="nav-item"><a class="nav-link" href="follow-us.html">Follow us</a></li>
             </ul>
         </div>
     </nav>
@@ -63,42 +88,42 @@
         <div id="semestersContainer">
             <h4 class="text-muted mb-3">Thamheediyya</h4>
             <div class="rank-bar" onclick="showRanks('wafy_thamheediyya_sem1', 'Thamheediyya Semester 1')">
-                <span>Thamheediyya Semester 1</span> <i class="fas fa-chevron-right"></i>
+                <span>Thamheediyya Semester 1</span> <i class="fas fa-trophy"></i>
             </div>
             <div class="rank-bar" onclick="showRanks('wafy_thamheediyya_sem2', 'Thamheediyya Semester 2')">
-                <span>Thamheediyya Semester 2</span> <i class="fas fa-chevron-right"></i>
+                <span>Thamheediyya Semester 2</span> <i class="fas fa-trophy"></i>
             </div>
             <div class="rank-bar" onclick="showRanks('wafy_thamheediyya_sem3', 'Thamheediyya Semester 3')">
-                <span>Thamheediyya Semester 3</span> <i class="fas fa-chevron-right"></i>
+                <span>Thamheediyya Semester 3</span> <i class="fas fa-trophy"></i>
             </div>
             <div class="rank-bar" onclick="showRanks('wafy_thamheediyya_sem4', 'Thamheediyya Semester 4')">
-                <span>Thamheediyya Semester 4</span> <i class="fas fa-chevron-right"></i>
+                <span>Thamheediyya Semester 4</span> <i class="fas fa-trophy"></i>
             </div>
 
             <h4 class="text-muted mb-3 mt-5">Aliya</h4>
             <div class="rank-bar" onclick="showRanks('wafy_aliya_sem1', 'Aliya Semester 1')">
-                <span>Aliya Semester 1</span> <i class="fas fa-chevron-right"></i>
+                <span>Aliya Semester 1</span> <i class="fas fa-trophy"></i>
             </div>
             <div class="rank-bar" onclick="showRanks('wafy_aliya_sem2', 'Aliya Semester 2')">
-                <span>Aliya Semester 2</span> <i class="fas fa-chevron-right"></i>
+                <span>Aliya Semester 2</span> <i class="fas fa-trophy"></i>
             </div>
             <div class="rank-bar" onclick="showRanks('wafy_aliya_sem3', 'Aliya Semester 3')">
-                <span>Aliya Semester 3</span> <i class="fas fa-chevron-right"></i>
+                <span>Aliya Semester 3</span> <i class="fas fa-trophy"></i>
             </div>
             <div class="rank-bar" onclick="showRanks('wafy_aliya_sem4', 'Aliya Semester 4')">
-                <span>Aliya Semester 4</span> <i class="fas fa-chevron-right"></i>
+                <span>Aliya Semester 4</span> <i class="fas fa-trophy"></i>
             </div>
             <div class="rank-bar" onclick="showRanks('wafy_aliya_sem5', 'Aliya Semester 5')">
-                <span>Aliya Semester 5</span> <i class="fas fa-chevron-right"></i>
+                <span>Aliya Semester 5</span> <i class="fas fa-trophy"></i>
             </div>
             <div class="rank-bar" onclick="showRanks('wafy_aliya_sem6', 'Aliya Semester 6')">
-                <span>Aliya Semester 6</span> <i class="fas fa-chevron-right"></i>
+                <span>Aliya Semester 6</span> <i class="fas fa-trophy"></i>
             </div>
             <div class="rank-bar" onclick="showRanks('wafy_aliya_sem7', 'Aliya Semester 7')">
-                <span>Aliya Semester 7</span> <i class="fas fa-chevron-right"></i>
+                <span>Aliya Semester 7</span> <i class="fas fa-trophy"></i>
             </div>
             <div class="rank-bar" onclick="showRanks('wafy_aliya_sem8', 'Aliya Semester 8')">
-                <span>Aliya Semester 8</span> <i class="fas fa-chevron-right"></i>
+                <span>Aliya Semester 8</span> <i class="fas fa-trophy"></i>
             </div>
         </div>
 
@@ -115,7 +140,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-light">
-                    <h5 class="modal-title" id="rankModalTitle" style="color:#02244e; font-weight:bold;">Rank List</h5>
+                    <h5 class="modal-title" id="rankModalTitle">Rank List</h5>
                     <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                 </div>
                 <div class="modal-body">
@@ -126,13 +151,14 @@
                     
                     <div id="rankContent" style="display:none;">
                         <div class="table-responsive">
-                            <table class="table table-hover text-center">
+                            <table class="table table-hover text-center" id="rankTable">
                                 <thead class="thead-dark">
                                     <tr>
                                         <th>Rank</th>
                                         <th>CIC No.</th>
                                         <th>Name</th>
                                         <th>Total Marks</th>
+                                        <th>%</th>
                                     </tr>
                                 </thead>
                                 <tbody id="rankTableBody"></tbody>
@@ -146,16 +172,14 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" onclick="downloadPDF()">
+                        <i class="fas fa-file-pdf"></i> Download PDF
+                    </button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
         // Initialize Supabase
@@ -165,6 +189,8 @@
 
         // Cache for student names
         let studentsCache = {};
+        let currentRankData = []; // Store data for PDF
+        let currentSemTitle = '';
 
         async function loadStudents() {
             const { data } = await supabase.from('students').select('id, full_name, cic_no');
@@ -175,6 +201,7 @@
 
         async function showRanks(semKey, title) {
             // 1. Setup UI
+            currentSemTitle = title;
             document.getElementById('rankModalTitle').textContent = title;
             document.getElementById('loadingSpinner').style.display = 'block';
             document.getElementById('rankContent').style.display = 'none';
@@ -193,6 +220,7 @@
             if (error || !results || results.length === 0) {
                 document.getElementById('loadingSpinner').style.display = 'none';
                 document.getElementById('noDataMessage').style.display = 'block';
+                currentRankData = [];
                 return;
             }
 
@@ -203,65 +231,102 @@
                 const student = studentsCache[entry.student_id];
                 if (!student) return; // Skip if student deleted
 
-                // EXTRACT TOTAL MARK
-                // Logic: Get the LAST item in the results_data array (usually the "Total" row)
-                // OR find a key named 'total' in the last row.
                 let totalMarks = 0;
+                let maxMarks = 0;
+                let isStarPlus = true; 
                 const dataArray = entry.results_data;
                 
                 if (Array.isArray(dataArray) && dataArray.length > 0) {
-                    // We assume the LAST row contains the grand total in the 'Total' column
-                    // Or we sum up all totals if there is no grand total row
-                    // Let's try to find the "Total" value in the last row first
-                    const lastRow = dataArray[dataArray.length - 1];
+                    // 1. Find Total Marks
+                    const summaryRow = dataArray.find(r => (r.subject || r.Subject || '').toLowerCase() === 'total');
+
+                    if (summaryRow) {
+                        totalMarks = parseFloat(summaryRow.total || summaryRow.Total || 0);
+                        maxMarks = parseFloat(summaryRow.max || summaryRow.Max || 0);
+                    } else {
+                        // Fallback: sum all rows
+                        totalMarks = dataArray.reduce((sum, row) => sum + parseFloat(row.total || row.Total || 0), 0);
+                        maxMarks = dataArray.reduce((sum, row) => sum + parseFloat(row.max || row.Max || 0), 0);
+                    }
+
+                    // 2. Check Star Plus Condition (>= 90% in ALL subjects)
+                    const subjectRows = dataArray.filter(r => (r.subject || r.Subject || '').toLowerCase() !== 'total');
                     
-                    // Try to find key 'Total' case-insensitive
-                    const totalKey = Object.keys(lastRow).find(k => k.toLowerCase() === 'total');
-                    
-                    if (totalKey && lastRow[totalKey]) {
-                        totalMarks = parseFloat(lastRow[totalKey]);
-                    } 
-                    // Fallback: If last row doesn't have total, maybe it's the summation of all subjects?
-                    // Let's stick to "last value in column Total" as requested.
+                    if (subjectRows.length === 0) isStarPlus = false;
+
+                    for (const row of subjectRows) {
+                        const subTotal = parseFloat(row.total || row.Total || 0);
+                        const subMax = parseFloat(row.max || row.Max || 0);
+                        
+                        if (subMax > 0) {
+                            const percentage = (subTotal / subMax) * 100;
+                            if (percentage < 90) {
+                                isStarPlus = false;
+                                break;
+                            }
+                        } else {
+                            isStarPlus = false;
+                            break;
+                        }
+                    }
+                } else {
+                    isStarPlus = false;
                 }
 
-                if (!isNaN(totalMarks)) {
+                if (!isNaN(totalMarks) && totalMarks > 0) {
+                    const overallPercentage = maxMarks > 0 ? (totalMarks / maxMarks) * 100 : 0;
+
                     rankedList.push({
                         name: student.full_name,
                         cic: student.cic_no,
-                        mark: totalMarks
+                        mark: totalMarks,
+                        percentage: overallPercentage,
+                        isStarPlus: isStarPlus
                     });
                 }
             });
 
             // 5. Sort by Marks (Descending)
             rankedList.sort((a, b) => b.mark - a.mark);
+            currentRankData = rankedList; // Store for PDF
 
             // 6. Render Table
             const tbody = document.getElementById('rankTableBody');
             tbody.innerHTML = '';
 
+            if (rankedList.length === 0) {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                document.getElementById('noDataMessage').style.display = 'block';
+                return;
+            }
+
             let currentRank = 1;
             rankedList.forEach((s, index) => {
-                // Handle Ties: If mark matches previous, use same rank
                 if (index > 0 && s.mark < rankedList[index - 1].mark) {
                     currentRank = index + 1;
                 }
 
-                // Styling for Top 3
-                let rowClass = '';
                 let badgeClass = 'badge-secondary';
+                let rowStyle = '';
                 
-                if (currentRank === 1) { rowClass = 'rank-1'; badgeClass = 'badge-warning'; }
-                else if (currentRank === 2) { rowClass = 'rank-2'; badgeClass = 'badge-secondary'; }
-                else if (currentRank === 3) { rowClass = 'rank-3'; badgeClass = 'badge-danger'; }
+                if (currentRank === 1) { badgeClass = 'rank-1'; rowStyle='background-color:#fffbec'; }
+                else if (currentRank === 2) { badgeClass = 'rank-2'; }
+                else if (currentRank === 3) { badgeClass = 'rank-3'; }
+
+                const starBadge = s.isStarPlus 
+                    ? `<span class="star-plus"><i class="fas fa-star"></i> STAR PLUS</span>` 
+                    : '';
 
                 const row = `
-                    <tr class="student-row">
-                        <td><span class="badge ${badgeClass} p-2" style="font-size:1rem;">#${currentRank}</span></td>
+                    <tr class="student-row" style="${rowStyle}">
+                        <td><span class="badge ${badgeClass} p-2" style="font-size:1rem; min-width:40px;">#${currentRank}</span></td>
                         <td>${s.cic}</td>
-                        <td class="text-left font-weight-bold">${s.name}</td>
-                        <td style="font-size:1.1rem; font-weight:bold;">${s.mark}</td>
+                        <td class="text-left">
+                            <span style="font-weight:bold; color:#02244e;">${s.name}</span>
+                            ${starBadge}
+                        </td>
+                        <td style="font-size:1.1rem; font-weight:bold; color:#02244e;">${s.mark}</td>
+                        <td style="font-weight:bold; color:#555;">${s.percentage.toFixed(1)}%</td>
                     </tr>
                 `;
                 tbody.innerHTML += row;
@@ -271,7 +336,60 @@
             document.getElementById('rankContent').style.display = 'block';
         }
 
-        // Load students immediately
+        function downloadPDF() {
+            if (!currentRankData || currentRankData.length === 0) return alert("No data to download");
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Title
+            doc.setFontSize(18);
+            doc.setTextColor(2, 36, 78); // #02244e
+            doc.text(currentSemTitle + " - Rank List", 14, 15);
+            
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text("Generated on: " + new Date().toLocaleDateString(), 14, 22);
+
+            // Data Preparation
+            const tableBody = [];
+            let currentRank = 1;
+
+            currentRankData.forEach((s, index) => {
+                if (index > 0 && s.mark < currentRankData[index - 1].mark) {
+                    currentRank = index + 1;
+                }
+                
+                // Star Plus Text
+                let nameText = s.name;
+                if (s.isStarPlus) nameText += " (STAR PLUS)";
+
+                tableBody.push([
+                    currentRank,
+                    s.cic,
+                    nameText,
+                    s.mark,
+                    s.percentage.toFixed(1) + '%'
+                ]);
+            });
+
+            doc.autoTable({
+                head: [['Rank', 'CIC No.', 'Name', 'Total Marks', 'Percentage']],
+                body: tableBody,
+                startY: 28,
+                theme: 'grid',
+                headStyles: { fillColor: [2, 36, 78] }, // Blue Header
+                styles: { fontSize: 10, cellPadding: 4 },
+                columnStyles: {
+                    0: { fontStyle: 'bold', halign: 'center' }, // Rank
+                    3: { fontStyle: 'bold', halign: 'center' }, // Marks
+                    4: { halign: 'center' }
+                }
+            });
+
+            doc.save(currentSemTitle.replace(/ /g, "_") + "_RankList.pdf");
+        }
+
         loadStudents();
     </script>
 </body>
