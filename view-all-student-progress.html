@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>View All Student Progress - الأبطال</title>
     <link rel="stylesheet" href="sc.css" />
+    <link rel="stylesheet" href="view-all-student-progress.css"/>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -41,19 +42,26 @@
             </div>
         </div>
 
+        <div class="row">
+            <div class="col-12 d-md-none d-flex flex-row justify-content-center mb-2">
+                <button  onclick="window.location.href='view-all-exam-results.html';" class="btn btn-info btn-lg mr-1" style="width: 90px; height: 60px; font-size: 14px; display: block;">Whole Results</button>
+                <button  onclick="window.location.href='wafy-exam-ranks.html';" class="btn btn-success btn-lg ml-1" style="width: 90px; height: 60px; font-size: 14px; display: block;">Exam Rank</button>
+            </div>
+        </div>
+
         <!-- Search and Filter Section -->
         <div class="row mb-4">
             <div class="col-12 col-md-6">
                 <div class="form-group">
+                    <button  onclick="window.location.href='view-all-exam-results.html';" class="btn btn-info btn-lg d-none d-md-block" style="width: 180px; margin: auto; display: block; margin-bottom: 10px;">Whole Results</button>
                     <input type="text" class="form-control" id="searchInput" placeholder="Search by CIC No. or Name..." style="font-family: Almarai;">
-                    <button  onclick="window.location.href='view-all-exam-results.html';" class="btn btn-info btn-lg mt-2" style="width: 180px; margin: auto; display: block;">Whole Results</button>
                 </div>
             </div>
             <div class="col-12 col-md-6 text-right">
+                <button  onclick="window.location.href='wafy-exam-ranks.html';" class="btn btn-success btn-lg d-none d-md-block" style="width: 180px; margin: auto; display: block; margin-bottom: 10px;">Exam Rank</button>
                 <button class="btn btn-primary" onclick="refreshStudents()" style="font-family: Almarai;">
                     <i class="fas fa-sync-alt"></i> Refresh
                 </button>
-                <button  onclick="window.location.href='wafy-exam-ranks.html';" class="btn btn-success btn-lg mt-2" style="width: 180px; margin: auto; display: block;">Exam Rank</button>
             </div>
         </div>
 
@@ -72,7 +80,7 @@
             <div class="col-12">
                 <div class="card students-card">
                     <div class="card-body">
-                        <div class="row align-items-center">
+                        <div class="row align-items-center table-head">
                             <div class="col-2 text-center">
                                 <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">SL No.</h5>
                             </div>

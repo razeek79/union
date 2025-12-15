@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- PDF & Excel Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    
     <style>
         body { background: #f9f9f9; font-family: Almarai, Arial, sans-serif; }
         h1, h2, h3 { color: #02244e; }
@@ -56,6 +61,9 @@
 
     let currentStudentId = null;
     let currentCicNo = null;
+    let currentStudentName = ""; // Store for PDF filename
+    let currentResultsData = null; // Store for export
+    let currentSemLabel = ""; 
 
     // 1. Navigation Structure
     const resultSections = [
@@ -111,7 +119,7 @@
         }
     ];
 
-    // 2. STRICT COLUMN DEFINITIONS (This fixes the disorder)
+    // 2. STRICT COLUMN DEFINITIONS
     const COLUMN_CONFIGS = {
         wafy: [
             { key: 'subject', label: 'Subject' },
@@ -123,7 +131,7 @@
             { key: 'max', label: 'Max' },
             { key: 'status', label: 'Status' },
             { key: 'exam_mode', label: 'Exam Mode' },
-            { key: 'percentage', label: 'Percentage' } // Custom Calculated Column
+            { key: 'percentage', label: 'Percentage' } 
         ],
         degree: [
             { key: 'subject', label: 'Subject' },
@@ -165,6 +173,7 @@
         }
 
         currentStudentId = student.id;
+        currentStudentName = student.full_name;
         document.getElementById('studentNameTitle').innerText = `Results for ${student.full_name} (${student.cic_no})`;
         
         renderMainSections();
@@ -215,6 +224,8 @@
     async function loadResults(semKey, semLabel) {
         const container = document.getElementById('resultsContainer');
         container.innerHTML = '<div class="text-center my-5"><div class="spinner-border text-primary"></div><p>Loading results...</p></div>';
+        
+        currentSemLabel = semLabel;
 
         const { data, error } = await supabase
             .from('semester_results')
@@ -226,10 +237,11 @@
 
         if (error || !data || !data.results_data || data.results_data.length === 0) {
             container.innerHTML = `<div class="alert alert-warning text-center">No results found for ${semLabel}.</div>`;
+            currentResultsData = null;
             return;
         }
 
-        // Determine which column config to use based on the semester key string
+        // Determine config
         let config = [];
         let isWafy = false;
         
@@ -243,11 +255,22 @@
         }
 
         const results = data.results_data;
+        currentResultsData = { results, config, isWafy }; // Store for Export
         
         // Build Table HTML
         let tableHtml = `
             <div class="result-card">
-                <h4 class="text-center border-bottom pb-3 mb-3">${semLabel} Results</h4>
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                    <h4 class="mb-0">${semLabel} Results</h4>
+                    <div class="btn-group">
+                        <button class="btn btn-danger btn-sm" onclick="downloadPDF()">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+                        <button class="btn btn-success btn-sm" onclick="downloadExcel()">
+                            <i class="fas fa-file-excel"></i> Excel
+                        </button>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover text-center">
                         <thead class="thead-light">
@@ -261,10 +284,8 @@
             let percentage = 0;
             let isFail = false;
 
-            // Helper to find data regardless of case (e.g., 'Total' vs 'total')
             const getVal = (k) => row[k] || row[k.toLowerCase()] || row[k.replace(/_/g, ' ')] || '';
 
-            // Special Wafy Logic (Percentage & Fail Check)
             if (isWafy) {
                 const total = parseFloat(getVal('total'));
                 const max = parseFloat(getVal('max') || getVal('max_mark'));
@@ -272,22 +293,15 @@
                 if (!isNaN(total) && !isNaN(max) && max > 0) {
                     percentage = (total / max) * 100;
                 }
-
-                // If percentage < 45%, mark as fail
                 if (percentage < 45) isFail = true;
             }
 
-            // Render Cells Strictly according to Config
             config.forEach(col => {
                 if (col.key === 'percentage') {
-                    // Render Percentage Column (Wafy only)
                     const pText = percentage > 0 ? percentage.toFixed(1) + '%' : '-';
                     rowHtml += `<td class="percentage-col ${isFail ? 'mark-low' : ''}">${pText}</td>`;
                 } else {
-                    // Render Normal Data
                     let val = getVal(col.key);
-                    
-                    // Highlight Total marks if failed (Wafy only)
                     if (isWafy && col.key === 'total' && isFail) {
                         rowHtml += `<td class="mark-low">${val}</td>`;
                     } else {
@@ -303,6 +317,97 @@
         tableHtml += `</tbody></table></div></div>`;
         container.innerHTML = tableHtml;
         container.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // --- EXPORT FUNCTIONS ---
+    function downloadPDF() {
+        if (!currentResultsData) return alert("No data loaded.");
+        
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const { results, config, isWafy } = currentResultsData;
+
+        // Header
+        doc.setFillColor(2, 36, 78);
+        doc.rect(0, 0, 210, 40, 'F');
+        doc.setFontSize(18);
+        doc.setTextColor(255, 255, 255);
+        doc.setFont("helvetica", "bold");
+        doc.text("EXAM RESULT", 105, 20, null, null, "center");
+        
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Name: ${currentStudentName}`, 14, 32);
+        doc.text(`Semester: ${currentSemLabel}`, 105, 32, null, null, "center");
+        
+        const today = new Date().toLocaleDateString();
+        doc.setFontSize(10);
+        doc.text(today, 195, 32, null, null, "right");
+
+        // Data
+        const headers = config.map(c => c.label);
+        const body = results.map(row => {
+            let percentage = 0;
+            const getVal = (k) => row[k] || row[k.toLowerCase()] || row[k.replace(/_/g, ' ')] || '';
+
+            if (isWafy) {
+                const total = parseFloat(getVal('total'));
+                const max = parseFloat(getVal('max') || getVal('max_mark'));
+                if (!isNaN(total) && !isNaN(max) && max > 0) {
+                    percentage = (total / max) * 100;
+                }
+            }
+
+            return config.map(col => {
+                if (col.key === 'percentage') return percentage > 0 ? percentage.toFixed(1) + '%' : '-';
+                return getVal(col.key);
+            });
+        });
+
+        doc.autoTable({
+            head: [headers],
+            body: body,
+            startY: 45,
+            theme: 'grid',
+            headStyles: { fillColor: [2, 36, 78] },
+            styles: { fontSize: 9, cellPadding: 3, valign: 'middle', halign: 'center' }
+        });
+
+        doc.save(`${currentStudentName}_${currentSemLabel}.pdf`);
+    }
+
+    function downloadExcel() {
+        if (!currentResultsData) return alert("No data loaded.");
+        
+        const { results, config, isWafy } = currentResultsData;
+        
+        const exportData = results.map(row => {
+            let percentage = 0;
+            const getVal = (k) => row[k] || row[k.toLowerCase()] || row[k.replace(/_/g, ' ')] || '';
+
+            if (isWafy) {
+                const total = parseFloat(getVal('total'));
+                const max = parseFloat(getVal('max') || getVal('max_mark'));
+                if (!isNaN(total) && !isNaN(max) && max > 0) {
+                    percentage = (total / max) * 100;
+                }
+            }
+
+            const rowObj = {};
+            config.forEach(col => {
+                if (col.key === 'percentage') {
+                    rowObj[col.label] = percentage > 0 ? percentage.toFixed(1) + '%' : '-';
+                } else {
+                    rowObj[col.label] = getVal(col.key);
+                }
+            });
+            return rowObj;
+        });
+
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Result");
+        XLSX.writeFile(wb, `${currentStudentName}_${currentSemLabel}.xlsx`);
     }
 
     window.onload = init;

@@ -151,7 +151,7 @@
                     
                     <div id="rankContent" style="display:none;">
                         <div class="table-responsive">
-                            <table class="table table-hover text-center" id="rankTable">
+                            <table class="table table-hover text-center">
                                 <thead class="thead-dark">
                                     <tr>
                                         <th>Rank</th>
@@ -180,6 +180,11 @@
             </div>
         </div>
     </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
         // Initialize Supabase
@@ -233,7 +238,7 @@
 
                 let totalMarks = 0;
                 let maxMarks = 0;
-                let isStarPlus = true; 
+                let isStarPlus = true; // Assume Star Plus until proven otherwise
                 const dataArray = entry.results_data;
                 
                 if (Array.isArray(dataArray) && dataArray.length > 0) {
@@ -250,9 +255,10 @@
                     }
 
                     // 2. Check Star Plus Condition (>= 90% in ALL subjects)
+                    // We must ignore the "Total" row itself for this check
                     const subjectRows = dataArray.filter(r => (r.subject || r.Subject || '').toLowerCase() !== 'total');
                     
-                    if (subjectRows.length === 0) isStarPlus = false;
+                    if (subjectRows.length === 0) isStarPlus = false; // No subjects = no star
 
                     for (const row of subjectRows) {
                         const subTotal = parseFloat(row.total || row.Total || 0);
@@ -262,9 +268,10 @@
                             const percentage = (subTotal / subMax) * 100;
                             if (percentage < 90) {
                                 isStarPlus = false;
-                                break;
+                                break; // One subject < 90% fails the condition
                             }
                         } else {
+                            // If max mark is missing/0, can't calculate %, assume not star
                             isStarPlus = false;
                             break;
                         }
@@ -274,6 +281,7 @@
                 }
 
                 if (!isNaN(totalMarks) && totalMarks > 0) {
+                    // Calculate overall percentage
                     const overallPercentage = maxMarks > 0 ? (totalMarks / maxMarks) * 100 : 0;
 
                     rankedList.push({
@@ -302,17 +310,20 @@
 
             let currentRank = 1;
             rankedList.forEach((s, index) => {
+                // Handle Ties: If mark matches previous, use same rank
                 if (index > 0 && s.mark < rankedList[index - 1].mark) {
                     currentRank = index + 1;
                 }
 
+                // Styling for Top 3
                 let badgeClass = 'badge-secondary';
                 let rowStyle = '';
                 
-                if (currentRank === 1) { badgeClass = 'rank-1'; rowStyle='background-color:#fffbec'; }
-                else if (currentRank === 2) { badgeClass = 'rank-2'; }
-                else if (currentRank === 3) { badgeClass = 'rank-3'; }
+                if (currentRank === 1) { badgeClass = 'badge-warning rank-1'; rowStyle='background-color:#fffbec'; }
+                else if (currentRank === 2) { badgeClass = 'badge-secondary rank-2'; }
+                else if (currentRank === 3) { badgeClass = 'badge-danger rank-3'; }
 
+                // Generate Star Plus Badge
                 const starBadge = s.isStarPlus 
                     ? `<span class="star-plus"><i class="fas fa-star"></i> STAR PLUS</span>` 
                     : '';
@@ -342,16 +353,32 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            // Title
-            doc.setFontSize(18);
-            doc.setTextColor(2, 36, 78); // #02244e
-            doc.text(currentSemTitle + " - Rank List", 14, 15);
-            
-            doc.setFontSize(10);
-            doc.setTextColor(100);
-            doc.text("Generated on: " + new Date().toLocaleDateString(), 14, 22);
+            // Helper to format date as DD/MM/YYYY
+            const today = new Date();
+            const dateStr = String(today.getDate()).padStart(2, '0') + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + today.getFullYear();
 
-            // Data Preparation
+            // --- PDF HEADER DESIGN ---
+            // Blue Header Bar
+            doc.setFillColor(2, 36, 78); // #02244e
+            doc.rect(0, 0, 210, 40, 'F'); // Full width rectangle at top
+
+            // Title (White text on blue)
+            doc.setFontSize(22);
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.text("EXAM RANK LIST", 105, 20, null, null, "center");
+            
+            // Subtitle (Semester Name)
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "normal");
+            doc.text(currentSemTitle, 105, 30, null, null, "center");
+
+            // Generated Date (Right aligned, below header)
+            doc.setTextColor(100);
+            doc.setFontSize(10);
+            doc.text("Generated on: " + dateStr, 195, 50, null, null, "right");
+
+            // --- TABLE DATA PREPARATION ---
             const tableBody = [];
             let currentRank = 1;
 
@@ -360,9 +387,9 @@
                     currentRank = index + 1;
                 }
                 
-                // Star Plus Text
+                // Star Plus Text for PDF
                 let nameText = s.name;
-                if (s.isStarPlus) nameText += " (STAR PLUS)";
+                if (s.isStarPlus) nameText += " ★"; // Using Unicode Star as marker
 
                 tableBody.push([
                     currentRank,
@@ -376,20 +403,55 @@
             doc.autoTable({
                 head: [['Rank', 'CIC No.', 'Name', 'Total Marks', 'Percentage']],
                 body: tableBody,
-                startY: 28,
+                startY: 55, // Start below the header info
                 theme: 'grid',
-                headStyles: { fillColor: [2, 36, 78] }, // Blue Header
-                styles: { fontSize: 10, cellPadding: 4 },
+                headStyles: { 
+                    fillColor: [2, 36, 78], // Matches header blue
+                    textColor: 255,
+                    fontStyle: 'bold',
+                    halign: 'center'
+                },
+                bodyStyles: { 
+                    textColor: 50,
+                    cellPadding: 5
+                },
                 columnStyles: {
-                    0: { fontStyle: 'bold', halign: 'center' }, // Rank
-                    3: { fontStyle: 'bold', halign: 'center' }, // Marks
-                    4: { halign: 'center' }
+                    0: { fontStyle: 'bold', halign: 'center', cellWidth: 20 }, // Rank
+                    1: { halign: 'center', cellWidth: 30 }, // CIC
+                    3: { fontStyle: 'bold', halign: 'center', cellWidth: 30 }, // Marks
+                    4: { halign: 'center', cellWidth: 30 }  // Percentage
+                },
+                alternateRowStyles: {
+                    fillColor: [245, 247, 250]
+                },
+                // Custom styling for "STAR PLUS"
+                didParseCell: function(data) {
+                    if (data.section === 'body' && data.column.index === 2) {
+                        const text = String(data.cell.raw);
+                        if (text.includes('★')) {
+                            data.cell.styles.textColor = [40, 167, 69]; // Green color
+                            data.cell.styles.fontStyle = 'bold';
+                            // Replace the unicode star with nicer text if needed, or keep it
+                            data.cell.text = text.replace('★', '(STAR PLUS)');
+                        }
+                    }
                 }
             });
+
+            // Footer
+            const pageCount = doc.internal.getNumberOfPages();
+            for(let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setTextColor(150);
+                doc.text('Page ' + i + ' of ' + pageCount, 105, 290, null, null, 'center');
+                doc.text('AL ABTHAL - Student Management System', 14, 290);
+            }
 
             doc.save(currentSemTitle.replace(/ /g, "_") + "_RankList.pdf");
         }
 
+        // Load students immediately
         loadStudents();
     </script>
 </body>

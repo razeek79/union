@@ -1,0 +1,49 @@
+/* =====================================================
+   MOBILE RESPONSIVE FIX – VIEW ALL STUDENTS PAGE
+   ===================================================== */
+
+@media (max-width: 576px) {
+
+    /* Student data text (SL No, CIC No, Name) */
+    .students-card h5 {
+        font-size: 0.85rem;
+        margin-bottom: 0;
+        font-weight: 600;
+    }
+
+    /* Column headings */
+    .table-head h5 {
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    /* View button */
+    .action-btn {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .action-btn i {
+        font-size: 0.75rem;
+    }
+
+    /* Page title */
+    h1 {
+        font-size: 1.3rem;
+    }
+
+    /* Search input */
+    #searchInput {
+        font-size: 0.9rem;
+        padding: 8px 12px;
+    }
+
+    /* Large buttons (Back, Whole Results, Exam Rank) */
+    .btn-lg {
+        font-size: 0.9rem;
+        padding: 8px 14px;
+    }
+}

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>View All Students - الأبطال</title>
     <link rel="stylesheet" href="sc.css" />
+    <link rel="stylesheet" href="view-all-students.css"/>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -71,7 +72,7 @@
             <div class="col-12">
                 <div class="card students-card">
                     <div class="card-body">
-                        <div class="row align-items-center">
+                        <div class="row align-items-center table-head">
                             <div class="col-2 text-center">
                                 <h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">SL No.</h5>
                             </div>
@@ -307,7 +308,7 @@
                                 <div class="col-2 text-center"><h5 style="margin:0">${idx+1}</h5></div>
                                 <div class="col-3 text-center"><h5 style="margin:0">${escapeHtml(student.cic_no)}</h5></div>
                                 <div class="col-5 text-center"><h5 style="margin:0">${escapeHtml(student.full_name)}</h5></div>
-                                <div class="col-2 text-center"><button class="btn btn-info btn-sm" type="button" onclick="showStudentDetails('${encodeURIComponent(String(student.cic_no || ''))}')">View</button></div>
+                                <div class="col-2 text-center"><button class="btn btn-info btn-sm action-btn" type="button" onclick="showStudentDetails('${encodeURIComponent(String(student.cic_no || ''))}')">View</button></div>
                             </div>
                         </div>
                     </div>

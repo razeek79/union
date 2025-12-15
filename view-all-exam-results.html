@@ -3,109 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View All Exam Results - الأبطال</title>
+    <title>All Exam Results - الأبطال</title>
+    <link rel="stylesheet" href="sc.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Excel & PDF Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <!-- PDF Generation (Optional for printing whole page) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         body { background: #f9f9f9; font-family: Almarai, Arial, sans-serif; }
-        h1, h2, h3 { color: #02244e; }
+        h1, h2, h3, h4, h5 { color: #02244e; }
+        
         .container { max-width: 1200px; margin-top: 100px; }
         
+        /* Filter Section */
         .filter-card {
-            background: #fff; border-radius: 12px; padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px;
-        }
-
-        .result-card {
             background: #fff; border-radius: 12px; padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 30px;
+            border-top: 5px solid #02244e;
         }
 
-        /* Marks Styling */
-        .mark-low { color: #dc3545; font-weight: bold; } /* Red for low marks */
+        /* Individual Student Result Block */
+        .student-result-block {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #e9ecef;
+            page-break-inside: avoid; /* Prevents cutting tables in half when printing */
+        }
+
+        .student-header {
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .student-info h4 { font-weight: bold; margin: 0; }
+        .student-info span { font-size: 1.1rem; color: #666; }
+
+        /* Table Styles */
+        .table thead th {
+            background-color: #02244e;
+            color: white;
+            border: none;
+            vertical-align: middle;
+        }
+        
+        /* Marks & Status Styling */
+        .mark-low { color: #dc3545; font-weight: bold; }
         .percentage-col { font-weight: bold; color: #02244e; }
         
-        /* Print/PDF adjustments */
+        .status-passed { color: #28a745; font-weight: bold; }
+        .status-failed { color: #dc3545; font-weight: bold; }
+
+        /* Print Button */
+        .print-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
         @media print {
-            .no-print { display: none; }
+            .no-print { display: none !important; }
+            .container { margin-top: 0; max-width: 100%; }
+            .student-result-block { box-shadow: none; border: 1px solid #ccc; }
         }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-    <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" style="height:40px;" /></a>
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top no-print">
+    <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" /></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
             <li class="nav-item"><a class="nav-link" href="main.html">Home</a></li>
-            <li class="nav-item active"><a class="nav-link" href="#">All Results</a></li>
+            <li class="nav-item"><a class="nav-link" href="students-progress.html">Students Progress</a></li>
         </ul>
     </div>
 </nav>
 
 <div class="container">
-    <h1 class="text-center mb-4">All Students Exam Results</h1>
+    <h2 class="text-center mb-4 no-print" style="font-weight: bold;">All Student Result Sheets</h2>
 
-    <!-- 1. Selection Filters -->
-    <div class="filter-card">
-        <div class="form-row align-items-end">
+    <!-- Filter Section -->
+    <div class="filter-card no-print">
+        <div class="row align-items-end">
             <div class="col-md-4">
-                <label>Select Course Type</label>
-                <select id="courseType" class="form-control" onchange="updateSemesterOptions()">
-                    <option value="">-- Choose Course --</option>
-                    <option value="wafy">Wafy (Thamheediyya / Aliya)</option>
-                    <option value="degree">Degree</option>
-                    <option value="highersec">Higher Secondary</option>
-                </select>
+                <div class="form-group mb-0">
+                    <label class="font-weight-bold">1. Select Course</label>
+                    <select id="courseType" class="form-control" onchange="updateSemesterOptions()">
+                        <option value="">-- Choose Course --</option>
+                        <option value="wafy">Wafy (Thamheediyya / Aliya)</option>
+                        <option value="degree">Degree</option>
+                        <option value="highersec">Higher Secondary</option>
+                    </select>
+                </div>
             </div>
             <div class="col-md-4">
-                <label>Select Semester</label>
-                <select id="semesterSelect" class="form-control" disabled>
-                    <option value="">-- Select Course First --</option>
-                </select>
+                <div class="form-group mb-0">
+                    <label class="font-weight-bold">2. Select Semester</label>
+                    <select id="semesterSelect" class="form-control" disabled>
+                        <option value="">-- Select Course First --</option>
+                    </select>
+                </div>
             </div>
             <div class="col-md-4">
-                <button class="btn btn-primary btn-block" onclick="fetchResults()">Load Results</button>
+                <button class="btn btn-primary btn-block font-weight-bold" onclick="fetchAllResults()">
+                    Load All Sheets
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- 2. Results Display -->
-    <div id="resultsSection" style="display:none;">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 id="resultsTitle">Results</h4>
-            <div>
-                <button class="btn btn-success mr-2" onclick="downloadExcel()"><i class="fas fa-file-excel"></i> Excel</button>
-                <button class="btn btn-danger" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
-            </div>
-        </div>
+    <!-- Results Container -->
+    <div id="resultsContainer"></div>
 
-        <div class="result-card">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover text-center" id="resultsTable">
-                    <thead class="thead-dark" id="tableHead"></thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
+    <!-- Loading Spinner -->
     <div id="loadingSpinner" class="text-center my-5" style="display:none;">
-        <div class="spinner-border text-primary"></div>
-        <p>Fetching data...</p>
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
+        <p class="mt-2 text-muted">Generating report cards...</p>
     </div>
 
-    <div class="mt-5 text-center no-print">
-        <a href="javascript:history.back()" class="btn btn-secondary btn-lg">Back</a>
+    <!-- Print Button -->
+    <button class="btn btn-lg btn-danger no-print" onclick="window.print()" title="Print / Save as PDF">
+        <i class="fas fa-print"></i>
+    </button>
+
+    <div class="mt-5 text-center mb-5 no-print">
+        <a href="students-progress.html" class="btn btn-secondary btn-lg px-5">Back to Menu</a>
     </div>
 </div>
 
@@ -123,6 +161,15 @@
                 {k: 'wafy_aliya_sem3', v: 'Aliya Sem 3'}, {k: 'wafy_aliya_sem4', v: 'Aliya Sem 4'},
                 {k: 'wafy_aliya_sem5', v: 'Aliya Sem 5'}, {k: 'wafy_aliya_sem6', v: 'Aliya Sem 6'},
                 {k: 'wafy_aliya_sem7', v: 'Aliya Sem 7'}, {k: 'wafy_aliya_sem8', v: 'Aliya Sem 8'}
+            ],
+            // Specific Column Order for Wafy
+            columns: [
+                { key: 'subject', label: 'Subject' }, 
+                { key: 'ce_mark', label: 'CE Mark' }, { key: 'ce_max', label: 'CE Max' },
+                { key: 'te_mark', label: 'TE Mark' }, { key: 'te_max', label: 'TE Max' },
+                { key: 'total', label: 'Total' }, { key: 'max', label: 'Max' },
+                { key: 'status', label: 'Status' }, { key: 'exam_mode', label: 'Exam Mode' },
+                { key: 'percentage', label: 'Percentage' } // Calculated
             ]
         },
         degree: {
@@ -130,23 +177,29 @@
                 {k: 'degree_sem1', v: 'Degree Sem 1'}, {k: 'degree_sem2', v: 'Degree Sem 2'},
                 {k: 'degree_sem3', v: 'Degree Sem 3'}, {k: 'degree_sem4', v: 'Degree Sem 4'},
                 {k: 'degree_sem5', v: 'Degree Sem 5'}, {k: 'degree_sem6', v: 'Degree Sem 6'}
+            ],
+            columns: [
+                { key: 'subject', label: 'Subject' }, { key: 'credits', label: 'Credits' },
+                { key: 'grade', label: 'Grade' }, { key: 'credit_point', label: 'Credit Point' }, { key: 'status', label: 'Status' }
             ]
         },
         highersec: {
             sems: [
                 {k: 'highersec_plus1', v: 'Plus One'}, {k: 'highersec_plus2', v: 'Plus Two'}
+            ],
+            columns: [
+                { key: 'subject', label: 'Subject' }, { key: 'ce_mark', label: 'CE Mark' }, { key: 'ce_max', label: 'CE Max' },
+                { key: 'te_mark', label: 'TE Mark' }, { key: 'te_max', label: 'TE Max' }, { key: 'total', label: 'Total' }, { key: 'max', label: 'Max' }
             ]
         }
     };
 
-    // --- SUPABASE ---
     const supabaseUrl = 'https://ewpmkjqcjnhtxyfqgiba.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3cG1ranFjam5odHh5ZnFnaWJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzMTUyOTMsImV4cCI6MjA3Nzg5MTI5M30.i1ivEtua8fCktdit_DASxQigFg2Kb8NLn0WLLQ3LFmI';
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    let currentData = []; // Store data for export
+    let currentConfig = [];
 
-    // 1. Populate Semesters
     function updateSemesterOptions() {
         const type = document.getElementById('courseType').value;
         const semSelect = document.getElementById('semesterSelect');
@@ -162,205 +215,147 @@
         }
     }
 
-    // 2. Fetch Data
-    async function fetchResults() {
+    async function fetchAllResults() {
         const semKey = document.getElementById('semesterSelect').value;
-        const courseType = document.getElementById('courseType').value;
+        const type = document.getElementById('courseType').value;
         
         if (!semKey) return alert("Please select a semester.");
+        
+        const semLabel = document.getElementById('semesterSelect').options[document.getElementById('semesterSelect').selectedIndex].text;
+        currentConfig = CONFIG[type].columns;
 
         document.getElementById('loadingSpinner').style.display = 'block';
-        document.getElementById('resultsSection').style.display = 'none';
+        document.getElementById('resultsContainer').innerHTML = '';
 
-        // A. Get all results for this semester
+        // 1. Fetch Results
         const { data: results, error } = await supabase
             .from('semester_results')
             .select('student_id, results_data')
             .eq('semester_key', semKey);
 
         if (error) {
-            alert("Error fetching results: " + error.message);
             document.getElementById('loadingSpinner').style.display = 'none';
+            return alert("Error: " + error.message);
+        }
+
+        if (!results || results.length === 0) {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('resultsContainer').innerHTML = `<div class="alert alert-warning text-center">No results found for ${semLabel}.</div>`;
             return;
         }
 
-        // B. Get Student Details (Map ID -> Name/CIC)
+        // 2. Fetch Student Info
         const studentIds = results.map(r => r.student_id);
         const { data: students, error: stuError } = await supabase
             .from('students')
             .select('id, full_name, cic_no')
             .in('id', studentIds);
 
-        if (stuError) {
-            alert("Error fetching student details.");
-            document.getElementById('loadingSpinner').style.display = 'none';
-            return;
-        }
+        if (stuError) return alert("Error fetching students.");
 
-        // Create Map for easy lookup
         const studentMap = {};
         students.forEach(s => studentMap[s.id] = s);
 
-        // 3. Process Data
-        processData(results, studentMap, courseType);
+        // 3. Combine & Sort
+        let allData = [];
+        results.forEach(r => {
+            const student = studentMap[r.student_id];
+            if (student) {
+                allData.push({
+                    student: student,
+                    results: r.results_data,
+                    isWafy: type === 'wafy'
+                });
+            }
+        });
+
+        // Sort by CIC
+        allData.sort((a, b) => a.student.cic_no.localeCompare(b.student.cic_no));
+
+        // 4. Render All Tables
+        renderReportCards(allData, semLabel);
     }
 
-    function processData(results, studentMap, courseType) {
-        const isWafy = courseType === 'wafy';
-        const tableHead = document.getElementById('tableHead');
-        const tableBody = document.getElementById('tableBody');
+    function renderReportCards(allData, semLabel) {
+        const container = document.getElementById('resultsContainer');
         
-        // Clear previous
-        tableHead.innerHTML = '';
-        tableBody.innerHTML = '';
-        currentData = []; // Reset export data
+        allData.forEach(data => {
+            const s = data.student;
+            const isWafy = data.isWafy;
+            
+            // Build Table Block for ONE student
+            const block = document.createElement('div');
+            block.className = 'student-result-block';
+            
+            // Header for the student
+            let headerHtml = `
+                <div class="student-header">
+                    <div class="student-info">
+                        <h4>${s.full_name}</h4>
+                        <span>CIC No: <strong>${s.cic_no}</strong></span>
+                    </div>
+                    <div class="text-right text-muted">
+                        <h5>${semLabel}</h5>
+                    </div>
+                </div>
+            `;
 
-        if (results.length === 0) {
-            document.getElementById('loadingSpinner').style.display = 'none';
-            alert("No results found for this semester.");
-            return;
-        }
+            // Table Body
+            let tableHtml = `
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover text-center">
+                        <thead class="thead-light">
+                            <tr>${currentConfig.map(c => `<th>${c.label}</th>`).join('')}</tr>
+                        </thead>
+                        <tbody>
+            `;
 
-        // Define Columns based on Course Type
-        // We flatten the data: One row per STUDENT.
-        // For Wafy, we usually want "Total Mark" and "Percentage".
-        // If you want detail subjects, it gets wide. Let's assume "Summary View" first (Total/Rank).
-        // OR list EVERY subject row for every student? That would be huge.
-        // Let's list: CIC No | Name | Total Mark | Percentage (if Wafy) | Status (Pass/Fail)
+            data.results.forEach(row => {
+                let tr = '<tr>';
+                let percentage = 0;
+                let isFail = false;
 
-        // HEADERS
-        let headers = ['CIC No.', 'Name'];
-        if (isWafy) {
-            headers.push('Total Marks', 'Max Marks', 'Percentage', 'Result');
-        } else {
-            // Degree/HigherSec just show Total if available, or generic
-            headers.push('Total Marks', 'Result');
-        }
-        
-        let headerHtml = '<tr>';
-        headers.forEach(h => headerHtml += `<th>${h}</th>`);
-        headerHtml += '</tr>';
-        tableHead.innerHTML = headerHtml;
+                // Helper
+                const getVal = (k) => row[k] || row[k.toLowerCase()] || row[k.replace(/_/g, ' ')] || '';
 
-        // BODY
-        results.forEach(entry => {
-            const student = studentMap[entry.student_id];
-            if (!student) return;
-
-            const dataArray = entry.results_data;
-            let totalObtained = 0;
-            let totalMax = 0;
-            let status = 'Passed'; // Default, check for 'F'
-
-            // Calculate Totals from JSON
-            if (Array.isArray(dataArray)) {
-                // Try to find a summary row first
-                const summaryRow = dataArray.find(r => (r.subject || r.Subject || '').toLowerCase() === 'total');
-                
-                if (summaryRow) {
-                    totalObtained = parseFloat(summaryRow.total || summaryRow.Total || 0);
-                    totalMax = parseFloat(summaryRow.max || summaryRow.Max || 0);
-                    // Check status from summary or scan rows
-                    if ((summaryRow.status || summaryRow.Status || '').toLowerCase().includes('f') || (summaryRow.result || '').toLowerCase().includes('fail')) {
-                         status = 'Failed';
+                // Wafy Logic
+                if(isWafy) {
+                    const total = parseFloat(getVal('total'));
+                    const max = parseFloat(getVal('max') || getVal('max_mark'));
+                    if(!isNaN(total) && !isNaN(max) && max > 0) {
+                        percentage = (total/max)*100;
                     }
-                } else {
-                    // Sum manually
-                    dataArray.forEach(row => {
-                        const t = parseFloat(row.total || row.Total || 0);
-                        const m = parseFloat(row.max || row.Max || 0); // Sometimes max is per subject
-                        if (!isNaN(t)) totalObtained += t;
-                        // Status check per subject
-                        const s = (row.status || row.Status || '');
-                        if (s.toLowerCase() === 'f' || s.toLowerCase() === 'fail') status = 'Failed';
-                    });
-                    // Max is tricky to sum if not standard, let's assume 0 if not found
+                    // Mark red if < 45%
+                    if(percentage < 45) isFail = true;
                 }
-            }
 
-            let rowHtml = `<tr>
-                <td>${student.cic_no}</td>
-                <td>${student.full_name}</td>
-                <td>${totalObtained}</td>`;
+                // Render Cells
+                currentConfig.forEach(col => {
+                    if (col.key === 'percentage') {
+                        const pText = percentage > 0 ? percentage.toFixed(1) + '%' : '-';
+                        tr += `<td class="percentage-col ${isFail ? 'mark-low' : ''}">${pText}</td>`;
+                    } else {
+                        let val = getVal(col.key);
+                        // Highlight 'Total' if failed (Wafy only)
+                        if (isWafy && col.key === 'total' && isFail) {
+                            tr += `<td class="mark-low">${val}</td>`;
+                        } else {
+                            tr += `<td>${val}</td>`;
+                        }
+                    }
+                });
+                tr += '</tr>';
+                tableHtml += tr;
+            });
 
-            let percentage = 0;
-            if (isWafy) {
-                rowHtml += `<td>${totalMax || '-'}</td>`;
-                
-                if (totalMax > 0) {
-                    percentage = (totalObtained / totalMax) * 100;
-                    const pClass = percentage < 45 ? 'mark-low' : 'percentage-col';
-                    rowHtml += `<td class="${pClass}">${percentage.toFixed(2)}%</td>`;
-                    
-                    // Auto-fail if < 45%? Or rely on excel status?
-                    // Let's rely on Excel status primarily, but color red if low.
-                } else {
-                    rowHtml += `<td>-</td>`;
-                }
-            }
-
-            // Status Column
-            const statusClass = status === 'Failed' ? 'text-danger font-weight-bold' : 'text-success';
-            rowHtml += `<td class="${statusClass}">${status}</td></tr>`;
-            tableBody.innerHTML += rowHtml;
-
-            // Save for export
-            let exportRow = {
-                "CIC No": student.cic_no,
-                "Name": student.full_name,
-                "Total Marks": totalObtained,
-                "Result": status
-            };
-            if (isWafy) {
-                exportRow["Max Marks"] = totalMax;
-                exportRow["Percentage"] = percentage.toFixed(2) + '%';
-            }
-            currentData.push(exportRow);
+            tableHtml += `</tbody></table></div>`;
+            
+            block.innerHTML = headerHtml + tableHtml;
+            container.appendChild(block);
         });
 
         document.getElementById('loadingSpinner').style.display = 'none';
-        document.getElementById('resultsSection').style.display = 'block';
-        
-        // Update Title
-        const semText = document.getElementById('semesterSelect').options[document.getElementById('semesterSelect').selectedIndex].text;
-        document.getElementById('resultsTitle').innerText = semText + " Results";
-    }
-
-    // --- EXPORT FUNCTIONS ---
-    function downloadExcel() {
-        if (currentData.length === 0) return alert("No data to export");
-        
-        const ws = XLSX.utils.json_to_sheet(currentData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Results");
-        XLSX.writeFile(wb, "Exam_Results.xlsx");
-    }
-
-    function downloadPDF() {
-        if (currentData.length === 0) return alert("No data to export");
-        
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        
-        const title = document.getElementById('resultsTitle').innerText;
-        doc.text(title, 14, 15);
-        
-        // Get headers from first row of data
-        const headers = Object.keys(currentData[0]);
-        const body = currentData.map(row => Object.values(row));
-        
-        doc.autoTable({
-            head: [headers],
-            body: body,
-            startY: 20,
-            theme: 'grid',
-            styles: { fontSize: 10 },
-            headStyles: { fillColor: [2, 36, 78] } // Your theme blue
-        });
-        
-        doc.save("Exam_Results.pdf");
     }
 </script>
-
 </body>
 </html>
