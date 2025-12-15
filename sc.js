@@ -7,5 +7,5 @@ window.addEventListener("load", () => {
             // Redirect to main.html after fade-out animation
             window.location.href = "main.html";
         }, 1000); // Wait for fade-out animation to finish
-    }, 3000); // Show intro for 3 seconds
+    }, 2000); // Show intro for 3 seconds
 });
