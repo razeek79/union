@@ -230,32 +230,3 @@ button:hover {
 }
 
 
-.council-card {
-    border: 2px solid #02244e;
-    border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(2, 36, 78, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-    min-height: 100%;
-}
-
-.council-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(2, 36, 78, 0.2);
-}
-
-.council-photo {
-    height: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    background-color: #f0f0f0;
-    border-radius: 10px;
-}
-
-.council-photo img {
-    width: 80%;
-    height: 100%;
-    object-fit: cover;
-}

@@ -1,0 +1,119 @@
+/* ===== Global Settings ===== */
+body {
+    background-color: #f8faff;
+    background-image: radial-gradient(#e6e9f0 1px, transparent 1px);
+    background-size: 20px 20px;
+    font-family: 'Almarai', sans-serif;
+}
+
+/* ===== Section Title ===== */
+.section-title {
+    color: #02244e;
+    font-weight: 800;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ===== Card Styling ===== */
+.council-card {
+    border: none;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgba(2, 36, 78, 0.08);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    position: relative;
+}
+
+/* Hover Effect: Lift and Glow */
+.council-card:hover {
+    trasform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(2, 36, 78, 0.15);
+}
+
+/* Gradient Top Border */
+.council-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, #02244e, #007bff);
+}
+
+/* Mentor Card Special Styling */
+.mentor-card {
+    border: 2px solid rgba(255, 215, 0, 0.3); /* Subtle gold border */
+}
+.mentor-card::after {
+    background: linear-gradient(90deg, #B8860B, #FFD700);
+}
+
+/* ===== Image Wrapper ===== */
+/* This ensures all photos look uniform regardless of original aspect ratio */
+.card-img-wrapper {
+    width: 100%;
+    height: 320px; /* Taller height for better portraits */
+    overflow: hidden;
+    background-color: #f0f0f0;
+    position: relative;
+}
+
+/* Image Styling */
+.council-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center; /* Focuses on faces */
+    trasition: transform 0.5s ease;
+}
+
+/* Image Zoom on Hover */
+.council-card:hover img {
+    trasform: scale(1.05);
+}
+
+/* ===== Typography ===== */
+.card-body {
+    padding: 1.5rem;
+    background: #fff;
+    z-index: 1;
+}
+
+.position-title {
+    color: #6c757d;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 0.5rem;
+}
+
+.member-name {
+    color: #02244e;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* ===== Responsive Adjustments ===== */
+@media (max-width: 768px) {
+    .card-img-wrapper {
+        height: 350px; /* Taller on mobile for full impact */
+    }
+    .member-name {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .section-title {
+        font-size: 2rem;
+    }
+    .card-img-wrapper {
+        height: 300px;
+    }
+}
