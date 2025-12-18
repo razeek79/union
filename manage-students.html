@@ -114,6 +114,7 @@
     </div>
 
     <script>
+        const supabaseClient = window.supabaseClient;
 
         // *** SECRET SUFFIX for 4-char passwords ***
         // We append this to any student password to satisfy Supabase's 6-char limit.
@@ -136,7 +137,7 @@
             const password = document.getElementById('password').value;
             const email = getLoginEmail(username);
 
-            const { data, error } = await supabase.auth.signInWithPassword({
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
                 email: email,
                 password: password
             });
@@ -146,7 +147,7 @@
                 return;
             }
 
-            const { data: officialData, error: roleError } = await supabase
+            const { data: officialData, error: roleError } = await supabaseClient
                 .from('officials')
                 .select('role')
                 .eq('id', data.user.id)
@@ -154,7 +155,7 @@
 
             if (roleError || !officialData) {
                 alert('Access Denied: You are not listed in the officials database.');
-                await supabase.auth.signOut();
+                await supabaseClient.auth.signOut();
                 return;
             }
 
@@ -195,7 +196,7 @@
             const email = cicNo.toLowerCase() + '@student.com';
 
             // 1. Check if exists via RPC
-            const { data: existingUsers, error: checkError } = await supabase.rpc('get_user_by_email', { email: email });
+            const { data: existingUsers, error: checkError } = await supabaseClient.rpc('get_user_by_email', { email: email });
 
             if (!checkError && existingUsers && existingUsers.length > 0) {
                 alert("Error: This CIC No. login already exists.");
@@ -203,7 +204,7 @@
             }
 
             // 2. Create Student Login
-            const { data, error } = await supabase.auth.signUp({
+            const { data, error } = await supabaseClient.auth.signUp({
                 email: email,
                 password: finalPassword // Send padded password
             });
@@ -218,7 +219,7 @@
             }
             
             // 3. Create Profile
-            const { error: dbError } = await supabase
+            const { error: dbError } = await supabaseClient
                 .from('students')
                 .insert([{ id: data.user.id, cic_no: cicNo, full_name: name }]);
 
@@ -238,7 +239,7 @@
             
             if (!confirm(`Remove ${studentName}?`)) return;
 
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from('students')
                 .delete()
                 .eq('full_name', studentName);
