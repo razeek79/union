@@ -1,3 +1,16 @@
-const SUPABASE_URL = 'https://ewpmkjqcjnhtxyfqgiba.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3cG1ranFjam5odHh5ZnFnaWJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzMTUyOTMsImV4cCI6MjA3Nzg5MTI5M30.i1ivEtua8fCktdit_DASxQigFg2Kb8NLn0WLLQ3LFmI';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// 1. Define Keys
+const _SUPABASE_URL = 'https://ewpmkjqcjnhtxyfqgiba.supabase.co';
+const _SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3cG1ranFjam5odHh5ZnFnaWJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzMTUyOTMsImV4cCI6MjA3Nzg5MTI5M30.i1ivEtua8fCktdit_DASxQigFg2Kb8NLn0WLLQ3LFmI';
+
+// 2. Initialize Client
+// We assign it to 'window.supabaseClient' to avoid conflict with the 'supabase' library object
+window.supabaseClient = window.supabase.createClient(_SUPABASE_URL, _SUPABASE_KEY);
+
+// 3. Backward Compatibility Hack
+// Many of your scripts expect 'supabase' to be the client, not the library.
+// But the library loads as 'window.supabase'.
+// We can't overwrite window.supabase easily if we need 'createClient' from it.
+// SOLUTION: Your HTML files should declare: const supabase = window.supabaseClient;
+```
+
+``

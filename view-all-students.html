@@ -217,9 +217,12 @@
 
     <script>
         // Supabase config
-
+        const supabase = window.supabaseClient;
         let studentsCache = [];
 
+        if (!supabase || !supabase.from) {
+        console.error("Supabase client not initialized! Check config.js");
+        }
         async function fetchStudents() {
             try {
                 // Fetch all students
