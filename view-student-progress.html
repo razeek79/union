@@ -116,6 +116,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <script>
+        const supabaseClient = window.supabaseClient;
 
         function getQueryParam(key) {
             return new URLSearchParams(window.location.search).get(key);
@@ -130,7 +131,7 @@
             }
 
             // Fetch student from Supabase
-            const { data: student, error } = await supabase
+            const { data: student, error } = await supabaseClient
                 .from('students')
                 .select('full_name, cic_no')
                 .eq('cic_no', cicNo)
