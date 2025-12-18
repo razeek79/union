@@ -215,7 +215,6 @@
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script>
-        const supabase = window.supabaseClient;
         let studentsCache = [];
 
         if (!supabase || !supabase.from) {
@@ -224,7 +223,7 @@
         async function fetchStudents() {
             try {
                 // Fetch all students
-                const { data, error } = await supabase
+                const { data, error } = await window.supabaseClient
                     .from('students')
                     .select('id, cic_no, full_name, admission_no, dob, guardian_name, occupation, address, phone_no, email_id')
                     .order('cic_no', { ascending: true });
