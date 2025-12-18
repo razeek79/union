@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="sc.css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <style>
       .editable-cell { cursor: pointer; background: #fff; }
@@ -83,9 +84,6 @@
     const TABLE_KEYS = ["subject", "credits", "grade", "credit_point", "status"];
     
     // --- SUPABASE ---
-    const supabaseUrl = 'https://ewpmkjqcjnhtxyfqgiba.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3cG1ranFjam5odHh5ZnFnaWJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzMTUyOTMsImV4cCI6MjA3Nzg5MTI5M30.i1ivEtua8fCktdit_DASxQigFg2Kb8NLn0WLLQ3LFmI';
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
     let currentStudentId = null;
 
     async function init() {
