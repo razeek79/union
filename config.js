@@ -5,12 +5,3 @@ const _SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 // 2. Initialize Client
 // We assign it to 'window.supabaseClient' to avoid conflict with the 'supabase' library object
 window.supabaseClient = window.supabase.createClient(_SUPABASE_URL, _SUPABASE_KEY);
-
-// 3. Backward Compatibility Hack
-// Many of your scripts expect 'supabase' to be the client, not the library.
-// But the library loads as 'window.supabase'.
-// We can't overwrite window.supabase easily if we need 'createClient' from it.
-// SOLUTION: Your HTML files should declare: const supabase = window.supabaseClient;
-```
-
-``
