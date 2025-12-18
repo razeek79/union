@@ -202,6 +202,7 @@
     </div>
 
     <script>
+        const supabaseClient = window.supabaseClient;
 
         // *** SECRET SUFFIX (Matches what you set in manage-students.html) ***
         const PASSWORD_SUFFIX = "_ALABTHAL";
@@ -214,15 +215,15 @@
 
         // --- HELPER: UPDATE LEAVES ---
         async function updateLeaves(studentId, total, medical) {
-            const { data: existing } = await supabase.from('student_leaves').select('id').eq('student_id', studentId).single();
+            const { data: existing } = await supabaseClient.from('student_leaves').select('id').eq('student_id', studentId).single();
             
             if (existing) {
-                await supabase.from('student_leaves').update({ 
+                await supabaseClient.from('student_leaves').update({ 
                     total_leaves: total || 0, 
                     medical_leaves: medical || 0 
                 }).eq('id', existing.id);
             } else {
-                await supabase.from('student_leaves').insert([{ 
+                await supabaseClient.from('student_leaves').insert([{ 
                     student_id: studentId, 
                     total_leaves: total || 0, 
                     medical_leaves: medical || 0 
@@ -232,7 +233,7 @@
 
         // --- HELPER: FETCH LEAVES ---
         async function fetchLeaves(studentId) {
-            const { data, error } = await supabase.from('student_leaves').select('*').eq('student_id', studentId).single();
+            const { data, error } = await supabaseClient.from('student_leaves').select('*').eq('student_id', studentId).single();
             if (error || !data) return { total_leaves: 0, medical_leaves: 0 };
             return data;
         }
@@ -254,7 +255,7 @@
         async function performSmartLogin(username, password) {
             // 1. Chief Admin (Uses normal 6+ char password)
             if (username === 'Razeek Fariz') {
-                const { data, error } = await supabase.auth.signInWithPassword({ email: 'razeekfariz1@gmail.com', password });
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email: 'razeekfariz1@gmail.com', password });
                 if (error) throw error;
                 return data.user;
             }
@@ -263,7 +264,7 @@
             const cleanName = username.replace(/\s+/g, '').toLowerCase();
             
             // Try with the padded password for students
-            let { data, error } = await supabase.auth.signInWithPassword({ 
+            let { data, error } = await supabaseClient.auth.signInWithPassword({ 
                 email: cleanName + '@student.com', 
                 password: password + PASSWORD_SUFFIX 
             });
@@ -271,7 +272,7 @@
             if (!error) return data.user;
 
             // 3. If failed, try as OFFICIAL (Uses normal 6+ char password)
-            ({ data, error } = await supabase.auth.signInWithPassword({ email: cleanName + '@official.com', password: password }));
+            ({ data, error } = await supabaseClient.auth.signInWithPassword({ email: cleanName + '@official.com', password: password }));
             
             if (error) throw new Error("Invalid username or password");
             return data.user;
@@ -280,13 +281,13 @@
         async function determineUserRole(user, displayUsername) {
             const userId = user.id;
 
-            const { data: official } = await supabase.from('officials').select('*').eq('id', userId).single();
+            const { data: official } = await supabaseClient.from('officials').select('*').eq('id', userId).single();
             if (official) {
                 setupSession(official.username, official.role, false, null);
                 return;
             }
 
-            const { data: student } = await supabase.from('students').select('*').eq('id', userId).single();
+            const { data: student } = await supabaseClient.from('students').select('*').eq('id', userId).single();
             if (student) {
                 setupSession(student.full_name, 'student', true, student);
                 return;
@@ -318,7 +319,7 @@
 
         // --- ADMIN FUNCTIONS ---
         async function refreshStudents() {
-            const { data, error } = await supabase.from('students').select('*').order('cic_no');
+            const { data, error } = await supabaseClient.from('students').select('*').order('cic_no');
             if (error) return alert("Error loading students");
             studentsCache = data;
             renderStudentList(data);
@@ -405,7 +406,7 @@
                 phone_no: document.getElementById('editPhoneNo').value
             };
 
-            const { error } = await supabase.from('students').update(updates).eq('cic_no', editingCicNo);
+            const { error } = await supabaseClient.from('students').update(updates).eq('cic_no', editingCicNo);
             
             if (error) {
                 alert("Error: " + error.message);
@@ -455,7 +456,7 @@
                 phone_no: document.getElementById('phoneNo').value
             };
             
-            const { error } = await supabase.from('students').update(updates).eq('id', currentStudentData.id);
+            const { error } = await supabaseClient.from('students').update(updates).eq('id', currentStudentData.id);
             
             if (error) {
                 alert("Error: " + error.message);
@@ -470,7 +471,7 @@
         });
 
         window.logout = async function() {
-            await supabase.auth.signOut();
+            await supabaseClient.auth.signOut();
             location.reload();
         };
 

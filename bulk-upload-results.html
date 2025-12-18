@@ -98,6 +98,7 @@
     </div>
 
     <script>
+        const supabaseClient = window.supabaseClient;
         // --- CONFIGURATION ---
         const CONFIG = {
             wafy: {
@@ -280,7 +281,7 @@
                     log(`Found ${cicList.length} unique students.`);
 
                     log("Fetching student IDs from database...");
-                    const { data: studentsDB, error: stuError } = await supabase
+                    const { data: studentsDB, error: stuError } = await window.supabaseClient
                         .from('students')
                         .select('id, cic_no')
                         .in('cic_no', cicList);
@@ -316,23 +317,33 @@
 
                     if (upsertPayload.length > 0) {
                         log(`Uploading ${upsertPayload.length} student records...`);
-                        
+
                         const chunkSize = 50;
                         for (let i = 0; i < upsertPayload.length; i += chunkSize) {
                             const chunk = upsertPayload.slice(i, i + chunkSize);
                             const ids = chunk.map(x => x.student_id);
-                            await supabase.from('semester_results').delete().eq('semester_key', semesterKey).in('student_id', ids);
 
-                            const { error } = await supabase.from('semester_results').insert(chunk);
+                            await supabaseClient
+                                .from('semester_results')
+                                .delete()
+                                .eq('semester_key', semesterKey)
+                                .in('student_id', ids);
+
+                            const { error } = await supabaseClient
+                                .from('semester_results')
+                                .insert(chunk);
+
                             if (error) throw error;
-                            
-                            log(`Batch ${i/chunkSize + 1} uploaded successfully.`, "success");
+
+                            log(`Batch ${i / chunkSize + 1} uploaded successfully.`, "success");
                         }
+
                         log("Bulk Upload Complete!", "success");
                         alert("Upload Complete!");
                     } else {
                         log("No valid data to upload.", "error");
                     }
+
 
                 } catch (err) {
                     log("Error: " + err.message, "error");
