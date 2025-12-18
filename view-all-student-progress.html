@@ -127,13 +127,14 @@
     </div>
 
     <script>
+        const supabaseClient = window.supabaseClient;
 
         let studentsCache = [];
 
         async function fetchStudents() {
             document.getElementById('studentsList').innerHTML = '<div class="col-12 text-center text-muted">Loading...</div>';
             
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('students')
                 .select('cic_no, full_name')
                 .order('cic_no');
