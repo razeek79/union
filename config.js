@@ -4,4 +4,8 @@ const _SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 
 // 2. Initialize Client
 // We assign it to 'window.supabaseClient' to avoid conflict with the 'supabase' library object
-window.supabaseClient = window.supabase.createClient(_SUPABASE_URL, _SUPABASE_KEY);
+if (window.supabase && window.supabase.createClient) {
+    window.supabaseClient = window.supabase.createClient(_SUPABASE_URL, _SUPABASE_KEY);
+} else {
+    console.error("Supabase library not loaded. Check script order.");
+}
