@@ -119,6 +119,7 @@
     </div>
 
     <script>
+        const supabaseClient = window.supabaseClient;
 
         let currentStudentId = null;
 
@@ -131,7 +132,7 @@
             const cicNo = getQueryParam('cicNo');
             if (!cicNo) return alert("Missing CIC No.");
 
-            const { data: student, error } = await supabase
+            const { data: student, error } = await supabaseClient
                 .from('students')
                 .select('id, full_name, cic_no')
                 .eq('cic_no', cicNo)
@@ -151,7 +152,7 @@
 
         // 2. Fetch Skills
         async function loadSkills() {
-            const { data: list, error } = await supabase
+            const { data: list, error } = await supabaseClient
                 .from('extra_skills')
                 .select('*')
                 .eq('student_id', currentStudentId)
@@ -205,7 +206,7 @@
 
             if (!skill) return alert("Please enter a skill.");
 
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from('extra_skills')
                 .insert([{
                     student_id: currentStudentId,
@@ -224,7 +225,7 @@
         window.deleteSkill = async function(id) {
             if (!confirm("Delete this skill?")) return;
 
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from('extra_skills')
                 .delete()
                 .eq('id', id);

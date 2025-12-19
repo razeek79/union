@@ -79,6 +79,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <script>
+    const supabaseClient = window.supabaseClient;
     // --- CONFIG ---
     const SEMESTER_KEY = 'degree_sem3'; // <--- CHANGE THIS
     const TABLE_KEYS = ["subject", "credits", "grade", "credit_point", "status"];
@@ -98,7 +99,7 @@
         const cicNo = params.get('cicNo');
         if (!cicNo) return alert("Missing CIC No.");
         
-        const { data: student, error } = await supabase.from('students').select('id, full_name, cic_no').eq('cic_no', cicNo).single();
+        const { data: student, error } = await supabaseClient.from('students').select('id, full_name, cic_no').eq('cic_no', cicNo).single();
         if (error || !student) return alert("Student Not Found");
 
         currentStudentId = student.id;
@@ -107,7 +108,7 @@
     }
 
     async function loadExistingResults() {
-        const { data } = await supabase.from('semester_results')
+        const { data } = await supabaseClient.from('semester_results')
             .select('results_data')
             .match({ student_id: currentStudentId, semester_key: SEMESTER_KEY })
             .single();
@@ -172,8 +173,8 @@
 
         if (dataToSave.length === 0) return alert("Table is empty.");
 
-        await supabase.from('semester_results').delete().match({ student_id: currentStudentId, semester_key: SEMESTER_KEY });
-        const { error } = await supabase.from('semester_results').insert([{
+        await supabaseClient.from('semester_results').delete().match({ student_id: currentStudentId, semester_key: SEMESTER_KEY });
+        const { error } = await supabaseClient.from('semester_results').insert([{
             student_id: currentStudentId, semester_key: SEMESTER_KEY, results_data: dataToSave
         }]);
 
@@ -183,7 +184,7 @@
 
     async function deleteResults() {
         if(!confirm("Delete all results for this semester?")) return;
-        await supabase.from('semester_results').delete().match({ student_id: currentStudentId, semester_key: SEMESTER_KEY });
+        await supabaseClient.from('semester_results').delete().match({ student_id: currentStudentId, semester_key: SEMESTER_KEY });
         location.reload();
     }
     window.onload = init;

@@ -68,6 +68,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <script>
+    const supabaseClient = window.supabaseClient;
     // --- CONFIG FOR WAFY ---
     const SEMESTER_KEY = 'wafy_thamheediyya_sem2'; // <--- CHANGE THIS FOR OTHER SEMESTERS
     const TABLE_KEYS = ["subject", "ce_mark", "ce_max", "te_mark", "te_max", "total", "max", "status", "exam_mode"];
@@ -86,7 +87,7 @@
         const cicNo = new URLSearchParams(window.location.search).get('cicNo');
         if (!cicNo) return alert("Missing CIC No.");
         
-        const { data: student, error } = await supabase.from('students').select('id, full_name, cic_no').eq('cic_no', cicNo).single();
+        const { data: student, error } = await supabaseClient.from('students').select('id, full_name, cic_no').eq('cic_no', cicNo).single();
         if (error || !student) return alert("Student Not Found");
         
         currentStudentId = student.id;
@@ -95,7 +96,7 @@
     }
 
     async function loadExistingResults() {
-        const { data } = await supabase.from('semester_results').select('results_data').match({ student_id: currentStudentId, semester_key: SEMESTER_KEY }).single();
+        const { data } = await supabaseClient.from('semester_results').select('results_data').match({ student_id: currentStudentId, semester_key: SEMESTER_KEY }).single();
         if (data?.results_data?.length > 0) renderTable(data.results_data);
         else { document.getElementById('noDataMsg').style.display = 'block'; document.getElementById('previewSection').style.display = 'none'; }
     }
@@ -149,14 +150,14 @@
             if (hasData) dataToSave.push(rowObj);
         });
 
-        await supabase.from('semester_results').delete().match({ student_id: currentStudentId, semester_key: SEMESTER_KEY });
-        const { error } = await supabase.from('semester_results').insert([{ student_id: currentStudentId, semester_key: SEMESTER_KEY, results_data: dataToSave }]);
+        await supabaseClient.from('semester_results').delete().match({ student_id: currentStudentId, semester_key: SEMESTER_KEY });
+        const { error } = await supabaseClient.from('semester_results').insert([{ student_id: currentStudentId, semester_key: SEMESTER_KEY, results_data: dataToSave }]);
         if (error) alert(error.message); else alert("Saved!");
     }
 
     async function deleteResults() {
         if(!confirm("Delete all?")) return;
-        await supabase.from('semester_results').delete().match({ student_id: currentStudentId, semester_key: SEMESTER_KEY });
+        await supabaseClient.from('semester_results').delete().match({ student_id: currentStudentId, semester_key: SEMESTER_KEY });
         location.reload();
     }
     window.onload = init;

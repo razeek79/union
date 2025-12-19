@@ -56,6 +56,8 @@
 </div>
 
 <script>
+    const supabaseClient = window.supabaseClient;
+
     let currentStudentId = null;
     let currentCicNo = null;
     let currentStudentName = ""; // Store for PDF filename
@@ -158,7 +160,7 @@
             return;
         }
 
-        const { data: student, error } = await supabase
+        const { data: student, error } = await supabaseClient
             .from('students')
             .select('id, full_name, cic_no')
             .eq('cic_no', currentCicNo)
@@ -224,7 +226,7 @@
         
         currentSemLabel = semLabel;
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('semester_results')
             .select('results_data')
             .match({ student_id: currentStudentId, semester_key: semKey })

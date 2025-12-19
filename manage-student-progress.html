@@ -153,6 +153,7 @@
     </div>
 
     <script>
+        const supabaseClient = window.supabaseClient;
 
         const PASSWORD_SUFFIX = "_ALABTHAL";
         let studentsCache = [];
@@ -166,14 +167,14 @@
             try {
                 // A. Chief Admin
                 if (username === 'Razeek Fariz') {
-                    const { data, error } = await supabase.auth.signInWithPassword({ email: 'razeekfariz1@gmail.com', password });
+                    const { data, error } = await supabaseClient.auth.signInWithPassword({ email: 'razeekfariz1@gmail.com', password });
                     if (error) throw error;
                     return setupSession(username, 'chief_admin');
                 }
 
                 // B. Student (Redirect)
                 const cleanName = username.replace(/\s+/g, '').toLowerCase();
-                let { data: stuData, error: stuError } = await supabase.auth.signInWithPassword({ 
+                let { data: stuData, error: stuError } = await supabaseClient.auth.signInWithPassword({ 
                     email: cleanName + '@student.com', 
                     password: password + PASSWORD_SUFFIX 
                 });
@@ -185,13 +186,13 @@
                 }
 
                 // C. Official (Dashboard)
-                let { data: offData, error: offError } = await supabase.auth.signInWithPassword({ 
+                let { data: offData, error: offError } = await supabaseClient.auth.signInWithPassword({ 
                     email: cleanName + '@official.com', 
                     password: password 
                 });
                 
                 if (!offError) {
-                    const { data: official } = await supabase.from('officials').select('role').eq('id', offData.user.id).single();
+                    const { data: official } = await supabaseClient.from('officials').select('role').eq('id', offData.user.id).single();
                     return setupSession(username, official ? official.role : 'official');
                 }
 
@@ -215,7 +216,7 @@
         async function refreshStudents() {
             document.getElementById('studentsList').innerHTML = '<div class="col-12 text-center text-muted py-5">Loading students...</div>';
             
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('students')
                 .select('cic_no, full_name')
                 .order('cic_no');
@@ -279,7 +280,7 @@
         });
 
         window.logout = async function() {
-            await supabase.auth.signOut();
+            await supabaseClient.auth.signOut();
             localStorage.removeItem('mgmtUser');
             localStorage.removeItem('mgmtUserRole');
             location.reload();

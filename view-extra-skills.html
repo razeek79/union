@@ -95,6 +95,8 @@
     </div>
 
     <script>
+        const supabaseClient = window.supabaseClient;
+
         function getQueryParam(key) {
             return new URLSearchParams(window.location.search).get(key);
         }
@@ -107,7 +109,7 @@
                 return;
             }
 
-            const { data: student, error } = await supabase
+            const { data: student, error } = await supabaseClient
                 .from('students')
                 .select('id, full_name, cic_no')
                 .eq('cic_no', cicNo)
@@ -126,7 +128,7 @@
 
         // 2. Fetch Skills from DB
         async function loadSkills(studentId) {
-            const { data: list, error } = await supabase
+            const { data: list, error } = await supabaseClient
                 .from('extra_skills')
                 .select('*') // columns: id, skill, certificate
                 .eq('student_id', studentId)

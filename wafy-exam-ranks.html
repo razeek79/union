@@ -188,6 +188,8 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
+        const supabaseClient = window.supabaseClient;
+
         // Initialize Supabase
         // Cache for student names
         let studentsCache = {};
@@ -195,7 +197,7 @@
         let currentSemTitle = '';
 
         async function loadStudents() {
-            const { data } = await supabase.from('students').select('id, full_name, cic_no');
+            const { data } = await supabaseClient.from('students').select('id, full_name, cic_no');
             if(data) {
                 data.forEach(s => studentsCache[s.id] = s);
             }
@@ -214,7 +216,7 @@
             if (Object.keys(studentsCache).length === 0) await loadStudents();
 
             // 3. Fetch Results for this Semester
-            const { data: results, error } = await supabase
+            const { data: results, error } = await supabaseClient
                 .from('semester_results')
                 .select('student_id, results_data')
                 .eq('semester_key', semKey);

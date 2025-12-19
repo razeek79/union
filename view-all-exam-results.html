@@ -152,6 +152,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <script>
+    const supabaseClient = window.supabaseClient;
+
     // --- CONFIGURATION ---
     const CONFIG = {
         wafy: {
@@ -225,7 +227,7 @@
         document.getElementById('resultsContainer').innerHTML = '';
 
         // 1. Fetch Results
-        const { data: results, error } = await supabase
+        const { data: results, error } = await supabaseClient
             .from('semester_results')
             .select('student_id, results_data')
             .eq('semester_key', semKey);
@@ -243,7 +245,7 @@
 
         // 2. Fetch Student Info
         const studentIds = results.map(r => r.student_id);
-        const { data: students, error: stuError } = await supabase
+        const { data: students, error: stuError } = await supabaseClient
             .from('students')
             .select('id, full_name, cic_no')
             .in('id', studentIds);

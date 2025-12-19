@@ -134,6 +134,8 @@
     </div>
 
     <script>
+        const supabaseClient = window.supabaseClient;
+
         let currentStudentId = null;
 
         function getQueryParam(key) {
@@ -145,7 +147,7 @@
             const cicNo = getQueryParam('cicNo');
             if (!cicNo) return alert("Missing CIC No.");
 
-            const { data: student, error } = await supabase
+            const { data: student, error } = await supabaseClient
                 .from('students')
                 .select('id, full_name, cic_no')
                 .eq('cic_no', cicNo)
@@ -165,7 +167,7 @@
 
         // 2. Fetch Books
         async function loadBooks() {
-            const { data: books, error } = await supabase
+            const { data: books, error } = await supabaseClient
                 .from('books')
                 // Added 'date' to selection
                 .select('id, name, poet, pages, date') 
@@ -222,7 +224,7 @@
             const pages = document.getElementById('numPages').value;
             const date = document.getElementById('bookDate').value; // Get Date
 
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from('books')
                 .insert([{
                     student_id: currentStudentId,
@@ -243,7 +245,7 @@
         window.deleteBook = async function(id) {
             if (!confirm("Delete this book?")) return;
 
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from('books')
                 .delete()
                 .eq('id', id);

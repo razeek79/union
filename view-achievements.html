@@ -94,7 +94,7 @@
     </div>
 
     <script>
-
+        const supabaseClient = window.supabaseClient;
         function getQueryParam(key) {
             return new URLSearchParams(window.location.search).get(key);
         }
@@ -107,7 +107,7 @@
             }
 
             // 1. Get Student Details
-            const { data: student, error } = await supabase
+            const { data: student, error } = await supabaseClient
                 .from('students')
                 .select('id, full_name, cic_no')
                 .eq('cic_no', cicNo)
@@ -123,7 +123,7 @@
             document.getElementById('backBtn').href = `view-student-progress.html?cicNo=${student.cic_no}`;
 
             // 2. Get Achievements (Using columns: title, date)
-            const { data: achievements, error: achError } = await supabase
+            const { data: achievements, error: achError } = await supabaseClient
                 .from('achievements')
                 .select('title, date')
                 .eq('student_id', student.id)

@@ -46,8 +46,10 @@
     </div>
 
     <script>
+        const supabaseClient = window.supabaseClient;
+
         async function loadOfficials() {
-            const { data, error } = await supabase.from('officials').select('*');
+            const { data, error } = await supabaseClient.from('officials').select('*');
             const container = document.getElementById('officialsList');
             
             if (error) {
@@ -80,7 +82,7 @@
             if(!confirm("Are you sure? This will remove their access.")) return;
             
             // 1. Delete from officials table
-            const { error } = await supabase.from('officials').delete().eq('id', id);
+            const { error } = await supabaseClient.from('officials').delete().eq('id', id);
             
             if(error) {
                 alert("Error: " + error.message);

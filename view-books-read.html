@@ -120,7 +120,7 @@
     </div>
 
     <script>
-
+        const supabaseClient = window.supabaseClient;
         // Store all books globally to support filtering
         let allBooks = [];
 
@@ -136,7 +136,7 @@
             }
 
             // 1. Get Student Details
-            const { data: student, error } = await supabase
+            const { data: student, error } = await supabaseClient
                 .from('students')
                 .select('id, full_name, cic_no')
                 .eq('cic_no', cicNo)
@@ -152,7 +152,7 @@
             document.getElementById('backBtn').href = `view-student-progress.html?cicNo=${student.cic_no}`;
 
             // 2. Get Books (Added 'date' column)
-            const { data: books, error: bookError } = await supabase
+            const { data: books, error: bookError } = await supabaseClient
                 .from('books')
                 .select('id, name, poet, pages, date')
                 .eq('student_id', student.id)
