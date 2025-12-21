@@ -5,12 +5,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Manage Student Progress - الأبطال</title>
-    <!-- Link to main CSS -->
     <link rel="stylesheet" href="sc.css" />
-    <!-- Link to NEW Responsive CSS -->
     <link rel="stylesheet" href="manage-student-progress.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -20,7 +17,6 @@
 </head>
 
 <body>
-    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
         <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" style="height:40px;" /></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" style="width: 60px;">
@@ -38,7 +34,6 @@
 
     <div class="container mt-5" style="margin-top: 100px !important;">
         
-        <!-- Login Section -->
         <div id="loginSection">
             <div class="row justify-content-center">
                 <div class="col-12 col-md-6 col-lg-5">
@@ -84,7 +79,6 @@
             </div>
         </div>
 
-        <!-- Main Content -->
         <div id="mainContent" style="display: none;">
             <div class="row">
                 <div class="col-12">
@@ -101,7 +95,6 @@
                 </div>
             </div>
 
-            <!-- Search and Refresh -->
             <div class="row mb-4">
                 <div class="col-12 col-md-8 mb-2 mb-md-0">
                     <input type="text" class="form-control" id="searchInput" placeholder="Search by CIC No. or Name...">
@@ -113,7 +106,6 @@
                 </div>
             </div>
 
-            <!-- Count -->
             <div class="row mb-3">
                 <div class="col-12">
                     <div class="alert alert-info py-2">
@@ -122,7 +114,6 @@
                 </div>
             </div>
 
-            <!-- Header Row (Hidden on Mobile via CSS) -->
             <div class="row mb-2 header-row">
                 <div class="col-12">
                     <div class="card students-card" style="background-color: #f1f5fb;">
@@ -138,12 +129,10 @@
                 </div>
             </div>
 
-            <!-- Students List -->
             <div class="row" id="studentsList">
                 <div class="col-12 text-center text-muted py-5">Loading...</div>
             </div>
 
-            <!-- Back Button -->
             <div class="row mt-5 mb-5">
                 <div class="col-12 text-center">
                     <a href="students-progress.html" class="btn btn-secondary btn-lg">Back to Students Progress</a>
@@ -180,8 +169,8 @@
                 });
                 
                 if (!stuError) {
-                    alert(`Welcome Student ${username}! Redirecting...`);
-                    window.location.href = `edit-student-progress.html?cicNo=${username}`; 
+                    // Save role and Redirect
+                    setupSession(username, 'student');
                     return;
                 }
 
@@ -203,9 +192,19 @@
             }
         });
 
+        // --- UPDATED SESSION LOGIC (SMART LOGIN) ---
         function setupSession(name, role) {
             localStorage.setItem('mgmtUser', name);
             localStorage.setItem('mgmtUserRole', role);
+
+            // SMART LOGIN CHECK: 
+            // If it's a student, redirect them immediately to their edit page.
+            if (role === 'student') {
+                window.location.href = `edit-student-progress.html?cicNo=${name}`;
+                return; // Stop execution here so the dashboard doesn't flash
+            }
+
+            // If it's an Official, show the dashboard
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
             document.getElementById('loggedInUser').textContent = `${name} (${role})`;
@@ -246,7 +245,6 @@
                     <div class="card students-card">
                         <div class="card-body py-2">
                             <div class="row align-items-center text-center">
-                                <!-- Data Labels added for Mobile View via CSS -->
                                 <div class="col-2" data-label="SL No.">
                                     <h5>${index + 1}</h5>
                                 </div>
@@ -257,7 +255,6 @@
                                     <h5>${s.full_name}</h5>
                                 </div>
                                 <div class="col-2 text-center">
-                                    <!-- SMALL ICON BUTTON -->
                                     <button class="btn btn-warning btn-sm shadow-sm icon-only-btn" onclick="window.location.href='edit-student-progress.html?cicNo=${s.cic_no}'" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </button>

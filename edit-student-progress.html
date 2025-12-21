@@ -7,7 +7,6 @@
     <title>Edit Student Progress - الأبطال</title>
     <link rel="stylesheet" href="sc.css" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -17,7 +16,6 @@
 </head>
 
 <body>
-    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
         <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" /></a>
         <button class="navbar-toggler" style="width: 60px;" type="button" data-toggle="collapse" data-target="#navbarNav">
@@ -33,19 +31,22 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
     <div class="container mt-5" style="margin-top: 100px !important;">
         <div class="row">
-            <div class="col-12">
-                <h1 class="text-center mb-5" style="font-family: Almarai; color: #02244e;">Edit Student Progress</h1>
-                <h2 class="text-center mb-5" style="font-family: Almarai; color: #02244e;" id="studentNameTitle">Loading...</h2>
+            <div class="col-12 text-center">
+                <h1 class="mb-3" style="font-family: Almarai; color: #02244e;">Edit Student Progress</h1>
+                
+                <div id="studentLogoutWrapper" style="display:none;" class="mb-4">
+                    <button class="btn btn-outline-danger btn-sm" onclick="studentLogout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+
+                <h2 class="mb-5" style="font-family: Almarai; color: #02244e;" id="studentNameTitle">Loading...</h2>
             </div>
         </div>
 
-        <!-- Progress Sections in a 2x2 grid -->
-        <!-- First Row -->
         <div class="row mb-0 mb-md-4">
-            <!-- Books Read -->
             <div class="col-12 col-md-6 mb-3 mb-md-3">
                 <div class="card h-100 students-card">
                     <div class="card-body text-center">
@@ -58,7 +59,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Achievements -->
             <div class="col-12 col-md-6 mb-3">
                 <div class="card h-100 students-card">
                     <div class="card-body text-center">
@@ -73,9 +73,7 @@
             </div>
         </div>
 
-        <!-- Second Row -->
         <div class="row mb-0 mb-md-4">
-            <!-- Extra Skills -->
             <div class="col-12 col-md-6 mb-3">
                 <div class="card h-100 students-card">
                     <div class="card-body text-center">
@@ -88,7 +86,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Exam Progress -->
             <div class="col-12 col-md-6 mb-3">
                 <div class="card h-100 students-card">
                     <div class="card-body text-center">
@@ -103,8 +100,7 @@
             </div>
         </div>
 
-        <!-- Back Button -->
-        <div class="row mt-4 mb-5">
+        <div class="row mt-4 mb-5" id="backButtonContainer">
             <div class="col-12 text-center">
                 <a href="manage-student-progress.html" class="btn btn-secondary btn-lg" style="font-family: Almarai;">
                     <i class="fas fa-arrow-left"></i> Back to Manage Progress
@@ -153,7 +149,51 @@
             };
         }
 
-        document.addEventListener('DOMContentLoaded', loadStudent);
+        // --- UPDATED SMART LOGIN & NAVIGATION LOGIC ---
+        function checkUserRole() {
+            const role = localStorage.getItem('mgmtUserRole');
+            const logoutWrapper = document.getElementById('studentLogoutWrapper');
+            const backContainer = document.getElementById('backButtonContainer');
+            const backBtn = backContainer.querySelector('a'); // Select the link inside the container
+
+            // If the user is a STUDENT
+            if (role === 'student') {
+                logoutWrapper.style.display = 'block'; // Show Logout
+                
+                // Show Back Button but modify it for Students
+                backContainer.style.display = 'block'; 
+                backBtn.href = "students-progress.html"; // Go to public progress page
+                backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Back to Students Progress';
+                backBtn.classList.remove('btn-secondary'); 
+                backBtn.classList.add('btn-info');       // Optional: Make it blue
+
+            } else {
+                // If the user is an OFFICIAL (or admin)
+                logoutWrapper.style.display = 'none';  // Hide Logout
+                
+                // Show Back Button for Officials (Goes to Dashboard)
+                backContainer.style.display = 'block'; 
+                backBtn.href = "manage-student-progress.html";
+                backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Back to Manage Progress';
+                backBtn.classList.remove('btn-info');
+                backBtn.classList.add('btn-secondary');
+            }
+        }
+
+        async function studentLogout() {
+            if(confirm("Are you sure you want to logout?")) {
+                await supabaseClient.auth.signOut();
+                localStorage.removeItem('mgmtUserRole');
+                localStorage.removeItem('mgmtUser');
+                // Redirect back to the login page
+                window.location.href = 'manage-student-progress.html';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStudent();
+            checkUserRole();
+        });
     </script>
     <script src="access-control.js"></script>
 </body>
