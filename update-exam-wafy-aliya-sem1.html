@@ -160,6 +160,122 @@
         await supabaseClient.from('semester_results').delete().match({ student_id: currentStudentId, semester_key: SEMESTER_KEY });
         location.reload();
     }
+
+    // --- AUTO CALCULATION LOGIC (Vertical, Horizontal & Status) ---
+    
+    document.getElementById('tableBody').addEventListener('input', function(e) {
+        const td = e.target;
+        if (!td.classList.contains('editable-cell')) return;
+
+        const key = td.dataset.key;
+        const tr = td.closest('tr');
+        
+        // 1. Horizontal Calculation: Update the current row's totals and status
+        // We exclude the last row from this check so we don't overwrite "Passed/Failed" with "P/F"
+        const tableBody = document.getElementById('tableBody');
+        if (tr !== tableBody.lastElementChild) {
+             if (['ce_mark', 'te_mark', 'ce_max', 'te_max'].includes(key)) {
+                updateRowTotals(tr);
+            }
+        }
+        
+        // 2. Vertical Calculation: Update the Grand Total Row
+        if (['ce_mark', 'ce_max', 'te_mark', 'te_max', 'total', 'max', 'status'].includes(key)) {
+             updateGrandTotal();
+        }
+    });
+
+    // Calculates horizontal totals and P/F status for a single data row
+    function updateRowTotals(tr) {
+        const getVal = (k) => {
+            const cell = tr.querySelector(`td[data-key="${k}"]`);
+            return cell ? (parseFloat(cell.textContent.trim()) || 0) : 0;
+        };
+
+        // Calculate Sums
+        const ceMark = getVal('ce_mark');
+        const teMark = getVal('te_mark');
+        const ceMax = getVal('ce_max');
+        const teMax = getVal('te_max');
+
+        const totalCell = tr.querySelector(`td[data-key="total"]`);
+        if (totalCell) totalCell.textContent = ceMark + teMark;
+
+        const maxCell = tr.querySelector(`td[data-key="max"]`);
+        if (maxCell) maxCell.textContent = ceMax + teMax;
+
+        // Calculate Status: P if TE Mark >= 45% of TE Max, else F
+        const statusCell = tr.querySelector(`td[data-key="status"]`);
+        if (statusCell && teMax > 0) {
+            // 45% threshold
+            const threshold = 0.45 * teMax;
+            const isPassed = teMark >= threshold;
+            
+            statusCell.textContent = isPassed ? 'P' : 'F';
+            // Optional: Add color for better visibility
+            statusCell.style.color = isPassed ? 'green' : 'red';
+            statusCell.style.fontWeight = 'bold';
+        }
+    }
+
+    // Calculates vertical sums and determines the overall exam status
+    function updateGrandTotal() {
+        const rows = document.querySelectorAll('#tableBody tr');
+        // Need at least 2 rows (1 data + 1 total)
+        if (rows.length < 2) return; 
+
+        const lastRow = rows[rows.length - 1];
+        
+        const keys = ['ce_mark', 'ce_max', 'te_mark', 'te_max', 'total', 'max'];
+        const totals = {};
+        keys.forEach(k => totals[k] = 0);
+
+        let allPassed = true;
+
+        // Loop through all rows EXCEPT the last one
+        for (let i = 0; i < rows.length - 1; i++) {
+            const row = rows[i];
+            
+            // 1. Accumulate Sums
+            keys.forEach(key => {
+                const cell = row.querySelector(`td[data-key="${key}"]`);
+                const val = cell ? (parseFloat(cell.textContent.trim()) || 0) : 0;
+                totals[key] += val;
+            });
+
+            // 2. Check Row Status
+            const statusCell = row.querySelector(`td[data-key="status"]`);
+            if (statusCell) {
+                const statusText = statusCell.textContent.trim().toUpperCase();
+                // If any row is 'F' (or not 'P'), the grand total is Failed
+                if (statusText !== 'P') {
+                    allPassed = false;
+                }
+            }
+        }
+
+        // Apply Column Sums to Last Row
+        keys.forEach(key => {
+            const cell = lastRow.querySelector(`td[data-key="${key}"]`);
+            if (cell) cell.textContent = totals[key];
+        });
+
+        // Apply Overall Status to Last Row
+        const totalStatusCell = lastRow.querySelector(`td[data-key="status"]`);
+        if (totalStatusCell) {
+            totalStatusCell.textContent = allPassed ? 'Passed' : 'Failed';
+            totalStatusCell.style.fontWeight = 'bold';
+            totalStatusCell.style.color = allPassed ? 'green' : 'red';
+        }
+
+        // Ensure Subject column says "Total"
+        const subjectCell = lastRow.querySelector('td[data-key="subject"]');
+        if(subjectCell && (subjectCell.textContent.trim() === '' || subjectCell.textContent.trim().toLowerCase() === 'total')) {
+            subjectCell.textContent = "Total";
+            subjectCell.style.fontWeight = "bold";
+        }
+    }
+    
     window.onload = init;
   </script>
 </body>

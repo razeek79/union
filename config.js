@@ -9,3 +9,9 @@ if (window.supabase && window.supabase.createClient) {
 } else {
     console.error("Supabase library not loaded. Check script order.");
 }
+
+
+window.CLOUDINARY = {
+  cloudName: "dhzrs4lwk",
+  uploadPreset: "council_archives"
+};

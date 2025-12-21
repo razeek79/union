@@ -117,20 +117,3 @@ body {
         height: 300px;
     }
 }
-.council-header-img {
-    width: 70%;
-    height: auto;
-    margin-top: 15px;
-    max-width: 70%;
-}
-.top-img {
-    text-align: center;
-    background-color: white;
-    margin: auto;
-    height: 80px;
-    width: 80px;
-    border-style: solid;
-    border-width: 3px;
-    border-color: #02244e;
-    border-radius: 45px;
-}
