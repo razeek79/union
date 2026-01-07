@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="council.css"/> 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -48,9 +49,52 @@
             text-shadow: 0 0 5px rgba(0,0,0,0.6);
         }
 
-        /* VIEW MODE SPECIFIC STYLES */
+        /* --- ON THIS DAY STYLES --- */
+        .on-this-day-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(118, 75, 162, 0.3);
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        .on-this-day-card:hover {
+            transform: translateY(-5px);
+        }
+        .on-this-day-header {
+            background: rgba(0,0,0,0.2);
+            padding: 12px 20px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .on-this-day-body {
+            padding: 20px;
+        }
+        .otd-badge {
+            background: #ffc107;
+            color: #000;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .otd-year {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffc107;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
         
-        /* Details View (Table) */
+        /* VIEW MODE SPECIFIC STYLES */
         .details-img-thumb {
             width: 50px;
             height: 50px;
@@ -83,23 +127,205 @@
         .media-container:hover .tile-overlay {
             opacity: 1;
         }
+        
+        /* Control Buttons in Modal */
+        .btn-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+            margin: 0 5px;
+            border: none;
+        }
+        .btn-circle:hover {
+            transform: scale(1.1);
+            text-decoration: none;
+        }
+        .btn-download { background-color: #f8f9fa; color: #333; }
+        .btn-edit { background-color: #ffc107; color: #fff; }
+        .btn-delete { background-color: #dc3545; color: #fff; }
+        .btn-expand { background-color: #17a2b8; color: #fff; }
+        .btn-comment { background-color: #fff; color: #02244e; }
+
+        /* COMMENTS SECTION */
+        #viewMediaModal .modal-content {
+            height: 90vh;
+            overflow: hidden; 
+            position: relative; 
+            background-color: rgba(0,0,0,0.9);
+        }
+        #viewMediaModal .modal-body {
+            height: 100%;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative; 
+        }
+        #comments-panel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80%;
+            background: #fff;
+            border-radius: 20px 20px 0 0;
+            z-index: 2000;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.5);
+        }
+        #comments-panel.open {
+            transform: translateY(0);
+        }
+        .comments-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            border-radius: 20px 20px 0 0;
+            flex-shrink: 0;
+        }
+        .comments-header h5 { margin: 0; font-weight: 700; color: #333; }
+        .comments-list {
+            flex-grow: 1; 
+            overflow-y: auto; 
+            padding: 15px;
+            background: #f8f9fa;
+            -webkit-overflow-scrolling: touch; 
+        }
+        .comment-item { display: flex; align-items: flex-start; margin-bottom: 15px; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .comment-avatar {
+            width: 35px; height: 35px; background: #02244e; color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-weight: bold;
+            margin-right: 10px; flex-shrink: 0; font-size: 0.9rem;
+        }
+        .comment-content {
+            background: #fff; padding: 10px 15px; border-radius: 0 15px 15px 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); max-width: 90%;
+        }
+        .comment-user { font-weight: 700; color: #02244e; font-size: 0.85rem; margin-bottom: 2px; display: block; }
+        .comment-text { color: #333; font-size: 0.95rem; word-wrap: break-word; line-height: 1.4; }
+        .comment-time { font-size: 0.7rem; color: #999; margin-top: 5px; display: block; text-align: right; }
+        .comment-input-wrapper {
+            padding: 15px; background: #fff; border-top: 1px solid #eee; display: flex; align-items: center; flex-shrink: 0;
+        }
+        .comment-input-field {
+            flex-grow: 1; border: 1px solid #ddd; border-radius: 25px; padding: 12px 20px; background-color: #f1f3f5; outline: none; transition: all 0.2s;
+        }
+        .comment-input-field:focus { background-color: #fff; border-color: #02244e; }
+        .btn-send-comment {
+            width: 45px; height: 45px; margin-left: 10px; border-radius: 50%; background-color: #02244e; color: #fff; border: none;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(2, 36, 78, 0.2); transition: transform 0.2s;
+        }
+        .btn-send-comment:hover { transform: scale(1.1); }
+
+        /* --- STORY MODE STYLES --- */
+        .btn-story-mode {
+            background: linear-gradient(45deg, #ff0099, #493240);
+            color: white;
+            border-radius: 50px;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            box-shadow: 0 5px 15px rgba(255, 0, 153, 0.3);
+            transition: transform 0.3s;
+        }
+        .btn-story-mode:hover { transform: scale(1.05); color: white; text-decoration: none; }
+
+        #story-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+        }
+
+        /* Background Blur for Story */
+        #story-background-blur {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center;
+            filter: blur(20px) brightness(0.6);
+            z-index: 1;
+            transition: background-image 0.5s ease;
+        }
+
+        #story-media-wrapper {
+            width: 100%;
+            height: 85%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 2; /* Above blur */
+            overflow: hidden;
+        }
+
+        #story-media-wrapper img, #story-media-wrapper video {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        /* Ken Burns Animation Classes */
+        .story-zoom-in { animation: zoomInEffect 7s linear forwards; }
+        .story-zoom-out { animation: zoomOutEffect 7s linear forwards; }
+
+        @keyframes zoomInEffect {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.15); }
+        }
+        @keyframes zoomOutEffect {
+            0% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        #story-controls {
+            position: absolute; bottom: 30px; width: 100%; text-align: center; color: white; z-index: 10001;
+        }
+        .story-btn {
+            background: rgba(255,255,255,0.2); border: none; color: white; font-size: 1.5rem;
+            padding: 15px; width: 60px; height: 60px; border-radius: 50%; margin: 0 10px; cursor: pointer;
+            transition: background 0.3s; display: inline-flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        .story-btn:hover { background: rgba(255,255,255,0.4); }
+
+        #story-close {
+            position: absolute; top: 20px; right: 20px; color: white; font-size: 2.5rem; cursor: pointer;
+            z-index: 10001; background: none; border: none; text-shadow: 0 0 5px #000;
+        }
+
+        #story-progress-bar {
+            position: absolute; top: 0; left: 0; height: 5px; background: #ff0099; width: 0%;
+            transition: width 0.1s linear; box-shadow: 0 0 10px #ff0099; z-index: 10002;
+        }
+        
+        #story-meta {
+            position: absolute; bottom: 110px; text-align: center; width: 100%; z-index: 10001;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+        }
+        /* Text Animation */
+        .text-slide-up { animation: fadeInUp 0.8s ease-out; }
 
         /* Generic Helper */
         .year-header {
-            cursor: pointer;
-            padding: 15px;
-            background: white;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            font-weight: bold;
-            color: #02244e;
+            cursor: pointer; padding: 15px; background: white; border-bottom: 1px solid #eee; margin-bottom: 10px;
+            border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-weight: bold; color: #02244e;
         }
         .login-toggle .btn.active {
-            background-color: #02244e !important;
-            color: white !important;
-            border-color: #02244e !important;
+            background-color: #02244e !important; color: white !important; border-color: #02244e !important;
         }
     </style>
 </head>
@@ -186,7 +412,7 @@
             <div id="main-dashboard">
                 <div class="row mb-5">
                     <div class="col-12 text-center">
-                        <h2 class="section-title">Previous Councils</h2>
+                        <h2 class="section-title">Council Leadership</h2>
                         <p class="text-muted">Archives of past councils.</p>
                     </div>
                     <div class="col-12 mt-4" id="archives-container">
@@ -199,7 +425,7 @@
                 <div class="row">
                     <div class="col-12 text-center">
                         <h2 class="section-title">Our Memories</h2>
-                        <p class="text-muted mb-4">Capture and save our shared moments here.</p>
+                        <p class="text-muted mb-4">Capture and view our shared moments.</p>
                         
                         <button class="btn btn-success mb-3 px-4" onclick="$('#memoryModal').modal('show')">
                             <i class="fas fa-plus"></i> Add Memory
@@ -214,10 +440,18 @@
 
             <div id="memories-page" style="display: none;">
                 <div class="row mb-3 align-items-center">
-                    <div class="col-6">
-                        <button class="btn btn-secondary" onclick="toggleMemoriesPage(false)">
+                    <div class="col-6 d-flex align-items-center">
+                        <button class="btn btn-secondary mr-3" onclick="toggleMemoriesPage(false)">
                             <i class="fas fa-arrow-left"></i> Back
                         </button>
+                        <div class="d-none">
+                            <button id="musicToggleBtn" class="btn btn-light shadow-sm rounded-circle d-flex align-items-center justify-content-center" 
+                                    onclick="toggleMusic()" 
+                                    title="Mute/Unmute Music"
+                                    style="width: 38px; height: 38px; padding: 0; color: #02244e; border: 1px solid #dee2e6;">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                        </div>    
                     </div>
                     <div class="col-6 text-right">
                         <div class="dropdown">
@@ -237,6 +471,8 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="on-this-day-container" class="mb-4"></div>
                 
                 <div class="row">
                     <div class="col-12 text-center mb-2">
@@ -248,8 +484,36 @@
                 <div class="row" id="gallery-container">
                     <div class="col-12 text-center"><p>Loading memories...</p></div>
                 </div>
+                
+                <div class="row mt-4 mb-5">
+                    <div class="col-12 text-center">
+                        <button class="btn btn-story-mode shadow-lg" onclick="startStoryMode()">
+                            <i class="fas fa-play mr-2"></i> Start Story Mode
+                        </button>
+                    </div>
+                </div>
             </div>
 
+        </div>
+    </div>
+
+    <div id="story-overlay">
+        <div id="story-background-blur"></div>
+        <div id="story-progress-bar"></div>
+        <button id="story-close" onclick="exitStoryMode()">&times;</button>
+        
+        <div id="story-media-wrapper">
+            </div>
+        
+        <div id="story-meta">
+            <h3 id="story-title" class="text-white text-slide-up"></h3>
+            <p id="story-date" class="text-white-50 text-slide-up"></p>
+        </div>
+        
+        <div id="story-controls">
+            <button class="story-btn" onclick="prevStory()"><i class="fas fa-step-backward"></i></button>
+            <button class="story-btn" id="story-play-pause" onclick="toggleStoryPause()"><i class="fas fa-pause"></i></button>
+            <button class="story-btn" onclick="nextStory()"><i class="fas fa-step-forward"></i></button>
         </div>
     </div>
 
@@ -257,11 +521,28 @@
         const supabaseClient = window.supabaseClient;
         const PASSWORD_SUFFIX = "_ALABTHAL"; 
         
+        // BACKGROUND MUSIC CONFIG
+        const bgMusic = new Audio('songs/piano-flute.mp3');
+        bgMusic.loop = true;
+        bgMusic.volume = 0.2; 
+        
+        // STORY MUSIC
+        const storyMusic = new Audio('songs/memories.mp3');
+        storyMusic.loop = true;
+        storyMusic.volume = 0.3;
+
         // Global variables
         let allMemories = [];
-        let currentView = 'medium'; // Default view
+        let currentView = 'medium'; 
+        let currentViewMemId = null; 
+        let currentUserDisplay = ""; 
 
         let memTitle, memDate, memDesc, memFile;
+        
+        // Story vars
+        let storyIndex = 0;
+        let storyTimer = null;
+        let isStoryPaused = false;
 
         document.addEventListener('DOMContentLoaded', () => {
             memTitle = document.getElementById("memTitle");
@@ -289,39 +570,302 @@
             });
 
             checkSession();
+            
+            if ("Notification" in window && Notification.permission === "default") {
+                Notification.requestPermission();
+            }
+            
+            window.addEventListener('online', () => {
+                if(allMemories.length > 0) processOnThisDay();
+            });
 
             $('#viewMediaModal').on('hidden.bs.modal', function () {
                 document.getElementById('viewMediaContent').innerHTML = '';
+                $('#comments-panel').removeClass('open');
+                if ($('#memories-page').is(':visible')) {
+                    bgMusic.play().catch(e => console.log("Music resume blocked/failed:", e));
+                }
             });
         });
+
+        // --- MUSIC TOGGLE LOGIC ---
+        function toggleMusic() {
+            if (bgMusic.muted) {
+                bgMusic.muted = false;
+                document.getElementById('musicToggleBtn').innerHTML = '<i class="fas fa-volume-up"></i>';
+            } else {
+                bgMusic.muted = true;
+                document.getElementById('musicToggleBtn').innerHTML = '<i class="fas fa-volume-mute"></i>';
+            }
+        }
 
         function toggleMemoriesPage(show) {
             if (show) {
                 $('#main-dashboard').hide();
                 $('#memories-page').fadeIn();
                 window.scrollTo(0, 0);
+                
+                bgMusic.muted = false;
+                document.getElementById('musicToggleBtn').innerHTML = '<i class="fas fa-volume-up"></i>';
+                bgMusic.play().catch(error => console.log("Music play failed:", error));
+                
+                processOnThisDay();
+
             } else {
                 $('#memories-page').hide();
                 $('#main-dashboard').fadeIn();
+                bgMusic.pause();
+                bgMusic.currentTime = 0; 
+            }
+        }
+
+        // --- STORY MODE LOGIC ---
+        function startStoryMode() {
+            if(!allMemories || allMemories.length === 0) return alert("No memories to show!");
+            
+            bgMusic.pause();
+            
+            storyMusic.currentTime = 0;
+            storyMusic.play().catch(e => console.log("Story music blocked", e));
+            
+            $('#story-overlay').css('display', 'flex').hide().fadeIn();
+            storyIndex = 0;
+            isStoryPaused = false;
+            showStoryItem(storyIndex);
+            
+            const docEl = document.documentElement;
+            if(docEl.requestFullscreen) docEl.requestFullscreen();
+        }
+
+        function exitStoryMode() {
+            clearTimeout(storyTimer);
+            storyMusic.pause();
+            $('#story-overlay').fadeOut();
+            document.getElementById('story-media-wrapper').innerHTML = ''; 
+            
+            if ($('#memories-page').is(':visible')) {
+                bgMusic.play().catch(e => {});
+            }
+            
+            if(document.exitFullscreen) document.exitFullscreen();
+        }
+
+        function showStoryItem(index) {
+            if(index >= allMemories.length) { exitStoryMode(); return; }
+            if(index < 0) index = 0;
+            
+            storyIndex = index;
+            const mem = allMemories[index];
+            const wrapper = document.getElementById('story-media-wrapper');
+            const bgBlur = document.getElementById('story-background-blur');
+            const isVideo = mem.image_url.includes("/video/");
+            
+            // Set blurred background
+            bgBlur.style.backgroundImage = `url(${mem.image_url.replace('.mp4','.jpg')})`; // Fallback for video thumbnail if available or just use URL if it's image
+            // Note: If video URL is passed to bg-image it won't work well, but for simplicity assuming images or handling externally. 
+            // Better fix for video bg:
+            if(isVideo) bgBlur.style.backgroundImage = 'none'; // Or a default gradient
+            else bgBlur.style.backgroundImage = `url(${mem.image_url})`;
+
+            const bar = document.getElementById('story-progress-bar');
+            bar.style.transition = 'none';
+            bar.style.width = '0%';
+            
+            // Text Animations: Re-trigger by clearing and re-adding class or content
+            const titleEl = document.getElementById('story-title');
+            const dateEl = document.getElementById('story-date');
+            
+            // Remove classes to reset
+            titleEl.classList.remove('animate__fadeInUp');
+            dateEl.classList.remove('animate__fadeInUp');
+            
+            void titleEl.offsetWidth; // Trigger reflow
+            
+            titleEl.innerText = mem.title;
+            dateEl.innerText = new Date(mem.event_date).toLocaleDateString('en-GB');
+            
+            titleEl.classList.add('animate__animated', 'animate__fadeInUp');
+            dateEl.classList.add('animate__animated', 'animate__fadeInUp');
+
+            if (isVideo) {
+                storyMusic.volume = 0.1; 
+                
+                wrapper.innerHTML = `<video id="story-video" autoplay class="img-fluid animate__animated animate__fadeIn">
+                    <source src="${mem.image_url}" type="video/mp4">
+                </video>`;
+                
+                const vid = document.getElementById('story-video');
+                vid.onended = () => nextStory();
+                
+            } else {
+                storyMusic.volume = 0.3; 
+                // Random Ken Burns Effect
+                const effects = ['story-zoom-in', 'story-zoom-out'];
+                const randomEffect = effects[Math.floor(Math.random() * effects.length)];
+                
+                wrapper.innerHTML = `<img src="${mem.image_url}" class="animate__animated animate__fadeIn ${randomEffect}">`;
+                
+                if(!isStoryPaused) {
+                    setTimeout(() => {
+                        bar.style.transition = 'width 5s linear';
+                        bar.style.width = '100%';
+                    }, 50);
+                    storyTimer = setTimeout(nextStory, 5000);
+                }
+            }
+        }
+
+        function nextStory() {
+            clearTimeout(storyTimer);
+            showStoryItem(storyIndex + 1);
+        }
+
+        function prevStory() {
+            clearTimeout(storyTimer);
+            showStoryItem(storyIndex - 1);
+        }
+
+        function toggleStoryPause() {
+            isStoryPaused = !isStoryPaused;
+            const btn = document.getElementById('story-play-pause');
+            const vid = document.getElementById('story-video');
+            const bar = document.getElementById('story-progress-bar');
+            
+            if(isStoryPaused) {
+                btn.innerHTML = '<i class="fas fa-play"></i>';
+                clearTimeout(storyTimer);
+                storyMusic.pause();
+                if(vid) vid.pause();
+                
+                const computedStyle = window.getComputedStyle(bar);
+                const width = computedStyle.getPropertyValue('width');
+                bar.style.width = width;
+                bar.style.transition = 'none';
+                
+                // Pause Ken Burns
+                const img = document.querySelector('#story-media-wrapper img');
+                if(img) img.style.animationPlayState = 'paused';
+                
+            } else {
+                btn.innerHTML = '<i class="fas fa-pause"></i>';
+                storyMusic.play();
+                if(vid) {
+                    vid.play();
+                } else {
+                    const img = document.querySelector('#story-media-wrapper img');
+                    if(img) img.style.animationPlayState = 'running';
+                    
+                    bar.style.transition = 'width 5s linear';
+                    bar.style.width = '100%';
+                    storyTimer = setTimeout(nextStory, 5000);
+                }
+            }
+        }
+
+        // --- ON THIS DAY LOGIC ---
+        function processOnThisDay() {
+            const container = document.getElementById('on-this-day-container');
+            container.innerHTML = ''; 
+
+            if (!allMemories || allMemories.length === 0) return;
+
+            const today = new Date();
+            const tMonth = today.getMonth(); 
+            const tDate = today.getDate();   
+            const tDateStr = today.toDateString(); 
+
+            const matches = allMemories.filter(m => {
+                const mD = new Date(m.event_date);
+                return mD.getMonth() === tMonth && 
+                       mD.getDate() === tDate && 
+                       mD.getFullYear() < today.getFullYear();
+            });
+
+            if (matches.length > 0) {
+                const lastNotified = localStorage.getItem('otd_notified_date');
+                if (lastNotified !== tDateStr) {
+                    if (Notification.permission === "granted") {
+                        const notif = new Notification(`On This Day (${matches.length} Memories)`, {
+                            body: `See what happened on this day in past years!`,
+                            icon: 'https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png'
+                        });
+                        notif.onclick = function() {
+                            window.focus();
+                            this.close();
+                        };
+                        localStorage.setItem('otd_notified_date', tDateStr);
+                    }
+                }
+
+                let contentHtml = '';
+                if (matches.length === 1) {
+                    const m = matches[0];
+                    contentHtml = `
+                        <div class="text-center" style="cursor:pointer;" onclick="openViewModal(${m.id})">
+                             <div class="mb-2"><span class="otd-year">${new Date(m.event_date).getFullYear()}</span></div>
+                             ${m.image_url.includes('/video/') ? '<i class="fas fa-play-circle fa-3x mb-2 text-white-50"></i><br>' : ''}
+                             <img src="${m.image_url}" class="img-fluid rounded shadow-lg" style="max-height: 250px; object-fit: cover; border: 2px solid rgba(255,255,255,0.3);">
+                             <h4 class="mt-3 text-white">"${m.title}"</h4>
+                             <p class="mb-0 text-white-50 small">${m.description || ''}</p>
+                        </div>
+                    `;
+                } else {
+                    let indicators = '';
+                    let slides = '';
+                    matches.forEach((m, idx) => {
+                        indicators += `<li data-target="#otdCarousel" data-slide-to="${idx}" class="${idx===0?'active':''}"></li>`;
+                        slides += `
+                            <div class="carousel-item ${idx===0?'active':''}" style="cursor:pointer;" onclick="openViewModal(${m.id})">
+                                <div class="text-center">
+                                    <div class="mb-2"><span class="otd-year">${new Date(m.event_date).getFullYear()}</span></div>
+                                    ${m.image_url.includes('/video/') ? '<i class="fas fa-play-circle fa-2x mb-2 text-white-50"></i><br>' : ''}
+                                    <img src="${m.image_url}" class="img-fluid rounded shadow-lg" style="max-height: 250px; object-fit: cover; border: 2px solid rgba(255,255,255,0.3);">
+                                    <h5 class="mt-3 text-white">${m.title}</h5>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    contentHtml = `
+                        <div id="otdCarousel" class="carousel slide" data-ride="carousel">
+                            <ol class="carousel-indicators">${indicators}</ol>
+                            <div class="carousel-inner">${slides}</div>
+                            <a class="carousel-control-prev" href="#otdCarousel" role="button" data-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            </a>
+                            <a class="carousel-control-next" href="#otdCarousel" role="button" data-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            </a>
+                        </div>
+                    `;
+                }
+
+                const cardHtml = `
+                    <div class="col-12">
+                        <div class="card on-this-day-card">
+                            <div class="on-this-day-header">
+                                <div><i class="fas fa-history"></i> On This Day</div>
+                                <span class="otd-badge">Special Memories</span>
+                            </div>
+                            <div class="on-this-day-body">
+                                ${contentHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.innerHTML = `<div class="row">${cardHtml}</div>`;
             }
         }
 
         // --- VIEW CHANGER ---
         function changeView(viewMode) {
             currentView = viewMode;
-            
-            // Update Label
             const labels = {
-                'extra-large': 'Extra Large Icons',
-                'large': 'Large Icons',
-                'medium': 'Medium Icons',
-                'small': 'Small Icons',
-                'extra-small': 'Extra Small Icons',
-                'details': 'Details View',
-                'tiles': 'Tiles View'
+                'extra-large': 'Extra Large Icons', 'large': 'Large Icons', 'medium': 'Medium Icons',
+                'small': 'Small Icons', 'extra-small': 'Extra Small Icons', 'details': 'Details View', 'tiles': 'Tiles View'
             };
             document.getElementById('currentViewLabel').innerText = labels[viewMode];
-            
             renderMemories();
         }
 
@@ -334,124 +878,60 @@
                 return;
             }
 
-            // Special case for Details view (Table)
             if (currentView === 'details') {
                 let tableHtml = `
                 <div class="col-12">
                     <div class="table-responsive">
                         <table class="table table-hover table-bordered bg-white shadow-sm">
                             <thead class="thead-light">
-                                <tr>
-                                    <th>Image</th>
-                                    <th>Date</th>
-                                    <th>Title</th>
-                                    <th>Description</th>
-                                    <th>Actions</th>
-                                </tr>
+                                <tr><th>Image</th><th>Date</th><th>Title</th><th>Description</th></tr>
                             </thead>
                             <tbody>`;
                 
                 allMemories.forEach(mem => {
                     const isVideo = mem.image_url.includes("/video/");
                     tableHtml += `
-                        <tr>
-                            <td>
-                                <div onclick="viewMedia('${mem.image_url}', '${isVideo?'video':'image'}')">
-                                ${isVideo 
-                                    ? `<i class="fas fa-file-video fa-2x text-primary" style="cursor:pointer"></i>` 
-                                    : `<img src="${mem.image_url}" class="details-img-thumb" alt="thumb">`
-                                }
-                                </div>
-                            </td>
-                            <td>${new Date(mem.event_date).toLocaleDateString()}</td>
+                        <tr style="cursor: pointer;" onclick="openViewModal(${mem.id})">
+                            <td><div>${isVideo ? `<i class="fas fa-file-video fa-2x text-primary"></i>` : `<img src="${mem.image_url}" class="details-img-thumb">`}</div></td>
+                            <td>${new Date(mem.event_date).toLocaleDateString('en-GB')}</td>
                             <td><strong>${mem.title}</strong></td>
                             <td class="small text-muted">${mem.description ? mem.description.substring(0,50)+'...' : '-'}</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning" onclick="editMemory(${mem.id}, '${esc(mem.title)}', '${esc(mem.description)}', '${mem.event_date}')"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteMemory(${mem.id})"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    `;
+                        </tr>`;
                 });
-                
                 tableHtml += `</tbody></table></div></div>`;
                 container.innerHTML = tableHtml;
                 return;
             }
 
-            // Loop for other views
             allMemories.forEach(mem => {
                 const isVideo = mem.image_url.includes("/video/");
-                
-                // --- 1. Prepare Media Block ---
                 let mediaHtml = '';
                 if (currentView === 'tiles') {
-                    // Tiles need specific aspect ratio handling
-                    if (isVideo) {
-                        mediaHtml = `
-                         <div class="media-container" onclick="viewMedia('${mem.image_url}', 'video')">
-                             <video class="tile-img"><source src="${mem.image_url}" type="video/mp4"></video>
-                             <div class="play-overlay"><i class="fas fa-play"></i></div>
-                             <div class="tile-overlay">${mem.title}</div>
-                         </div>`;
-                    } else {
-                        mediaHtml = `
-                        <div class="media-container" onclick="viewMedia('${mem.image_url}', 'image')">
-                            <img src="${mem.image_url}" class="tile-img" alt="${mem.title}">
-                            <div class="tile-overlay">${mem.title}</div>
-                        </div>`;
-                    }
+                    mediaHtml = isVideo ? 
+                        `<div class="media-container" onclick="openViewModal(${mem.id})"><video class="tile-img"><source src="${mem.image_url}"></video><div class="play-overlay"><i class="fas fa-play"></i></div><div class="tile-overlay">${mem.title}</div></div>` : 
+                        `<div class="media-container" onclick="openViewModal(${mem.id})"><img src="${mem.image_url}" class="tile-img"><div class="tile-overlay">${mem.title}</div></div>`;
                 } else {
-                    // Standard Card Media
-                    let imgClass = 'card-img-top';
-                    
-                    // Height adjustments for icon views
-                    let style = 'height: 150px; object-fit: cover;'; // Default Medium/Small/Large
+                    let imgClass = 'card-img-top', style = 'height: 150px; object-fit: cover;';
                     if (currentView === 'extra-large') style = 'height: 300px; object-fit: cover;';
                     if (currentView === 'extra-small') style = 'height: 80px; object-fit: cover;';
-
-                    if (isVideo) {
-                         mediaHtml = `
-                         <div class="media-container" onclick="viewMedia('${mem.image_url}', 'video')">
-                             <video class="${imgClass}" style="${style}">
-                                <source src="${mem.image_url}" type="video/mp4">
-                             </video>
-                             <div class="play-overlay"><i class="fas fa-play-circle ${['small','extra-small'].includes(currentView)?'fa-1x':'fa-2x'}"></i></div>
-                         </div>`;
-                    } else {
-                        mediaHtml = `
-                        <div class="media-container" onclick="viewMedia('${mem.image_url}', 'image')">
-                            <img src="${mem.image_url}" class="${imgClass}" style="${style}" alt="${mem.title}">
-                        </div>`;
-                    }
+                    mediaHtml = isVideo ? 
+                        `<div class="media-container" onclick="openViewModal(${mem.id})"><video class="${imgClass}" style="${style}"><source src="${mem.image_url}"></video><div class="play-overlay"><i class="fas fa-play-circle fa-2x"></i></div></div>` : 
+                        `<div class="media-container" onclick="openViewModal(${mem.id})"><img src="${mem.image_url}" class="${imgClass}" style="${style}"></div>`;
                 }
 
-                // --- 2. Build Item HTML based on View ---
                 let html = '';
-
-                // TILES VIEW
                 if (currentView === 'tiles') {
-                    html = `
-                    <div class="col-4 col-md-2 tile-item">
-                        ${mediaHtml}
-                    </div>`;
-                }
-                // ICON VIEWS (Grid System)
-                else {
-                    let colClass = 'col-6 col-md-3'; // Medium default
+                    html = `<div class="col-4 col-md-2 tile-item">${mediaHtml}</div>`;
+                } else {
+                    let colClass = 'col-6 col-md-3';
                     if (currentView === 'extra-large') colClass = 'col-12';
                     if (currentView === 'large') colClass = 'col-md-6 col-6';
                     if (currentView === 'small') colClass = 'col-4 col-md-2';
                     if (currentView === 'extra-small') colClass = 'col-3 col-md-1';
-
-                    // Font sizing
-                    let titleSize = '1rem';
-                    if (currentView === 'small') titleSize = '0.8rem';
-                    if (currentView === 'extra-small') titleSize = '0.7rem';
-
-                    // Show/Hide description based on size
+                    
+                    let titleSize = (currentView === 'extra-small') ? '0.7rem' : (currentView === 'small' ? '0.8rem' : '1rem');
+                    let showDate = (currentView !== 'extra-small');
                     let showDesc = (currentView === 'extra-large');
-                    let showDate = (currentView !== 'extra-small'); // Hide date on extra small
 
                     html = `
                     <div class="${colClass} mb-3 px-2">
@@ -459,41 +939,194 @@
                             ${mediaHtml}
                             <div class="card-body p-2">
                                 <h5 class="card-title" style="font-size: ${titleSize}; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${mem.title}</h5>
-                                ${showDate ? `<h6 class="text-muted" style="font-size: 0.75rem;">${new Date(mem.event_date).toLocaleDateString()}</h6>` : ''}
+                                ${showDate ? `<h6 class="text-muted" style="font-size: 0.75rem;">${new Date(mem.event_date).toLocaleDateString('en-GB')}</h6>` : ''}
                                 ${showDesc ? `<p class="mt-2">${mem.description||''}</p>` : ''}
-                                
-                                <div class="mt-2 text-right">
-                                    <button class="btn btn-sm btn-light text-warning px-1 py-0" onclick="editMemory(${mem.id}, '${esc(mem.title)}', '${esc(mem.description)}', '${mem.event_date}')"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-sm btn-light text-danger px-1 py-0" onclick="deleteMemory(${mem.id})"><i class="fas fa-trash"></i></button>
-                                </div>
                             </div>
                         </div>
                     </div>`;
                 }
-
                 container.insertAdjacentHTML('beforeend', html);
             });
         }
 
-        // Helper to escape strings for onclick
-        function esc(str) {
-            if (!str) return '';
-            return str.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
+        function esc(str) { return str ? str.replace(/'/g, "\\'").replace(/"/g, '&quot;') : ''; }
+
+        // --- NEW VIEW MODAL LOGIC WITH COMMENTS ---
+        function openViewModal(id) {
+            const mem = allMemories.find(m => m.id === id);
+            if (!mem) return;
+
+            currentViewMemId = id;
+            const isVideo = mem.image_url.includes("/video/");
+            const container = document.getElementById('viewMediaContent');
+            
+            if (isVideo) bgMusic.pause();
+            
+            let contentHtml = isVideo ? 
+                `<video id="active-media-el" controls autoplay class="img-fluid" style="max-height: 75vh; width: 100%; box-shadow: 0 0 20px rgba(0,0,0,0.5);"><source src="${mem.image_url}" type="video/mp4"></video>` : 
+                `<img id="active-media-el" src="${mem.image_url}" class="img-fluid" style="max-height: 75vh; box-shadow: 0 0 20px rgba(0,0,0,0.5);">`;
+
+            const expandBtn = !isVideo ? `<button class="btn btn-expand btn-circle mx-2" onclick="toggleFullscreen()"><i class="fas fa-expand"></i></button>` : '';
+
+            const controlsHtml = `
+                <div class="mt-4 text-center w-100">
+                    ${expandBtn}
+                    <button class="btn btn-download btn-circle mx-2" onclick="downloadMedia('${mem.image_url}', 'memory-${mem.id}')"><i class="fas fa-download"></i></button>
+                    <button class="btn btn-comment btn-circle mx-2" onclick="toggleComments()"><i class="fas fa-comment"></i></button>
+                    <button class="btn btn-edit btn-circle mx-2" onclick="handleViewEdit()"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-delete btn-circle mx-2" onclick="handleViewDelete()"><i class="fas fa-trash"></i></button>
+                    <div class="mt-3 text-white">
+                        <h5>${mem.title}</h5>
+                        <small>${new Date(mem.event_date).toLocaleDateString('en-GB')}</small>
+                        <p class="mt-1 small text-white-50">${mem.description || ''}</p>
+                    </div>
+                </div>
+            `;
+            
+            const commentsHtml = `
+                <div id="comments-panel">
+                    <div class="comments-header">
+                        <h5>Comments</h5>
+                        <button type="button" class="close" onclick="$('#comments-panel').removeClass('open')">&times;</button>
+                    </div>
+                    <div id="comments-list" class="comments-list">
+                        <div class="text-center p-3 text-muted">Loading...</div>
+                    </div>
+                    <div class="comment-input-wrapper">
+                        <input type="text" id="new-comment-text" class="comment-input-field" placeholder="Add a comment as ${currentUserDisplay}...">
+                        <button class="btn-send-comment" onclick="postComment()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = `<div class="w-100 d-flex flex-column align-items-center position-static">${contentHtml}${controlsHtml}</div>${commentsHtml}`;
+            $('#viewMediaModal').modal('show');
         }
 
-        function viewMedia(url, type) {
-            const container = document.getElementById('viewMediaContent');
-            if (type === 'video') {
-                container.innerHTML = `
-                    <video controls autoplay class="img-fluid" style="max-height: 85vh; width: 100%; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
-                        <source src="${url}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>`;
+        // --- COMMENTS LOGIC ---
+        function toggleComments() {
+            const panel = $('#comments-panel');
+            if (panel.hasClass('open')) {
+                panel.removeClass('open');
             } else {
-                container.innerHTML = `
-                    <img src="${url}" class="img-fluid" style="max-height: 85vh; box-shadow: 0 0 20px rgba(0,0,0,0.5);">`;
+                panel.addClass('open');
+                loadComments(currentViewMemId);
             }
-            $('#viewMediaModal').modal('show');
+        }
+
+        async function loadComments(memId) {
+            const listEl = document.getElementById('comments-list');
+            
+            // Fetch Comments (Descending order = Newest first)
+            const { data, error } = await supabaseClient
+                .from('memory_comments')
+                .select('*')
+                .eq('memory_id', memId)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                listEl.innerHTML = '<div class="p-3 text-danger text-center">Failed to load comments</div>';
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                listEl.innerHTML = '<div class="p-4 text-center text-muted"><i class="far fa-comment-dots fa-2x mb-2"></i><br>No comments yet.<br>Be the first to share your thoughts!</div>';
+                return;
+            }
+
+            let html = '';
+            data.forEach(c => {
+                const initial = c.user_name.charAt(0).toUpperCase();
+                // Format: dd/mm/yyyy hh:mm am/pm
+                const d = new Date(c.created_at);
+                const time = d.toLocaleDateString('en-GB') + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                html += `
+                    <div class="comment-item">
+                        <div class="comment-avatar">${initial}</div>
+                        <div class="comment-content">
+                            <span class="comment-user">${c.user_name}</span>
+                            <div class="comment-text">${c.comment_text}</div>
+                            <span class="comment-time">${time}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            listEl.innerHTML = html;
+        }
+
+        async function postComment() {
+            const input = document.getElementById('new-comment-text');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const btn = document.querySelector('.btn-send-comment');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            const { error } = await supabaseClient
+                .from('memory_comments')
+                .insert([{
+                    memory_id: currentViewMemId,
+                    user_name: currentUserDisplay || 'Anonymous',
+                    comment_text: text
+                }]);
+
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+
+            if (error) {
+                alert("Error posting comment: " + error.message);
+            } else {
+                input.value = '';
+                loadComments(currentViewMemId);
+            }
+        }
+
+        function toggleFullscreen() {
+            const elem = document.getElementById("active-media-el");
+            if(elem.requestFullscreen) elem.requestFullscreen();
+            else if(elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+        }
+
+        async function downloadMedia(url, filename) {
+            const btn = event.currentTarget;
+            const originalIcon = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                let ext = blob.type === 'video/mp4' ? 'mp4' : 'jpg';
+                link.download = `${filename}.${ext}`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(blobUrl);
+            } catch (error) {
+                window.open(url, '_blank');
+            } finally {
+                btn.innerHTML = originalIcon;
+                btn.disabled = false;
+            }
+        }
+
+        function handleViewEdit() {
+            $('#viewMediaModal').modal('hide');
+            const mem = allMemories.find(m => m.id === currentViewMemId);
+            editMemory(mem.id, mem.title, mem.description, mem.event_date);
+        }
+
+        function handleViewDelete() {
+            if (!confirm("Delete this memory?")) return;
+            $('#viewMediaModal').modal('hide');
+            deleteMemory(currentViewMemId);
         }
 
         // Login Logic
@@ -514,10 +1147,21 @@
             try {
                 const { data: { session }, error } = await supabaseClient.auth.getSession();
                 if (session) {
+                    // Try to fetch real name
+                    const { data: studentData } = await supabaseClient
+                        .from('students')
+                        .select('full_name')
+                        .eq('id', session.user.id)
+                        .single();
+                        
                     let display = session.user.email;
-                    if(session.user.user_metadata && session.user.user_metadata.full_name) {
+                    if (studentData) {
+                        display = studentData.full_name;
+                    } else if(session.user.user_metadata && session.user.user_metadata.full_name) {
                         display = session.user.user_metadata.full_name;
                     }
+                    
+                    currentUserDisplay = display; // SAVE FOR COMMENTS
                     showContent(display);
                 } else {
                     document.getElementById('login-section').style.display = 'block';
@@ -556,10 +1200,10 @@
             try {
                 const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: finalPassword });
                 if (error) throw error;
-                showContent(identity);
+                // Fetch name immediately after login for display
+                checkSession(); 
             } catch (err) {
                 alert("Login Failed: " + err.message);
-            } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
@@ -584,11 +1228,27 @@
             // Archives
             const { data: archives } = await window.supabaseClient
                 .from('council_archives')
-                .select('*')
-                .order('created_at', { ascending: false });
+                .select('*');
 
             const archContainer = document.getElementById('archives-container');
             if (archives && archives.length) {
+                // SORT LOGIC
+                archives.sort((a, b) => {
+                    const getTimestamp = (str) => {
+                        if (!str) return 0;
+                        const dmy = str.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+                        if (dmy) {
+                            return new Date(dmy[3], dmy[2] - 1, dmy[1]).getTime(); 
+                        }
+                        const yyyy = str.match(/^(\d{4})/);
+                        if (yyyy) {
+                            return new Date(yyyy[1], 0, 1).getTime();
+                        }
+                        return 0;
+                    };
+                    return getTimestamp(b.year_range) - getTimestamp(a.year_range);
+                });
+                
                 archContainer.innerHTML = '';
                 archives.forEach(arch => {
                     const id = `collapse${arch.id}`;
@@ -614,31 +1274,40 @@
                 .select('*')
                 .order('event_date', { ascending: false });
 
-            // STORE IN GLOBAL VARIABLE
             allMemories = memories || [];
             
-            // RENDER DEFAULT VIEW
+            // PROCESS OTD if user is viewing that section
+            if ($('#memories-page').is(':visible')) {
+                processOnThisDay();
+            }
+            
             renderMemories();
         }
 
         async function uploadMemory() {
             const title = memTitle.value.trim();
-            const date = memDate.value;
+            let date = memDate.value; 
             const desc = memDesc.value.trim();
             const file = memFile.files[0];
+            
             const uploadBtn = document.getElementById("uploadBtn");
             const uploadText = document.getElementById("uploadText");
             const uploadSpinner = document.getElementById("uploadSpinner");
+            
             uploadBtn.disabled = true;
             uploadText.innerText = "Uploading...";
             uploadSpinner.style.display = "inline-block";
 
-            if (!title || !date || (!editId && !file)) {
-                alert("Title, Date, and File are required.");
+            if (!title || (!editId && !file)) {
+                alert("Title and File are required.");
                 uploadBtn.disabled = false;
                 uploadText.innerText = editId ? "Update" : "Upload";
                 uploadSpinner.style.display = "none";
                 return;
+            }
+
+            if (!date) {
+                date = new Date().toISOString().split('T')[0];
             }
 
             try {
@@ -673,7 +1342,7 @@
                 editId = null;
                 document.querySelector("#memoryModal .modal-title").innerText = "Add Memory";
                 uploadText.innerText = "Upload";
-                loadMemoriesData(); // Reloads and re-renders
+                loadMemoriesData(); 
 
             } catch (err) {
                 alert("Upload failed: " + err.message);
@@ -684,7 +1353,6 @@
         }
 
         async function deleteMemory(id) {
-            if (!confirm("Delete this memory?")) return;
             const { error } = await supabaseClient.from("memories").delete().eq("id", id);
             if (error) alert("Failed: " + error.message);
             else loadMemoriesData();
@@ -712,7 +1380,7 @@
         </div>
         <div class="modal-body">
             <input id="memTitle" class="form-control mb-2" placeholder="Title">
-            <input id="memDate" type="date" class="form-control mb-2">
+            <input id="memDate" type="date" class="form-control mb-2" placeholder="Date (Optional - defaults to today)">
             <textarea id="memDesc" class="form-control mb-2" placeholder="Description"></textarea>
             <div id="previewBox" class="mb-3 text-center" style="display:none;">
                 <img id="imgPreview" class="img-fluid rounded" style="max-height:200px; display:none;">

@@ -7,7 +7,6 @@
     <title>Edit Books Read - الأبطال</title>
     <link rel="stylesheet" href="sc.css" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -17,7 +16,6 @@
 </head>
 
 <body>
-    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
         <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" /></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
@@ -33,7 +31,6 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
     <div class="container mt-5" style="margin-top: 100px !important;">
         <div class="row">
             <div class="col-12">
@@ -42,7 +39,6 @@
             </div>
         </div>
 
-        <!-- Add Book Form -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card students-card">
@@ -68,11 +64,10 @@
                                         <input type="number" class="form-control" id="numPages" required style="font-family: Almarai;" min="1">
                                     </div>
                                 </div>
-                                <!-- New Date Field -->
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label style="font-family: Almarai; color: #02244e; font-weight: bold;">Date Finished</label>
-                                        <input type="date" class="form-control" id="bookDate" style="font-family: Almarai;">
+                                        <input type="date" class="form-control" id="bookDate" required style="font-family: Almarai;">
                                     </div>
                                 </div>
                                 <div class="col-md-1">
@@ -88,7 +83,6 @@
             </div>
         </div>
 
-        <!-- Books List Header -->
         <div class="row mb-3">
             <div class="col-12">
                 <div class="card students-card">
@@ -106,12 +100,9 @@
             </div>
         </div>
 
-        <!-- Books List -->
         <div class="row" id="booksList">
-            <!-- Books will be loaded here dynamically -->
-        </div>
+            </div>
 
-        <!-- No Books Message -->
         <div class="row" id="noBooksMessage" style="display: none;">
             <div class="col-12 text-center">
                 <div class="card students-card">
@@ -123,7 +114,6 @@
             </div>
         </div>
 
-        <!-- Back Button -->
         <div class="row mt-4">
             <div class="col-12 text-center">
                 <a href="#" class="btn btn-secondary btn-lg" id="backBtn" style="font-family: Almarai;">
@@ -169,10 +159,9 @@
         async function loadBooks() {
             const { data: books, error } = await supabaseClient
                 .from('books')
-                // Added 'date' to selection
                 .select('id, name, poet, pages, date') 
                 .eq('student_id', currentStudentId)
-                .order('date', { ascending: false }); // Order by newest date first
+                .order('date', { ascending: false });
 
             if (error) {
                 alert("Error loading books: " + error.message);
@@ -222,7 +211,10 @@
             const name = document.getElementById('bookName').value;
             const poet = document.getElementById('poetName').value;
             const pages = document.getElementById('numPages').value;
-            const date = document.getElementById('bookDate').value; // Get Date
+            const date = document.getElementById('bookDate').value; 
+
+            // Validation check
+            if (!date) return alert("Please select the date finished");
 
             const { error } = await supabaseClient
                 .from('books')
@@ -231,7 +223,7 @@
                     name: name,
                     poet: poet,
                     pages: pages,
-                    date: date || null // Save Date
+                    date: date 
                 }]);
 
             if (error) alert("Error adding book: " + error.message);

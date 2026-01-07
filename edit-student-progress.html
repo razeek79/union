@@ -100,6 +100,21 @@
             </div>
         </div>
 
+        <div class="row mb-0 mb-md-4">
+            <div class="col-12 col-md-6 mb-3">
+                <div class="card h-100 students-card">
+                    <div class="card-body text-center">
+                        <div class="students-icon mb-3">
+                            <i class="fas fa-pen-nib" style="font-size: 3rem; color: #02244e;"></i>
+                        </div>
+                        <h3 class="card-title" style="font-family: Almarai; color: #02244e;">Writings</h3>
+                        <p class="card-text">Add and edit student writings and articles</p>
+                        <a href="#" class="btn btn-warning btn-lg" id="editWritingsBtn">Edit Writings</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row mt-4 mb-5" id="backButtonContainer">
             <div class="col-12 text-center">
                 <a href="manage-student-progress.html" class="btn btn-secondary btn-lg" style="font-family: Almarai;">
@@ -144,6 +159,7 @@
             document.getElementById('editBooksBtn').href = `edit-books-read.html?cicNo=${student.cic_no}`;
             document.getElementById('editAchievementsBtn').href = `edit-achievements.html?cicNo=${student.cic_no}`;
             document.getElementById('editExtraBtn').href = `edit-extra.html?cicNo=${student.cic_no}`;
+            document.getElementById('editWritingsBtn').href = `edit-writings.html?cicNo=${student.cic_no}`; // New Link
             document.getElementById('editExamBtn').onclick = function() {
                 window.location.href = `update-exam-progress.html?cicNo=${student.cic_no}`;
             };

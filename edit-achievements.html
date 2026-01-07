@@ -7,7 +7,6 @@
     <title>Edit Achievements - الأبطال</title>
     <link rel="stylesheet" href="sc.css" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -17,7 +16,6 @@
 </head>
 
 <body>
-    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
         <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" /></a>
         <button class="navbar-toggler" style="width: 60px;" type="button" data-toggle="collapse" data-target="#navbarNav">
@@ -33,7 +31,6 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
     <div class="container mt-5" style="margin-top: 100px !important;">
         <div class="row">
             <div class="col-12">
@@ -42,7 +39,6 @@
             </div>
         </div>
 
-        <!-- Add Achievement Form -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card students-card">
@@ -58,8 +54,8 @@
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label style="font-family: Almarai; color: #02244e; font-weight: bold;">Date (Optional)</label>
-                                        <input type="date" class="form-control" id="achievementDate" style="font-family: Almarai;">
+                                        <label style="font-family: Almarai; color: #02244e; font-weight: bold;">Date</label>
+                                        <input type="date" class="form-control" id="achievementDate" required style="font-family: Almarai;">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
@@ -75,7 +71,6 @@
             </div>
         </div>
 
-        <!-- Achievements List Header -->
         <div class="row mb-3">
             <div class="col-12">
                 <div class="card students-card">
@@ -91,12 +86,9 @@
             </div>
         </div>
 
-        <!-- Achievements List -->
         <div class="row" id="achievementsList">
-            <!-- Dynamic content -->
-        </div>
+            </div>
 
-        <!-- No Achievements Message -->
         <div class="row" id="noAchievementsMessage" style="display: none;">
             <div class="col-12 text-center">
                 <div class="card students-card">
@@ -108,7 +100,6 @@
             </div>
         </div>
 
-        <!-- Back Button -->
         <div class="row mt-4">
             <div class="col-12 text-center">
                 <a href="#" class="btn btn-secondary btn-lg" id="backBtn" style="font-family: Almarai;">
@@ -202,16 +193,17 @@
             e.preventDefault();
             
             const title = document.getElementById('achievementTitle').value.trim();
-            const date = document.getElementById('achievementDate').value; // yyyy-mm-dd
+            const date = document.getElementById('achievementDate').value; 
 
             if (!title) return alert("Please enter a title");
+            if (!date) return alert("Please select a date"); // Validation for Date
 
             const { error } = await supabaseClient
                 .from('achievements')
                 .insert([{
                     student_id: currentStudentId,
                     title: title,
-                    date: date || null
+                    date: date
                 }]);
 
             if (error) alert("Error adding: " + error.message);

@@ -7,7 +7,6 @@
     <title>Student Progress Details - الأبطال</title>
     <link rel="stylesheet" href="sc.css" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -16,7 +15,6 @@
 </head>
 
 <body>
-    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
         <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" /></a>
         <button class="navbar-toggler" style="width: 60px;" type="button" data-toggle="collapse" data-target="#navbarNav">
@@ -32,7 +30,6 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
     <div class="container mt-5" style="margin-top: 100px !important;">
         <div class="row">
             <div class="col-12">
@@ -41,10 +38,7 @@
             </div>
         </div>
 
-        <!-- Progress Sections in a 2x2 grid -->
-        <!-- First Row -->
         <div class="row mb-4">
-            <!-- Books Read -->
             <div class="col-12 col-md-6 mb-3">
                 <div class="card h-100 students-card">
                     <div class="card-body text-center">
@@ -57,7 +51,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Achievements -->
             <div class="col-12 col-md-6 mb-3">
                 <div class="card h-100 students-card">
                     <div class="card-body text-center">
@@ -72,9 +65,7 @@
             </div>
         </div>
 
-        <!-- Second Row -->
         <div class="row mb-4">
-            <!-- Extra Skills -->
             <div class="col-12 col-md-6 mb-3">
                 <div class="card h-100 students-card">
                     <div class="card-body text-center">
@@ -87,7 +78,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Exam Progress -->
             <div class="col-12 col-md-6 mb-3">
                 <div class="card h-100 students-card">
                     <div class="card-body text-center">
@@ -102,7 +92,21 @@
             </div>
         </div>
 
-        <!-- Back Button -->
+        <div class="row mb-4">
+            <div class="col-12 col-md-6 mb-3">
+                <div class="card h-100 students-card">
+                    <div class="card-body text-center">
+                        <div class="students-icon mb-3">
+                            <i class="fas fa-pen-nib" style="font-size: 3rem; color: #02244e;"></i>
+                        </div>
+                        <h3 class="card-title" style="font-family: Almarai; color: #02244e;">Writings</h3>
+                        <p class="card-text">View articles and writings by the student</p>
+                        <a href="#" class="btn btn-primary btn-lg" id="writingsBtn">View Writings</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row mt-4 mb-5">
             <div class="col-12 text-center">
                 <a href="view-all-student-progress.html" class="btn btn-secondary btn-lg" style="font-family: Almarai;">
@@ -112,7 +116,6 @@
         </div>
     </div>
 
-    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <script>
@@ -149,6 +152,7 @@
             document.getElementById('booksReadBtn').href = `view-books-read.html?cicNo=${student.cic_no}`;
             document.getElementById('achievementsBtn').href = `view-achievements.html?cicNo=${student.cic_no}`;
             document.getElementById('extraSkillsBtn').href = `view-extra-skills.html?cicNo=${student.cic_no}`;
+            document.getElementById('writingsBtn').href = `view-writings.html?cicNo=${student.cic_no}`; // New Link
             document.getElementById('examProgressBtn').onclick = function() {
                 window.location.href = `view-exam-progress.html?cicNo=${student.cic_no}`;
             };

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Writings - الأبطال</title>
+    <link rel="stylesheet" href="sc.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" /></a>
+        <button class="navbar-toggler" style="width: 60px;" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="main.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="students-info.html">Students Info</a></li>
+                <li class="nav-item active"><a class="nav-link" href="students-progress.html">Students Progress</a></li>
+                <li class="nav-item"><a class="nav-link" href="council.html">Our Council</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5" style="margin-top: 100px !important;">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="text-center mb-5" style="font-family: Almarai; color: #02244e;">Edit Writings</h1>
+                <h2 class="text-center mb-5" style="font-family: Almarai; color: #02244e;" id="studentNameTitle">Loading...</h2>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card students-card">
+                    <div class="card-body">
+                        <h3 class="card-title mb-4" style="font-family: Almarai; color: #02244e;">Add New Writing</h3>
+                        <form id="addWritingForm">
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <div class="form-group">
+                                        <label style="font-family: Almarai; color: #02244e; font-weight: bold;">Writing Title / Topic</label>
+                                        <input type="text" class="form-control" id="writingTitle" required style="font-family: Almarai;" placeholder="Enter article or writing title">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label style="font-family: Almarai; color: #02244e; font-weight: bold;">Date</label>
+                                        <input type="date" class="form-control" id="writingDate" required style="font-family: Almarai;">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label>&nbsp;</label>
+                                    <button type="submit" class="btn btn-success btn-block" style="font-family: Almarai;">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card students-card">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-2 text-center"><h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">SL No.</h5></div>
+                            <div class="col-6 text-center"><h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">Writing</h5></div>
+                            <div class="col-2 text-center"><h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">Date</h5></div>
+                            <div class="col-2 text-center"><h5 style="font-family: Almarai; color: #02244e; margin: 0; font-weight: bold;">Action</h5></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" id="writingsList">
+            </div>
+
+        <div class="row" id="noWritingsMessage" style="display: none;">
+            <div class="col-12 text-center">
+                <div class="card students-card">
+                    <div class="card-body">
+                        <i class="fas fa-pen-nib" style="font-size: 4rem; color: #6c757d; margin-bottom: 1rem;"></i>
+                        <h3 class="mt-3" style="font-family: Almarai; color: #6c757d;">No Writings Added</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <a href="#" class="btn btn-secondary btn-lg" id="backBtn" style="font-family: Almarai;">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const supabaseClient = window.supabaseClient;
+
+        let currentStudentId = null;
+
+        function getQueryParam(key) {
+            return new URLSearchParams(window.location.search).get(key);
+        }
+
+        // 1. Load Student Info
+        async function loadData() {
+            const cicNo = getQueryParam('cicNo');
+            if (!cicNo) return alert("Missing CIC No.");
+
+            const { data: student, error } = await supabaseClient
+                .from('students')
+                .select('id, full_name, cic_no')
+                .eq('cic_no', cicNo)
+                .single();
+
+            if (error || !student) {
+                document.getElementById('studentNameTitle').textContent = "Student Not Found";
+                return;
+            }
+
+            currentStudentId = student.id;
+            document.getElementById('studentNameTitle').textContent = `${student.full_name} (${student.cic_no})`;
+            document.getElementById('backBtn').href = `edit-student-progress.html?cicNo=${student.cic_no}`;
+
+            loadWritings();
+        }
+
+        // 2. Fetch Writings from DB
+        async function loadWritings() {
+            // Assuming table name is 'writings'
+            const { data: list, error } = await supabaseClient
+                .from('writings')
+                .select('*') // columns: id, title, date
+                .eq('student_id', currentStudentId)
+                .order('date', { ascending: false });
+
+            if (error) {
+                // Handle case where table doesn't exist yet gracefully if needed, or alert error
+                alert("Error loading data: " + error.message);
+                return;
+            }
+
+            renderWritings(list || []);
+        }
+
+        function renderWritings(list) {
+            const container = document.getElementById('writingsList');
+            container.innerHTML = '';
+
+            if (list.length === 0) {
+                document.getElementById('noWritingsMessage').style.display = 'block';
+                return;
+            }
+            document.getElementById('noWritingsMessage').style.display = 'none';
+
+            list.forEach((item, index) => {
+                container.innerHTML += `
+                <div class="col-12 mb-3">
+                    <div class="card students-card">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-2 text-center"><h5>${index + 1}</h5></div>
+                                <div class="col-6 text-center"><h5>${item.title}</h5></div>
+                                <div class="col-2 text-center"><h5>${item.date}</h5></div>
+                                <div class="col-2 text-center">
+                                    <button class="btn btn-danger btn-sm" onclick="deleteWriting('${item.id}')">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+        }
+
+        // 3. Add Writing
+        document.getElementById('addWritingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('writingTitle').value.trim();
+            const date = document.getElementById('writingDate').value; 
+
+            if (!title) return alert("Please enter a title");
+            if (!date) return alert("Please select a date");
+
+            const { error } = await supabaseClient
+                .from('writings')
+                .insert([{
+                    student_id: currentStudentId,
+                    title: title,
+                    date: date
+                }]);
+
+            if (error) alert("Error adding: " + error.message);
+            else {
+                this.reset();
+                loadWritings();
+            }
+        });
+
+        // 4. Delete Writing
+        window.deleteWriting = async function(id) {
+            if (!confirm("Delete this writing?")) return;
+
+            const { error } = await supabaseClient
+                .from('writings')
+                .delete()
+                .eq('id', id);
+
+            if (error) alert("Error deleting: " + error.message);
+            else loadWritings();
+        };
+
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>
