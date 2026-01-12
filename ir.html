@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Internal Record (IR) - الأبطال</title>
+    <title>Integrated Record (IR) - الأبطال</title>
     
     <link rel="stylesheet" href="sc.css" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -17,68 +17,37 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <style>
-        /* Custom Tab Styling */
-        .nav-pills .nav-link {
-            border-radius: 30px;
-            padding: 10px 20px;
-            font-weight: 600;
-            margin-right: 10px;
-            color: #495057;
-            border: 1px solid #dee2e6;
-            transition: all 0.3s ease;
-            font-family: 'Almarai', sans-serif;
-        }
-        .nav-pills .nav-link.active {
-            background-color: #02244e; /* Theme Blue */
-            color: #fff;
-            border-color: #02244e;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .nav-pills .nav-link:hover:not(.active) {
-            background-color: #e9ecef;
-        }
-        
-        /* Section Icons */
-        .section-icon {
-            font-size: 3rem;
-            color: #02244e;
-            margin-bottom: 1rem;
-        }
-
-        /* Read Only Mode */
-        .read-only-mode input, 
-        .read-only-mode textarea, 
-        .read-only-mode select {
-            background-color: #f8f9fa;
-            border: 1px solid #ced4da;
-            pointer-events: none;
-        }
-        
-        /* Card Styles */
-        .students-card {
-            border: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border-radius: 12px;
-        }
-
-        /* New Styles for Total IR Table */
+        /* Styles */
+        .nav-pills .nav-link { border-radius: 30px; padding: 10px 20px; font-weight: 600; margin-right: 10px; color: #495057; border: 1px solid #dee2e6; transition: all 0.3s ease; font-family: 'Almarai', sans-serif; }
+        .nav-pills .nav-link.active { background-color: #02244e; color: #fff; border-color: #02244e; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .nav-pills .nav-link:hover:not(.active) { background-color: #e9ecef; }
+        .sub-pills .nav-link { border-radius: 5px; font-size: 0.9rem; padding: 8px 15px; }
+        .sub-pills .nav-link.active { background-color: #17a2b8; border-color: #17a2b8; }
+        .section-icon { font-size: 3rem; color: #02244e; margin-bottom: 1rem; }
+        .read-only-mode input, .read-only-mode textarea, .read-only-mode select { background-color: #f8f9fa; border: 1px solid #ced4da; pointer-events: none; }
+        .students-card { border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-radius: 12px; }
         .ir-input { width: 100px; text-align: center; font-weight: bold; border: 1px solid #ced4da; border-radius: 5px; }
         .ir-input:focus { border-color: #02244e; box-shadow: 0 0 5px rgba(2, 36, 78, 0.3); }
         .period-selector { max-width: 450px; margin: 0 auto; }
         .past-ir-badge { cursor: pointer; font-size: 0.9rem; transition: transform 0.2s; }
         .past-ir-badge:hover { transform: scale(1.05); }
+        
+        .add-incident-btn {
+            border-radius: 50%; width: 30px; height: 30px; padding: 0; line-height: 28px; text-align: center;
+            font-weight: bold; font-size: 16px; margin-left: 5px; display: none;
+        }
+        .edit-mode .add-incident-btn { display: inline-block; }
+        .history-btn { margin-top: 15px; font-size: 0.9rem; border-radius: 20px; cursor: pointer; }
+        
+        .filter-active-badge { font-size: 0.8rem; vertical-align: middle; display: none; }
     </style>
 </head>
 
 <body class="bg-light">
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-        <a class="navbar-brand" href="index.html">
-            <img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" style="height:40px;" />
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" style="width: 60px;">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+        <a class="navbar-brand" href="index.html"><img src="https://res.cloudinary.com/dh5jui6pu/image/upload/v1751959954/Screenshot_2025-07-08_130148_kg3qdg.png" class="navimg" style="height:40px;" /></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item"><a class="nav-link" href="main.html">Home</a></li>
@@ -103,10 +72,8 @@
                             <form id="loginForm">
                                 <div class="form-group"><label>Username / CIC No.</label><input type="text" class="form-control" id="loginUsername" required></div>
                                 <div class="form-group"><label>Password</label>
-                                    <div class="input-group">
-                                        <input type="password" class="form-control" id="loginPassword" required>
-                                        <div class="input-group-append"><button class="btn btn-outline-secondary" type="button" onclick="togglePassword('loginPassword')"><i class="fas fa-eye"></i></button></div>
-                                    </div>
+                                    <div class="input-group"><input type="password" class="form-control" id="loginPassword" required>
+                                    <div class="input-group-append"><button class="btn btn-outline-secondary" type="button" onclick="togglePassword('loginPassword')"><i class="fas fa-eye"></i></button></div></div>
                                 </div>
                                 <button type="submit" class="btn btn-primary btn-lg btn-block mt-4" style="background-color: #02244e;">Login</button>
                             </form>
@@ -118,9 +85,8 @@
         </div>
 
         <div id="appContent" style="display: none;">
-            
             <div class="text-center mb-4">
-                <h1 style="font-family: 'Almarai', sans-serif; color: #02244e;">Internal Record (IR)</h1>
+                <h1 style="font-family: 'Almarai', sans-serif; color: #02244e;">Integrated Record (IR)</h1>
                 <p class="text-muted">Behavioral & Value Assessment - Semester 4</p>
                 <div class="mb-3">
                     <span class="badge badge-success p-2" id="loggedInUser"></span>
@@ -134,12 +100,20 @@
             <div id="regularView">
                 <div id="officialControls" class="card students-card mb-4" style="display: none;">
                     <div class="card-body">
-                        <h5 class="card-title text-warning font-weight-bold"><i class="fas fa-user-tie"></i> Official Panel</h5>
+                        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+                            <h5 class="card-title text-warning font-weight-bold m-0"><i class="fas fa-user-tie"></i> Official Panel</h5>
+                            <div class="d-flex align-items-center">
+                                <button type="button" class="btn btn-secondary btn-sm mr-2" onclick="openFilterModal()"><i class="fas fa-filter"></i> Filter</button>
+                                <span id="filterBadge" class="badge badge-danger filter-active-badge mr-2">Filtered</span>
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-info active" id="btnViewMode" onclick="toggleAppMode('view')"><i class="fas fa-eye"></i> View</button>
+                                    <button type="button" class="btn btn-outline-warning" id="btnEditMode" onclick="toggleAppMode('edit')"><i class="fas fa-pen"></i> Edit</button>
+                                </div>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label>Select Student to Evaluate:</label>
-                            <select id="studentSelector" class="form-control" onchange="loadStudentData(this.value)">
-                                <option value="">-- Choose a Student --</option>
-                            </select>
+                            <select id="studentSelector" class="form-control" onchange="loadStudentData(this.value)"><option value="">-- Choose a Student --</option></select>
                         </div>
                     </div>
                 </div>
@@ -148,6 +122,13 @@
                     <div class="card-body text-center">
                         <h4 style="color: #02244e;"><i class="fas fa-user-graduate"></i> <span id="studentNameDisplay">Loading...</span></h4>
                         <span class="badge badge-primary p-2" id="studentCicDisplay" style="font-size: 1rem;"></span>
+                        <div id="studentFilterWarning" class="mt-2" style="display:none;"><span class="badge badge-danger">Date Filter Active</span></div>
+                    </div>
+                </div>
+
+                <div id="loadingSpinner" class="text-center py-5" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
                     </div>
                 </div>
 
@@ -157,23 +138,59 @@
                         <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#law"><i class="fas fa-gavel"></i> Law-Abiding</a></li>
                         <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#cleanliness"><i class="fas fa-broom"></i> Cleanliness</a></li>
                         <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#spirituality"><i class="fas fa-mosque"></i> Spirituality</a></li>
+                        <li class="nav-item" id="coCurrTabLi" style="display: none;"><a class="nav-link" data-toggle="pill" href="#cocurriculum"><i class="fas fa-star"></i> Co-curriculum</a></li>
                     </ul>
 
                     <form id="irForm">
                         <input type="hidden" id="recordId">
+                        
                         <div class="tab-content">
                             <div class="tab-pane fade show active" id="punctuality">
-                                <div class="card students-card"><div class="card-body text-center p-5"><div class="section-icon"><i class="far fa-clock"></i></div><h4 class="mb-4" style="color:#02244e;">Punctuality Record</h4><div class="form-row justify-content-center"><div class="form-group col-md-4"><label>Late Attendance</label><input type="number" class="form-control text-center form-control-lg" id="lateAttendance" value="0"></div><div class="form-group col-md-4"><label>Did Not Attend</label><input type="number" class="form-control text-center form-control-lg" id="didNotAttend" value="0"></div></div></div></div>
+                                <div class="card students-card">
+                                    <div class="card-body text-center p-5">
+                                        <div class="section-icon"><i class="far fa-clock"></i></div>
+                                        <h4 class="mb-4" style="color:#02244e;">Punctuality Record</h4>
+                                        <div class="form-row justify-content-center">
+                                            <div class="form-group col-md-4">
+                                                <label>Late Attendance</label>
+                                                <div class="d-flex align-items-center justify-content-center">
+                                                    <input type="number" class="form-control text-center form-control-lg" id="lateAttendance" value="0" readonly>
+                                                    <button type="button" class="btn btn-warning add-incident-btn shadow-sm" onclick="openPunctualityModal('late')" title="Add Incident"><i class="fas fa-plus" style="font-size: 12px;"></i></button>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label>Did Not Attend</label>
+                                                <div class="d-flex align-items-center justify-content-center">
+                                                    <input type="number" class="form-control text-center form-control-lg" id="didNotAttend" value="0" readonly>
+                                                    <button type="button" class="btn btn-warning add-incident-btn shadow-sm" onclick="openPunctualityModal('absent')" title="Add Incident"><i class="fas fa-plus" style="font-size: 12px;"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-info history-btn" onclick="showPunctualityDetails()"><i class="fas fa-list"></i> More Details</button>
+                                    </div>
+                                </div>
                             </div>
+
                             <div class="tab-pane fade" id="law">
-                                <div class="card students-card"><div class="card-body text-center p-5"><div class="section-icon"><i class="fas fa-gavel"></i></div><h4 class="mb-4" style="color:#02244e;">Law & Discipline</h4><div class="form-group" style="max-width:300px;margin:0 auto 20px;"><label>Violations</label><input type="number" class="form-control text-center form-control-lg" id="lawCount" value="0" oninput="toggleLawDescription()"></div><div class="form-group text-left mx-auto" style="max-width:600px;"><label>Description <span class="text-danger" id="lawDescReq" style="display:none;">*</span></label><textarea class="form-control" id="lawDescription" rows="4"></textarea></div></div></div>
+                                <div class="card students-card">
+                                    <div class="card-body text-center p-5">
+                                        <div class="section-icon"><i class="fas fa-gavel"></i></div>
+                                        <h4 class="mb-4" style="color:#02244e;">Law & Discipline</h4>
+                                        <div class="form-group" style="max-width: 300px; margin: 0 auto 20px auto;">
+                                            <label>Violation Count</label>
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <input type="number" class="form-control text-center form-control-lg" id="lawCount" min="0" value="0" readonly>
+                                                <button type="button" class="btn btn-warning add-incident-btn shadow-sm" onclick="openLawModal()" title="Add Violation"><i class="fas fa-plus" style="font-size: 12px;"></i></button>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-info history-btn" onclick="showLawDetails()"><i class="fas fa-list"></i> More Details</button>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="tab-pane fade" id="cleanliness">
-                                <div class="card students-card"><div class="card-body text-center p-5"><div class="section-icon"><i class="fas fa-broom"></i></div><h4 class="mb-4" style="color:#02244e;">Cleanliness</h4><div class="form-group" style="max-width:300px;margin:0 auto 20px;"><label>Grade</label><select class="form-control form-control-lg" id="cleanGrade"><option value="">Select</option><option value="A+">A+</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select></div><div class="form-group text-left mx-auto" style="max-width:600px;"><label>Remarks</label><textarea class="form-control" id="cleanRemarks" rows="3"></textarea></div></div></div>
-                            </div>
-                            <div class="tab-pane fade" id="spirituality">
-                                <div class="card students-card"><div class="card-body text-center p-5"><div class="section-icon"><i class="fas fa-mosque"></i></div><h4 class="mb-4" style="color:#02244e;">Spirituality</h4><div class="form-group" style="max-width:300px;margin:0 auto 20px;"><label>Grade</label><select class="form-control form-control-lg" id="spiritGrade"><option value="">Select</option><option value="A+">A+</option><option value="A">A</option><option value="B">B</option><option value="C">C</option></select></div><div class="text-left bg-light p-3 rounded mb-3 mx-auto" style="max-width:500px;"><div class="custom-control custom-checkbox"><input type="checkbox" class="custom-control-input" id="spiritPrayer"><label class="custom-control-label" for="spiritPrayer">Regular Prayers</label></div><div class="custom-control custom-checkbox"><input type="checkbox" class="custom-control-input" id="spiritMasjid"><label class="custom-control-label" for="spiritMasjid">Masjid Respect</label></div><div class="custom-control custom-checkbox"><input type="checkbox" class="custom-control-input" id="spiritActivity"><label class="custom-control-label" for="spiritActivity">Religious Activities</label></div></div><div class="form-group text-left mx-auto" style="max-width:600px;"><label>Remarks</label><textarea class="form-control" id="spiritRemarks" rows="3"></textarea></div></div></div>
-                            </div>
+
+                            <div class="tab-pane fade" id="cleanliness"><div class="card students-card"><div class="card-body text-center p-5"><div class="section-icon"><i class="fas fa-broom"></i></div><h4 class="mb-4" style="color:#02244e;">Cleanliness</h4><div class="form-group" style="max-width:300px;margin:0 auto 20px;"><label>Grade</label><select class="form-control form-control-lg" id="cleanGrade"><option value="">Select</option><option value="A+">A+</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select></div><div class="form-group text-left mx-auto" style="max-width:600px;"><label>Remarks</label><textarea class="form-control" id="cleanRemarks" rows="3"></textarea></div></div></div></div>
+                            <div class="tab-pane fade" id="spirituality"><div class="card students-card"><div class="card-body text-center p-5"><div class="section-icon"><i class="fas fa-mosque"></i></div><h4 class="mb-4" style="color:#02244e;">Spirituality</h4><div class="form-group" style="max-width:300px;margin:0 auto 20px;"><label>Grade</label><select class="form-control form-control-lg" id="spiritGrade"><option value="">Select</option><option value="A+">A+</option><option value="A">A</option><option value="B">B</option><option value="C">C</option></select></div><div class="text-left bg-light p-3 rounded mb-3 mx-auto" style="max-width:500px;"><div class="custom-control custom-checkbox"><input type="checkbox" class="custom-control-input" id="spiritPrayer"><label class="custom-control-label" for="spiritPrayer">Regular Prayers</label></div><div class="custom-control custom-checkbox"><input type="checkbox" class="custom-control-input" id="spiritMasjid"><label class="custom-control-label" for="spiritMasjid">Masjid Respect</label></div><div class="custom-control custom-checkbox"><input type="checkbox" class="custom-control-input" id="spiritActivity"><label class="custom-control-label" for="spiritActivity">Religious Activities</label></div></div><div class="form-group text-left mx-auto" style="max-width:600px;"><label>Remarks</label><textarea class="form-control" id="spiritRemarks" rows="3"></textarea></div></div></div></div>
+                            <div class="tab-pane fade" id="cocurriculum"><div class="card students-card"><div class="card-body"><div class="text-center mb-4"><div class="section-icon"><i class="fas fa-star"></i></div><h4 style="color:#02244e;">Co-Curricular Activities</h4></div><ul class="nav nav-pills sub-pills mb-3 justify-content-center" id="coCurrSubTabs"><li class="nav-item"><a class="nav-link active" data-toggle="pill" href="#sub-books">Books Read</a></li><li class="nav-item"><a class="nav-link" data-toggle="pill" href="#sub-achievements">Achievements</a></li><li class="nav-item"><a class="nav-link" data-toggle="pill" href="#sub-skills">Extra Skills</a></li><li class="nav-item"><a class="nav-link" data-toggle="pill" href="#sub-writings">Writings</a></li></ul><div class="tab-content bg-light p-3 rounded" style="min-height: 200px;"><div class="tab-pane fade show active" id="sub-books"><div id="list-books" class="list-group list-group-flush text-center text-muted">Select a student</div></div><div class="tab-pane fade" id="sub-achievements"><div id="list-achievements" class="list-group list-group-flush text-center text-muted">Select a student</div></div><div class="tab-pane fade" id="sub-skills"><div id="list-skills" class="list-group list-group-flush text-center text-muted">Select a student</div></div><div class="tab-pane fade" id="sub-writings"><div id="list-writings" class="list-group list-group-flush text-center text-muted">Select a student</div></div></div></div></div></div>
                         </div>
                         <div id="saveBtnContainer" class="mt-4 text-center" style="display: none;">
                             <button type="button" class="btn btn-warning btn-lg px-5 shadow font-weight-bold" onclick="saveData()"><i class="fas fa-save"></i> Save Changes</button>
@@ -186,62 +203,24 @@
             <div id="totalIrView" style="display: none;">
                 <div class="card students-card shadow-sm">
                     <div class="card-header bg-white border-bottom-0 pt-4 px-3 px-md-4">
-                        <div class="row align-items-center">
-                            <div class="col-3 col-md-2 text-left">
-                                <button class="btn btn-secondary btn-sm" onclick="closeTotalIRView()">
-                                    <i class="fas fa-arrow-left"></i> <span class="d-none d-sm-inline">Back</span>
-                                </button>
-                            </div>
-                            <div class="col-9 col-md-8 text-center">
-                                <h3 style="color: #02244e; margin: 0; font-size: 1.25rem;">Total IR Marks</h3>
-                            </div>
-                        </div>
-                        
-                        <div class="row mt-4 justify-content-center">
-                            <div class="col-12 col-md-8 text-center">
-                                <label class="font-weight-bold text-muted">Select Period</label>
-                                <div class="input-group period-selector w-100">
-                                    <select class="form-control" id="irPeriodSelect" onchange="handlePeriodChange()">
-                                        </select>
-                                    <input type="text" id="irPeriodManual" class="form-control" style="display: none;" placeholder="Enter Period (e.g. Sem 4)">
-                                    
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary" onclick="loadTotalIrData()">Go</button>
-                                        <button class="btn btn-secondary" onclick="openPastIRs()" title="Past Records">
-                                            <i class="fas fa-history"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="row align-items-center"><div class="col-3 col-md-2 text-left"><button class="btn btn-secondary btn-sm" onclick="closeTotalIRView()"><i class="fas fa-arrow-left"></i> <span class="d-none d-sm-inline">Back</span></button></div><div class="col-9 col-md-8 text-center"><h3 style="color: #02244e; margin: 0; font-size: 1.25rem;">Total IR Marks</h3></div></div>
+                        <div class="row mt-4 justify-content-center"><div class="col-12 col-md-8 text-center"><label class="font-weight-bold text-muted">Select Period</label><div class="input-group period-selector w-100"><select class="form-control" id="irPeriodSelect" onchange="handlePeriodChange()"></select><input type="text" id="irPeriodManual" class="form-control" style="display: none;" placeholder="Enter Period (e.g. Sem 4)"><div class="input-group-append"><button class="btn btn-primary" onclick="loadTotalIrData()">Go</button><button class="btn btn-secondary" onclick="openPastIRs()"><i class="fas fa-history"></i></button></div></div></div></div>
                     </div>
-                    
-                    <div class="card-body p-0">
-                        <div id="totalIrContent" class="p-4">
-                            <div class="text-center text-muted">Select a period and click Go</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <div class="modal fade" id="pastIrModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Past Records</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div id="pastIrList" class="list-group">
-                        <div class="text-center"><div class="spinner-border text-primary spinner-border-sm"></div> Loading...</div>
-                    </div>
+                    <div class="card-body p-0"><div id="totalIrContent" class="p-4"><div class="text-center text-muted">Select a period and click Go</div></div></div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="filterModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title"><i class="fas fa-filter"></i> Filter Data</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body"><div class="form-group"><label>From Date</label><input type="date" class="form-control" id="filterStartDate"></div><div class="form-group"><label>To Date</label><input type="date" class="form-control" id="filterEndDate"></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" onclick="clearFilter()">Clear</button><button type="button" class="btn btn-primary" onclick="applyFilter()">Apply</button></div></div></div></div>
+
+    <div class="modal fade" id="addIncidentModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="incidentModalTitle">Add Incident</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body"><input type="hidden" id="incidentType"><div class="form-group"><label>Date</label><input type="date" class="form-control" id="incidentDate"></div><div class="form-group"><label>Category (Optional)</label><select class="form-control" id="incidentCategory" onchange="toggleManualCategory()"><option value="">-- General --</option><option value="Masjid">Masjid</option><option value="Class">Class</option><option value="manual">Enter Manually...</option></select><input type="text" class="form-control mt-2" id="incidentCategoryManual" style="display: none;" placeholder="Enter Custom Category"></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button><button type="button" class="btn btn-primary" onclick="saveIncident()">Add Entry</button></div></div></div></div>
+
+    <div class="modal fade" id="addLawModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Add Violation</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body"><div class="form-group"><label>Date</label><input type="date" class="form-control" id="lawDate"></div><div class="form-group"><label>Description</label><textarea class="form-control" id="lawModalDesc" rows="3" placeholder="Describe the violation"></textarea></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button><button type="button" class="btn btn-primary" onclick="saveLawIncident()">Add Violation</button></div></div></div></div>
+
+    <div class="modal fade" id="viewDetailsModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Punctuality Details</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body"><div id="incidentHistoryList" class="list-group"></div></div></div></div></div>
+    <div class="modal fade" id="viewLawDetailsModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Violation History</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body"><div id="lawHistoryList" class="list-group"></div></div></div></div></div>
+    <div class="modal fade" id="pastIrModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Past Records</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body"><div id="pastIrList" class="list-group"></div></div></div></div></div>
 
     <script>
         const supabaseClient = window.supabaseClient;
@@ -252,42 +231,34 @@
         let userRole = null; 
         let currentStudentId = null;
         let allStudentsCache = [];
+        let appMode = 'view';
+        let currentPunctualityHistory = [];
+        let currentLawHistory = [];
+        let filterStart = null;
+        let filterEnd = null;
 
         // --- AUTH ---
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
-
             try {
                 if (username === 'Razeek Fariz') {
                     const { data, error } = await supabaseClient.auth.signInWithPassword({ email: 'razeekfariz1@gmail.com', password });
-                    if (error) throw error;
-                    setupSession(username, 'chief_admin', false, null);
-                    return;
+                    if(error) throw error; setupSession(username, 'chief_admin', false, null); return;
                 }
                 const cleanName = username.replace(/\s+/g, '').toLowerCase();
-                let { data: stuData, error: stuError } = await supabaseClient.auth.signInWithPassword({ 
-                    email: cleanName + '@student.com', 
-                    password: password + PASSWORD_SUFFIX 
-                });
+                let { data: stuData, error: stuError } = await supabaseClient.auth.signInWithPassword({ email: cleanName + '@student.com', password: password + PASSWORD_SUFFIX });
                 if (!stuError) {
                     const { data: student } = await supabaseClient.from('students').select('*').eq('cic_no', username).single();
-                    setupSession(username, 'student', true, student);
-                    return;
+                    setupSession(username, 'student', true, student); return;
                 }
-                let { data: offData, error: offError } = await supabaseClient.auth.signInWithPassword({ 
-                    email: cleanName + '@official.com', 
-                    password: password 
-                });
+                let { data: offData, error: offError } = await supabaseClient.auth.signInWithPassword({ email: cleanName + '@official.com', password: password });
                 if (!offError) {
                     const { data: officialData } = await supabaseClient.from('officials').select('role').eq('id', offData.user.id).single();
-                    if (officialData) {
-                        const role = officialData.role; 
-                        if (['mentor', 'chief_admin', 'special permitted by admin'].includes(role)) {
-                            setupSession(username, role, false, null);
-                        } else { alert("Access Denied."); await supabaseClient.auth.signOut(); }
-                    } else { alert("Error: Official profile not found."); await supabaseClient.auth.signOut(); }
+                    if (officialData && ['mentor', 'chief_admin', 'special permitted by admin'].includes(officialData.role)) {
+                        setupSession(username, officialData.role, false, null);
+                    } else { alert("Access Denied."); await supabaseClient.auth.signOut(); }
                     return;
                 }
                 throw new Error("Invalid username or password");
@@ -295,58 +266,181 @@
         });
 
         function setupSession(name, role, isStudent, studentData) {
-            localStorage.setItem('mgmtUser', name);
-            localStorage.setItem('mgmtUserRole', role);
+            localStorage.setItem('mgmtUser', name); localStorage.setItem('mgmtUserRole', role);
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('appContent').style.display = 'block';
             document.getElementById('loggedInUser').textContent = `${name} (${role})`;
             userRole = role;
-            if (isStudent || role === 'student') {
+            if (['mentor', 'chief_admin', 'special permitted by admin'].includes(role)) $('#coCurrTabLi').show(); else $('#coCurrTabLi').hide();
+            
+            if (isStudent || role === 'student') { 
                 currentUser = studentData; 
-                setupStudentView(studentData);
-            } else {
-                setupOfficialView();
-            }
+                const container = document.getElementById('studentProfileHeader').querySelector('.card-body');
+                const filterBtn = document.createElement('button');
+                filterBtn.className = 'btn btn-secondary btn-sm mt-2';
+                filterBtn.innerHTML = '<i class="fas fa-filter"></i> Filter';
+                filterBtn.onclick = openFilterModal;
+                container.appendChild(filterBtn);
+                setupStudentView(studentData); 
+            } else { setupOfficialView(); }
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            const savedUser = localStorage.getItem('mgmtUser');
-            const savedRole = localStorage.getItem('mgmtUserRole');
+            const savedUser = localStorage.getItem('mgmtUser'); const savedRole = localStorage.getItem('mgmtUserRole');
             if (savedUser && savedRole) {
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 if (session) {
                     if (savedRole === 'student') {
                         const { data: student } = await supabaseClient.from('students').select('*').eq('cic_no', savedUser).single();
                         setupSession(savedUser, savedRole, true, student);
-                    } else {
-                        if (['mentor', 'chief_admin', 'special permitted by admin'].includes(savedRole)) {
-                            setupSession(savedUser, savedRole, false, null);
-                        } else { localStorage.clear(); await supabaseClient.auth.signOut(); }
-                    }
+                    } else if (['mentor', 'chief_admin', 'special permitted by admin'].includes(savedRole)) {
+                        setupSession(savedUser, savedRole, false, null);
+                    } else { localStorage.clear(); await supabaseClient.auth.signOut(); }
                 } else { localStorage.clear(); }
             }
         });
 
-        // --- REGULAR VIEW SETUP ---
+        // --- FILTER ---
+        function openFilterModal() { $('#filterModal').modal('show'); }
+        function applyFilter() {
+            const s = document.getElementById('filterStartDate').value; const e = document.getElementById('filterEndDate').value;
+            if (s && e) { filterStart = s; filterEnd = e; $('#filterBadge').show(); $('#studentFilterWarning').show(); if (currentStudentId) loadStudentData(currentStudentId); $('#filterModal').modal('hide'); } 
+            else { alert("Please select both From and To dates."); }
+        }
+        function clearFilter() {
+            filterStart = null; filterEnd = null;
+            document.getElementById('filterStartDate').value = ''; document.getElementById('filterEndDate').value = '';
+            $('#filterBadge').hide(); $('#studentFilterWarning').hide();
+            if (currentStudentId) loadStudentData(currentStudentId);
+            $('#filterModal').modal('hide');
+        }
+        function isDateInRange(dateStr) { if (!filterStart || !filterEnd || !dateStr) return true; return dateStr >= filterStart && dateStr <= filterEnd; }
+
+        // --- MODE ---
+        function toggleAppMode(mode) {
+            appMode = mode;
+            const viewBtn = document.getElementById('btnViewMode'); const editBtn = document.getElementById('btnEditMode');
+            const irForm = document.getElementById('irForm');
+            if(mode === 'view') {
+                viewBtn.classList.add('active', 'btn-info'); viewBtn.classList.remove('btn-outline-info');
+                editBtn.classList.add('btn-outline-warning'); editBtn.classList.remove('active', 'btn-warning');
+                disableForm(true); document.getElementById('saveBtnContainer').style.display = 'none';
+                irForm.classList.remove('edit-mode');
+            } else {
+                editBtn.classList.add('active', 'btn-warning'); editBtn.classList.remove('btn-outline-warning');
+                viewBtn.classList.add('btn-outline-info'); viewBtn.classList.remove('active', 'btn-info');
+                if(currentStudentId) {
+                    disableForm(false); document.getElementById('saveBtnContainer').style.display = 'block';
+                    irForm.classList.add('edit-mode');
+                    document.getElementById('lateAttendance').disabled = true;
+                    document.getElementById('didNotAttend').disabled = true;
+                    document.getElementById('lawCount').disabled = true;
+                }
+            }
+        }
+
+        // --- HELPERS ---
+        function formatDate(dateStr) { if(!dateStr) return ''; const [y, m, d] = dateStr.split('-'); if(d && m && y) return `${d}/${m}/${y}`; return dateStr; }
+        
+        function disableForm(isDisabled) {
+            const elements = document.getElementById('irForm').elements;
+            for (let i = 0; i < elements.length; i++) {
+                if(elements[i].classList.contains('history-btn')) continue;
+                elements[i].disabled = isDisabled;
+            }
+        }
+
+        // --- PUNCTUALITY LOGIC ---
+        function openPunctualityModal(type) {
+            if(!currentStudentId) return;
+            document.getElementById('incidentType').value = type;
+            document.getElementById('incidentModalTitle').textContent = type === 'late' ? "Add Late Attendance" : "Add Did Not Attend";
+            document.getElementById('incidentDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('incidentCategory').value = "";
+            document.getElementById('incidentCategoryManual').value = "";
+            document.getElementById('incidentCategoryManual').style.display = "none";
+            $('#addIncidentModal').modal('show');
+        }
+
+        function toggleManualCategory() {
+            const select = document.getElementById('incidentCategory');
+            const input = document.getElementById('incidentCategoryManual');
+            if (select.value === 'manual') { input.style.display = 'block'; input.focus(); } else { input.style.display = 'none'; }
+        }
+
+        async function saveIncident() {
+            const type = document.getElementById('incidentType').value;
+            const date = document.getElementById('incidentDate').value;
+            const selectCat = document.getElementById('incidentCategory').value;
+            const manualCat = document.getElementById('incidentCategoryManual').value.trim();
+            let finalCat = selectCat;
+            if (selectCat === 'manual') { if (!manualCat) return alert("Please enter a category name."); finalCat = manualCat; } 
+            else if(!finalCat) finalCat = null;
+            if(!date) return alert("Please select a date");
+            currentPunctualityHistory.push({ type, date, category: finalCat });
+            await saveData(true); 
+            $('#addIncidentModal').modal('hide');
+        }
+
+        function showPunctualityDetails() {
+            if(!currentStudentId) return;
+            $('#viewDetailsModal').modal('show');
+            const list = document.getElementById('incidentHistoryList');
+            list.innerHTML = '';
+            const filteredHistory = currentPunctualityHistory.filter(i => isDateInRange(i.date));
+            if(!filteredHistory || filteredHistory.length === 0) { list.innerHTML = '<div class="text-muted text-center">No incidents in range.</div>'; return; }
+            const sorted = [...filteredHistory].sort((a,b) => new Date(b.date) - new Date(a.date));
+            list.innerHTML = sorted.map(i => {
+                let badge = i.type === 'late' ? '<span class="badge badge-warning">Late</span>' : '<span class="badge badge-danger">Absent</span>';
+                let catDisplay = i.category ? `<div class="mt-1 pl-1 text-muted small text-break" style="border-left: 2px solid #dee2e6;">${i.category}</div>` : '';
+                return `<div class="list-group-item"><div class="d-flex justify-content-between align-items-center"><div>${badge}</div><small class="text-muted font-weight-bold">${formatDate(i.date)}</small></div>${catDisplay}</div>`;
+            }).join('');
+        }
+
+        // --- LAW LOGIC ---
+        function openLawModal() {
+            if(!currentStudentId) return;
+            document.getElementById('lawDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('lawModalDesc').value = "";
+            $('#addLawModal').modal('show');
+        }
+
+        async function saveLawIncident() {
+            const date = document.getElementById('lawDate').value;
+            const desc = document.getElementById('lawModalDesc').value.trim();
+            if(!date) return alert("Please select a date");
+            if(!desc) return alert("Please provide a description");
+            currentLawHistory.push({ date: date, description: desc });
+            await saveData(true);
+            $('#addLawModal').modal('hide');
+        }
+
+        function showLawDetails() {
+            if(!currentStudentId) return;
+            $('#viewLawDetailsModal').modal('show');
+            const list = document.getElementById('lawHistoryList');
+            list.innerHTML = '';
+            const filteredLaw = currentLawHistory.filter(i => isDateInRange(i.date));
+            if(!filteredLaw || filteredLaw.length === 0) { list.innerHTML = '<div class="text-muted text-center">No violations recorded.</div>'; return; }
+            const sorted = [...filteredLaw].sort((a,b) => new Date(b.date) - new Date(a.date));
+            list.innerHTML = sorted.map(i => `<div class="list-group-item"><div class="d-flex w-100 justify-content-between"><h6 class="mb-1 text-danger font-weight-bold">Violation</h6><small class="text-muted font-weight-bold">${formatDate(i.date)}</small></div><p class="mb-1 text-break">${i.description}</p></div>`).join('');
+        }
+
+        // --- MAIN DATA ---
         async function setupOfficialView() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if(session) currentUser = session.user;
             document.getElementById('officialControls').style.display = 'block';
-            document.getElementById('saveBtnContainer').style.display = 'block';
             document.getElementById('studentProfileHeader').style.display = 'none';
             document.getElementById('mainFormContent').style.display = 'block';
-            
-            const { data: students } = await supabaseClient.from('students').select('id, full_name, cic_no').order('cic_no');
-            allStudentsCache = students || [];
-            
-            const selector = document.getElementById('studentSelector');
-            selector.innerHTML = '<option value="">-- Choose a Student --</option>';
-            allStudentsCache.forEach(s => {
-                const opt = document.createElement('option');
-                opt.value = s.id; opt.textContent = `${s.cic_no} - ${s.full_name}`;
-                selector.appendChild(opt);
-            });
-            disableForm(true);
+            toggleAppMode('view');
+            if(allStudentsCache.length===0) {
+                const { data } = await supabaseClient.from('students').select('id, full_name, cic_no').order('cic_no');
+                allStudentsCache = data || [];
+                const selector = document.getElementById('studentSelector');
+                selector.innerHTML = '<option value="">-- Choose a Student --</option>';
+                allStudentsCache.forEach(s => { const opt = document.createElement('option'); opt.value = s.id; opt.textContent = `${s.cic_no} - ${s.full_name}`; selector.appendChild(opt); });
+            }
         }
 
         function setupStudentView(studentData) {
@@ -363,212 +457,68 @@
             document.getElementById('irForm').classList.add('read-only-mode');
         }
 
-        // --- TOTAL IR VIEW LOGIC ---
-        
-        function showTotalIRView() {
-            document.getElementById('regularView').style.display = 'none';
-            document.getElementById('totalIrView').style.display = 'block';
-            populatePeriodDropdown();
-            loadTotalIrData(); 
-        }
-
-        function populatePeriodDropdown() {
-            const select = document.getElementById('irPeriodSelect');
-            select.innerHTML = '';
-            
-            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            const date = new Date();
-            
-            // Loop: Past 3 months (-3, -2, -1), Current (0), Future 1 (+1)
-            for (let i = -3; i <= 1; i++) {
-                const d = new Date(date.getFullYear(), date.getMonth() + i, 1);
-                const val = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
-                const option = document.createElement('option');
-                option.value = val;
-                option.textContent = val;
-                // Default select LAST month (i === -1)
-                if (i === -1) option.selected = true; 
-                select.appendChild(option);
-            }
-            
-            const manual = document.createElement('option');
-            manual.value = 'manual';
-            manual.textContent = 'Enter Manually (e.g. Sem 4)';
-            select.appendChild(manual);
-        }
-
-        function closeTotalIRView() {
-            document.getElementById('totalIrView').style.display = 'none';
-            document.getElementById('regularView').style.display = 'block';
-        }
-
-        function handlePeriodChange() {
-            const select = document.getElementById('irPeriodSelect');
-            const manualInput = document.getElementById('irPeriodManual');
-            if (select.value === 'manual') {
-                select.style.display = 'none';
-                manualInput.style.display = 'block';
-                manualInput.focus();
-            } else {
-                manualInput.style.display = 'none';
-                select.style.display = 'block';
-            }
-        }
-
-        // PAST IRs LOGIC
-        async function openPastIRs() {
-            $('#pastIrModal').modal('show');
-            const list = document.getElementById('pastIrList');
-            list.innerHTML = '<div class="text-center"><div class="spinner-border text-primary spinner-border-sm"></div> Loading...</div>';
-
-            const { data, error } = await supabaseClient
-                .from('total_ir_marks')
-                .select('period, updated_at')
-                .order('updated_at', { ascending: false });
-
-            if (error || !data) {
-                list.innerHTML = '<div class="text-danger p-3">Error loading history</div>';
-                return;
-            }
-
-            const seen = new Set();
-            const uniquePeriods = [];
-            data.forEach(item => {
-                if (!seen.has(item.period)) {
-                    seen.add(item.period);
-                    uniquePeriods.push(item.period);
-                }
-            });
-
-            if (uniquePeriods.length === 0) {
-                list.innerHTML = '<div class="text-muted p-3 text-center">No past records found.</div>';
-            } else {
-                list.innerHTML = '';
-                uniquePeriods.forEach(p => {
-                    const item = document.createElement('a');
-                    item.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center past-ir-badge';
-                    item.innerHTML = `<span><i class="far fa-calendar-alt mr-2"></i> ${p}</span> <i class="fas fa-chevron-right text-muted"></i>`;
-                    item.onclick = () => selectPastPeriod(p);
-                    list.appendChild(item);
-                });
-            }
-        }
-
-        function selectPastPeriod(period) {
-            $('#pastIrModal').modal('hide');
-            const select = document.getElementById('irPeriodSelect');
-            const manual = document.getElementById('irPeriodManual');
-            
-            let exists = false;
-            for(let i=0; i<select.options.length; i++) {
-                if(select.options[i].value === period) {
-                    select.selectedIndex = i;
-                    exists = true;
-                    break;
-                }
-            }
-
-            if(exists) {
-                select.style.display = 'block';
-                manual.style.display = 'none';
-            } else {
-                select.value = 'manual';
-                select.style.display = 'none';
-                manual.style.display = 'block';
-                manual.value = period;
-            }
-            
-            loadTotalIrData();
-        }
-
-        async function loadTotalIrData() {
-            const container = document.getElementById('totalIrContent');
-            container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
-
-            const select = document.getElementById('irPeriodSelect');
-            let period = select.value;
-            if (period === 'manual') {
-                period = document.getElementById('irPeriodManual').value.trim();
-                if (!period) { container.innerHTML = '<div class="text-danger text-center">Please enter a period</div>'; return; }
-            }
-
-            if (userRole === 'student') {
-                const { data, error } = await supabaseClient.from('total_ir_marks')
-                    .select('mark')
-                    .eq('student_id', currentUser.id)
-                    .eq('period', period)
-                    .single();
-                
-                if (error && error.code !== 'PGRST116') {
-                    container.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
-                    return;
-                }
-                const mark = data ? data.mark : "Not Added";
-                container.innerHTML = `
-                    <div class="card shadow-sm p-4 text-center">
-                        <h4>Your IR Mark for <span class="text-info">${period}</span></h4>
-                        <div class="display-4 font-weight-bold text-dark mt-3">${mark}</div>
-                    </div>
-                `;
-            } else {
-                if (allStudentsCache.length === 0) {
-                    const { data } = await supabaseClient.from('students').select('id, full_name, cic_no').order('cic_no');
-                    allStudentsCache = data || [];
-                }
-                const { data: marks, error } = await supabaseClient.from('total_ir_marks').select('student_id, mark').eq('period', period);
-                if (error) { container.innerHTML = 'Error loading marks'; return; }
-
-                const marksMap = {};
-                marks.forEach(m => marksMap[m.student_id] = m.mark);
-
-                let html = `
-                    <h5 class="text-center mb-4">Editing Marks for: <b>${period}</b></h5>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
-                            <thead class="thead-light">
-                                <tr><th>CIC No.</th><th>Name</th><th class="text-center" style="width: 150px;">Mark</th></tr>
-                            </thead>
-                            <tbody>
-                `;
-                allStudentsCache.forEach(s => {
-                    const val = marksMap[s.id] !== undefined ? marksMap[s.id] : '';
-                    html += `<tr><td>${s.cic_no}</td><td>${s.full_name}</td><td class="text-center"><input type="number" class="ir-input form-control" value="${val}" onchange="saveTotalIrMark('${s.id}', '${period}', this.value)" placeholder="-"></td></tr>`;
-                });
-                html += `</tbody></table></div>`;
-                container.innerHTML = html;
-            }
-        }
-
-        async function saveTotalIrMark(studentId, period, value) {
-            const { data: existing } = await supabaseClient.from('total_ir_marks').select('id').eq('student_id', studentId).eq('period', period).single();
-            let error;
-            if (existing) {
-                const { error: err } = await supabaseClient.from('total_ir_marks').update({ mark: value || null, updated_by: currentUser.id }).eq('id', existing.id);
-                error = err;
-            } else {
-                if (value) {
-                    const { error: err } = await supabaseClient.from('total_ir_marks').insert([{ student_id: studentId, period: period, mark: value, updated_by: currentUser.id }]);
-                    error = err;
-                }
-            }
-            if(error) alert("Error saving mark: " + error.message);
-        }
-
-        // --- EXISTING FORM FUNCTIONS ---
         async function loadStudentData(studentId) {
             if (!studentId) { disableForm(true); document.getElementById('irForm').reset(); return; }
-            currentStudentId = studentId; disableForm(false); await loadStudentValues(studentId);
+            // 1. Immediate UI Feedback
+            document.getElementById('loadingSpinner').style.display = 'block';
+            document.getElementById('mainFormContent').style.display = 'none';
+            
+            // 2. Clear current state
+            currentStudentId = studentId; 
+            currentPunctualityHistory = []; 
+            currentLawHistory = [];
+
+            // 3. Fetch Data in Parallel
+            await Promise.all([
+                loadStudentValues(studentId),
+                loadCoCurricularData(studentId)
+            ]);
+
+            // 4. Update UI based on Role/Mode
+            if (userRole !== 'student') {
+                if (appMode === 'edit') {
+                    disableForm(false);
+                    document.getElementById('saveBtnContainer').style.display = 'block';
+                    document.getElementById('irForm').classList.add('edit-mode');
+                    document.getElementById('lateAttendance').disabled = true;
+                    document.getElementById('didNotAttend').disabled = true;
+                    document.getElementById('lawCount').disabled = true;
+                } else {
+                    disableForm(true);
+                    document.getElementById('saveBtnContainer').style.display = 'none';
+                    document.getElementById('irForm').classList.remove('edit-mode');
+                }
+            } 
+            
+            // 5. Show Content
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('mainFormContent').style.display = 'block';
         }
 
         async function loadStudentValues(studentId) {
             const { data } = await supabaseClient.from('student_values').select('*').eq('student_id', studentId).eq('semester', CURRENT_SEMESTER).single();
             if (data) {
                 document.getElementById('recordId').value = data.id;
-                document.getElementById('lateAttendance').value = data.late_attendance || 0;
-                document.getElementById('didNotAttend').value = data.did_not_attend || 0;
-                document.getElementById('lawCount').value = data.law_violation_count || 0;
-                document.getElementById('lawDescription').value = data.law_violation_description || '';
-                toggleLawDescription();
+                currentPunctualityHistory = data.punctuality_history || [];
+                currentLawHistory = data.law_history || [];
+
+                let lateCount = 0; let absentCount = 0;
+                currentPunctualityHistory.filter(i => isDateInRange(i.date)).forEach(i => {
+                    if (i.type === 'late') lateCount++;
+                    if (i.type === 'absent' || i.type === 'did_not_attend') absentCount++;
+                });
+                let lawCount = currentLawHistory.filter(i => isDateInRange(i.date)).length;
+
+                if (filterStart && filterEnd) {
+                    document.getElementById('lateAttendance').value = lateCount;
+                    document.getElementById('didNotAttend').value = absentCount;
+                    document.getElementById('lawCount').value = lawCount;
+                } else {
+                    document.getElementById('lateAttendance').value = data.late_attendance || 0;
+                    document.getElementById('didNotAttend').value = data.did_not_attend || 0;
+                    document.getElementById('lawCount').value = data.law_violation_count || 0;
+                }
+
                 document.getElementById('cleanGrade').value = data.cleanliness_grade || '';
                 document.getElementById('cleanRemarks').value = data.cleanliness_remarks || '';
                 document.getElementById('spiritGrade').value = data.spirituality_grade || '';
@@ -579,41 +529,44 @@
             } else {
                 document.getElementById('irForm').reset();
                 document.getElementById('recordId').value = "";
+                currentPunctualityHistory = []; currentLawHistory = [];
             }
         }
 
-        function toggleLawDescription() {
-            const count = parseInt(document.getElementById('lawCount').value) || 0;
-            const desc = document.getElementById('lawDescription');
-            const label = document.getElementById('lawDescReq');
-            if (count > 0) { label.style.display = 'inline'; desc.required = true; } 
-            else { label.style.display = 'none'; desc.required = false; }
+        async function loadCoCurricularData(studentId) {
+            const renderList = (id, data, formatter) => {
+                const el = document.getElementById(id);
+                const filtered = data ? data.filter(i => isDateInRange(i.date)) : [];
+                if (filtered.length === 0) el.innerHTML = '<div class="text-center text-muted p-3">No records found in range.</div>';
+                else el.innerHTML = filtered.map((item) => `<div class="list-group-item"><div class="d-flex w-100 justify-content-between"><h6 class="mb-1">${formatter(item)}</h6><small>${formatDate(item.date)}</small></div></div>`).join('');
+            };
+            const { data: books } = await supabaseClient.from('books').select('*').eq('student_id', studentId).order('date', {ascending: false});
+            renderList('list-books', books, (i) => `<strong>${i.name}</strong> by ${i.poet} (${i.pages} pgs)`);
+            const { data: achievements } = await supabaseClient.from('achievements').select('*').eq('student_id', studentId).order('date', {ascending: false});
+            renderList('list-achievements', achievements, (i) => i.title);
+            const { data: skills } = await supabaseClient.from('extra_skills').select('*').eq('student_id', studentId);
+            renderList('list-skills', skills, (i) => `<strong>${i.skill || i.title}</strong>: ${i.description || i.details || ''}`);
+            const { data: writings } = await supabaseClient.from('writings').select('*').eq('student_id', studentId).order('date', {ascending: false});
+            renderList('list-writings', writings, (i) => i.title);
         }
 
-        function disableForm(isDisabled) {
-            const elements = document.getElementById('irForm').elements;
-            for (let i = 0; i < elements.length; i++) elements[i].disabled = isDisabled;
-        }
-
-        async function saveData() {
+        async function saveData(silent = false) {
             if (userRole === 'student') return;
             if (!currentStudentId) return alert("No student selected!");
             const saveBtn = document.querySelector('#saveBtnContainer button');
-            const statusMsg = document.getElementById('saveStatus');
-            const lawCount = parseInt(document.getElementById('lawCount').value) || 0;
-            const lawDesc = document.getElementById('lawDescription').value.trim();
-            if (lawCount > 0 && !lawDesc) {
-                alert("Please provide a description for the Law Violations.");
-                $('#law-tab').tab('show'); document.getElementById('lawDescription').focus(); return;
-            }
-            saveBtn.disabled = true; saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            if(!silent) { saveBtn.disabled = true; saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; }
+
+            let realLate = 0; let realAbsent = 0;
+            currentPunctualityHistory.forEach(i => { if(i.type==='late') realLate++; if(i.type==='absent' || i.type==='did_not_attend') realAbsent++; });
+            let realLaw = currentLawHistory.length;
+
             const payload = {
                 student_id: currentStudentId,
                 semester: CURRENT_SEMESTER,
-                late_attendance: document.getElementById('lateAttendance').value || 0,
-                did_not_attend: document.getElementById('didNotAttend').value || 0,
-                law_violation_count: lawCount,
-                law_violation_description: lawDesc,
+                late_attendance: realLate, 
+                did_not_attend: realAbsent, 
+                law_violation_count: realLaw,
+                // Removed law_violation_description 
                 cleanliness_grade: document.getElementById('cleanGrade').value,
                 cleanliness_remarks: document.getElementById('cleanRemarks').value,
                 spirituality_grade: document.getElementById('spiritGrade').value,
@@ -621,34 +574,87 @@
                 spirituality_masjid_respect: document.getElementById('spiritMasjid').checked,
                 spirituality_activities: document.getElementById('spiritActivity').checked,
                 spirituality_remarks: document.getElementById('spiritRemarks').value,
+                punctuality_history: currentPunctualityHistory,
+                law_history: currentLawHistory,
                 updated_by: currentUser.id,
                 updated_at: new Date()
             };
+
             const recordId = document.getElementById('recordId').value;
             let result;
             if (recordId) result = await supabaseClient.from('student_values').update(payload).eq('id', recordId);
             else result = await supabaseClient.from('student_values').insert([payload]);
-            if (result.error) {
-                alert("Error saving: " + result.error.message);
-                saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
-            } else {
-                statusMsg.textContent = "Data saved successfully!";
-                statusMsg.className = "mt-2 text-success font-weight-bold";
-                if (!recordId) loadStudentValues(currentStudentId); 
-                setTimeout(() => { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes'; statusMsg.textContent = ""; }, 2000);
-            }
+
+            if(!silent) {
+                if (result.error) { alert("Error saving: " + result.error.message); saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes'; }
+                else {
+                    const statusMsg = document.getElementById('saveStatus');
+                    statusMsg.textContent = "Data saved successfully!"; statusMsg.className = "mt-2 text-success font-weight-bold";
+                    if (!recordId) loadStudentValues(currentStudentId); 
+                    setTimeout(() => { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes'; statusMsg.textContent = ""; }, 2000);
+                }
+            } else { loadStudentValues(currentStudentId); }
         }
 
-        window.logout = async function() {
-            await supabaseClient.auth.signOut();
-            localStorage.removeItem('mgmtUser'); localStorage.removeItem('mgmtUserRole');
-            location.reload();
-        };
+        // --- TOTAL IR LOGIC ---
+        function showTotalIRView() { document.getElementById('regularView').style.display = 'none'; document.getElementById('totalIrView').style.display = 'block'; populatePeriodDropdown(); loadTotalIrData(); }
+        function closeTotalIRView() { document.getElementById('totalIrView').style.display = 'none'; document.getElementById('regularView').style.display = 'block'; }
+        function populatePeriodDropdown() {
+            const select = document.getElementById('irPeriodSelect'); select.innerHTML = '';
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const date = new Date();
+            for (let i = -3; i <= 1; i++) {
+                const d = new Date(date.getFullYear(), date.getMonth() + i, 1);
+                const val = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+                const option = document.createElement('option'); option.value = val; option.textContent = val;
+                if (i === -1) option.selected = true; 
+                select.appendChild(option);
+            }
+            const manual = document.createElement('option'); manual.value = 'manual'; manual.textContent = 'Enter Manually'; select.appendChild(manual);
+        }
+        function handlePeriodChange() {
+            const select = document.getElementById('irPeriodSelect'); const manualInput = document.getElementById('irPeriodManual');
+            if (select.value === 'manual') { select.style.display = 'none'; manualInput.style.display = 'block'; manualInput.focus(); } 
+            else { manualInput.style.display = 'none'; select.style.display = 'block'; }
+        }
+        async function openPastIRs() {
+            $('#pastIrModal').modal('show'); const list = document.getElementById('pastIrList'); list.innerHTML = 'Loading...';
+            const { data } = await supabaseClient.from('total_ir_marks').select('period').order('updated_at', { ascending: false });
+            if(!data) { list.innerHTML = 'Error'; return; }
+            const unique = [...new Set(data.map(item => item.period))];
+            list.innerHTML = unique.length ? unique.map(p => `<a class="list-group-item list-group-item-action past-ir-badge" onclick="selectPastPeriod('${p}')">${p}</a>`).join('') : 'No history';
+        }
+        function selectPastPeriod(p) {
+            $('#pastIrModal').modal('hide'); const sel = document.getElementById('irPeriodSelect'); const man = document.getElementById('irPeriodManual');
+            let found = false; for(let i=0; i<sel.options.length; i++) if(sel.options[i].value === p) { sel.selectedIndex=i; found=true; break; }
+            if(found) { sel.style.display='block'; man.style.display='none'; } else { sel.value='manual'; sel.style.display='none'; man.style.display='block'; man.value=p; }
+            loadTotalIrData();
+        }
+        async function loadTotalIrData() {
+            const container = document.getElementById('totalIrContent'); container.innerHTML = 'Loading...';
+            const select = document.getElementById('irPeriodSelect');
+            let period = select.value === 'manual' ? document.getElementById('irPeriodManual').value : select.value;
+            if(!period) return;
 
-        window.togglePassword = function(id) {
-            const input = document.getElementById(id);
-            input.type = input.type === 'password' ? 'text' : 'password';
-        };
+            if (userRole === 'student') {
+                const { data } = await supabaseClient.from('total_ir_marks').select('mark').eq('student_id', currentUser.id).eq('period', period).single();
+                container.innerHTML = `<div class="card shadow-sm p-4 text-center"><h4>Your IR Mark: <span class="text-info">${period}</span></h4><h1 class="font-weight-bold">${data ? data.mark : "Not Added"}</h1></div>`;
+            } else {
+                if(allStudentsCache.length===0) allStudentsCache = (await supabaseClient.from('students').select('id,full_name,cic_no').order('cic_no')).data;
+                const { data } = await supabaseClient.from('total_ir_marks').select('student_id, mark').eq('period', period);
+                const map = {}; if(data) data.forEach(m => map[m.student_id] = m.mark);
+                container.innerHTML = `<div class="table-responsive"><table class="table table-bordered"><thead><tr><th>CIC</th><th>Name</th><th>Mark</th></tr></thead><tbody>` +
+                    allStudentsCache.map(s => `<tr><td>${s.cic_no}</td><td>${s.full_name}</td><td><input type="number" class="ir-input form-control" value="${map[s.id]||''}" onchange="saveTotalIrMark('${s.id}','${period}',this.value)"></td></tr>`).join('') + `</tbody></table></div>`;
+            }
+        }
+        async function saveTotalIrMark(sid, per, val) {
+            const { data } = await supabaseClient.from('total_ir_marks').select('id').eq('student_id', sid).eq('period', per).single();
+            if(data) await supabaseClient.from('total_ir_marks').update({mark: val||null}).eq('id', data.id);
+            else if(val) await supabaseClient.from('total_ir_marks').insert([{student_id: sid, period: per, mark: val}]);
+        }
+
+        window.logout = async () => { await supabaseClient.auth.signOut(); localStorage.clear(); location.reload(); };
+        window.togglePassword = (id) => { const x = document.getElementById(id); x.type = x.type === 'password' ? 'text' : 'password'; };
     </script>
 </body>
 </html>
