@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Exam Progress</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Supabase Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <!-- PDF & Excel Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
@@ -36,6 +35,18 @@
         /* Custom Styles for Marks */
         .mark-low { color: #dc3545; font-weight: bold; } /* Red for low marks */
         .percentage-col { font-weight: bold; color: #02244e; }
+
+        /* --- MOBILE TOGGLE STYLES --- */
+        @media (max-width: 767.98px) {
+            /* Hide specific columns by default on mobile */
+            .wafy-mobile-hide {
+                display: none;
+            }
+            /* Show them when table has 'table-expanded' class */
+            .table-expanded .wafy-mobile-hide {
+                display: table-cell;
+            }
+        }
     </style>
 </head>
 <body>
@@ -60,8 +71,8 @@
 
     let currentStudentId = null;
     let currentCicNo = null;
-    let currentStudentName = ""; // Store for PDF filename
-    let currentResultsData = null; // Store for export
+    let currentStudentName = ""; 
+    let currentResultsData = null; 
     let currentSemLabel = ""; 
 
     // 1. Navigation Structure
@@ -254,9 +265,22 @@
         }
 
         const results = data.results_data;
-        currentResultsData = { results, config, isWafy }; // Store for Export
+        currentResultsData = { results, config, isWafy }; 
         
-        // Build Table HTML
+        // Define Columns to Hide on Mobile (Wafy Only)
+        const hideOnMobileCols = ['CE Max', 'TE Max', 'Exam Mode', 'Percentage'];
+
+        // Build Buttons
+        // Note: d-md-none makes Expand button visible ONLY on mobile
+        let expandBtnHtml = '';
+        if (isWafy) {
+            expandBtnHtml = `
+                <button class="btn btn-info btn-sm d-md-none ml-1" id="expandBtn" onclick="toggleTable()">
+                    <i class="fas fa-expand"></i> Expand
+                </button>
+            `;
+        }
+
         let tableHtml = `
             <div class="result-card">
                 <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
@@ -268,12 +292,19 @@
                         <button class="btn btn-success btn-sm" onclick="downloadExcel()">
                             <i class="fas fa-file-excel"></i> Excel
                         </button>
+                        ${expandBtnHtml}
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover text-center">
+                    <table class="table table-bordered table-hover text-center" id="resultTable">
                         <thead class="thead-light">
-                            <tr>${config.map(col => `<th>${col.label}</th>`).join('')}</tr>
+                            <tr>
+                                ${config.map(col => {
+                                    // Add hide class if Wafy and in hide list
+                                    const hideClass = (isWafy && hideOnMobileCols.includes(col.label)) ? 'wafy-mobile-hide' : '';
+                                    return `<th class="${hideClass}">${col.label}</th>`;
+                                }).join('')}
+                            </tr>
                         </thead>
                         <tbody>
         `;
@@ -296,15 +327,17 @@
             }
 
             config.forEach(col => {
+                const hideClass = (isWafy && hideOnMobileCols.includes(col.label)) ? 'wafy-mobile-hide' : '';
+                
                 if (col.key === 'percentage') {
                     const pText = percentage > 0 ? percentage.toFixed(1) + '%' : '-';
-                    rowHtml += `<td class="percentage-col ${isFail ? 'mark-low' : ''}">${pText}</td>`;
+                    rowHtml += `<td class="percentage-col ${isFail ? 'mark-low' : ''} ${hideClass}">${pText}</td>`;
                 } else {
                     let val = getVal(col.key);
                     if (isWafy && col.key === 'total' && isFail) {
-                        rowHtml += `<td class="mark-low">${val}</td>`;
+                        rowHtml += `<td class="mark-low ${hideClass}">${val}</td>`;
                     } else {
-                        rowHtml += `<td>${val}</td>`;
+                        rowHtml += `<td class="${hideClass}">${val}</td>`;
                     }
                 }
             });
@@ -316,6 +349,26 @@
         tableHtml += `</tbody></table></div></div>`;
         container.innerHTML = tableHtml;
         container.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // --- TOGGLE FUNCTION (Mobile Only) ---
+    function toggleTable() {
+        const table = document.getElementById('resultTable');
+        const btn = document.getElementById('expandBtn');
+        
+        if (table.classList.contains('table-expanded')) {
+            // Collapse
+            table.classList.remove('table-expanded');
+            btn.innerHTML = '<i class="fas fa-expand"></i> Expand';
+            btn.classList.remove('btn-warning');
+            btn.classList.add('btn-info');
+        } else {
+            // Expand
+            table.classList.add('table-expanded');
+            btn.innerHTML = '<i class="fas fa-compress"></i> Collapse';
+            btn.classList.remove('btn-info');
+            btn.classList.add('btn-warning');
+        }
     }
 
     // --- EXPORT FUNCTIONS ---
