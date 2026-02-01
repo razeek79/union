@@ -44,6 +44,8 @@
             /* Add button spacing */
             .add-btn-col {
                 margin-top: 10px;
+                display: flex;
+                gap: 5px;
             }
         }
     </style>
@@ -77,7 +79,12 @@
             <div class="col-12">
                 <div class="card students-card">
                     <div class="card-body">
-                        <h3 class="card-title mb-4" style="font-family: Almarai; color: #02244e;">Add New Book</h3>
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="card-title m-0" style="font-family: Almarai; color: #02244e;" id="formTitle">Add New Book</h3>
+                            <button type="button" class="btn btn-secondary btn-sm" id="cancelEditBtn" style="display: none;" onclick="resetForm()">
+                                <i class="fas fa-times"></i> Cancel Edit
+                            </button>
+                        </div>
                         <form id="addBookForm">
                             <div class="row">
                                 <div class="col-md-3 col-12 mb-2">
@@ -106,7 +113,7 @@
                                 </div>
                                 <div class="col-md-1 col-12 add-btn-col">
                                     <label class="d-none d-md-block">&nbsp;</label>
-                                    <button type="submit" class="btn btn-primary btn-block" style="font-family: Almarai;">
+                                    <button type="submit" class="btn btn-primary btn-block" id="submitBtn" style="font-family: Almarai;">
                                         <i class="fas fa-plus"></i> Add
                                     </button>
                                 </div>
@@ -160,6 +167,8 @@
         const supabaseClient = window.supabaseClient;
 
         let currentStudentId = null;
+        let currentBooksList = []; // Store fetched books locally for editing
+        let editingBookId = null; // Track if we are editing
 
         function getQueryParam(key) {
             return new URLSearchParams(window.location.search).get(key);
@@ -201,7 +210,8 @@
                 return;
             }
 
-            renderBooks(books || []);
+            currentBooksList = books || []; // Save to local variable
+            renderBooks(currentBooksList);
         }
 
         function renderBooks(books) {
@@ -246,9 +256,14 @@
                                 </div>
                                 
                                 <div class="col-12 col-md-2 text-center mt-2 mt-md-0">
-                                    <button class="btn btn-danger btn-sm w-100" onclick="deleteBook('${book.id}')">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
+                                    <div class="btn-group w-100" role="group">
+                                        <button class="btn btn-warning btn-sm" onclick="editBook('${book.id}')" title="Edit">
+                                            <i class="fas fa-pen"></i> <span class="d-md-none">Edit</span>
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" onclick="deleteBook('${book.id}')" title="Delete">
+                                            <i class="fas fa-trash"></i> <span class="d-md-none">Delete</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -257,7 +272,47 @@
             });
         }
 
-        // 3. Add Book
+        // 3. Edit Logic
+        window.editBook = function(id) {
+            const book = currentBooksList.find(b => b.id === id);
+            if(!book) return;
+
+            // Populate Form
+            document.getElementById('bookName').value = book.name;
+            document.getElementById('poetName').value = book.poet;
+            document.getElementById('numPages').value = book.pages;
+            document.getElementById('bookDate').value = book.date;
+
+            // Change UI State
+            editingBookId = id;
+            document.getElementById('formTitle').innerText = "Edit Book";
+            document.getElementById('formTitle').className = "card-title m-0 text-warning";
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> Update';
+            submitBtn.classList.remove('btn-primary');
+            submitBtn.classList.add('btn-success');
+
+            document.getElementById('cancelEditBtn').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to form
+        };
+
+        window.resetForm = function() {
+            document.getElementById('addBookForm').reset();
+            editingBookId = null;
+            
+            document.getElementById('formTitle').innerText = "Add New Book";
+            document.getElementById('formTitle').className = "card-title m-0 text-primary"; // Reset color
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add';
+            submitBtn.classList.remove('btn-success');
+            submitBtn.classList.add('btn-primary');
+
+            document.getElementById('cancelEditBtn').style.display = 'none';
+        };
+
+        // 4. Handle Submit (Add or Update)
         document.getElementById('addBookForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -266,27 +321,45 @@
             const pages = document.getElementById('numPages').value;
             const date = document.getElementById('bookDate').value; 
 
-            // Validation check
             if (!date) return alert("Please select the date finished");
 
-            const { error } = await supabaseClient
-                .from('books')
-                .insert([{
-                    student_id: currentStudentId,
-                    name: name,
-                    poet: poet,
-                    pages: pages,
-                    date: date 
-                }]);
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
 
-            if (error) alert("Error adding book: " + error.message);
-            else {
-                this.reset();
+            let error;
+
+            if (editingBookId) {
+                // UPDATE Existing
+                const { error: updateError } = await supabaseClient
+                    .from('books')
+                    .update({ name, poet, pages, date })
+                    .eq('id', editingBookId);
+                error = updateError;
+            } else {
+                // INSERT New
+                const { error: insertError } = await supabaseClient
+                    .from('books')
+                    .insert([{
+                        student_id: currentStudentId,
+                        name: name,
+                        poet: poet,
+                        pages: pages,
+                        date: date 
+                    }]);
+                error = insertError;
+            }
+
+            btn.disabled = false;
+
+            if (error) {
+                alert("Error saving: " + error.message);
+            } else {
+                resetForm();
                 loadBooks();
             }
         });
 
-        // 4. Delete Book
+        // 5. Delete Book
         window.deleteBook = async function(id) {
             if (!confirm("Delete this book?")) return;
 
@@ -296,7 +369,11 @@
                 .eq('id', id);
 
             if (error) alert("Error deleting: " + error.message);
-            else loadBooks();
+            else {
+                // If we deleted the book currently being edited, reset form
+                if(editingBookId === id) resetForm();
+                loadBooks();
+            }
         };
 
         document.addEventListener('DOMContentLoaded', loadData);
