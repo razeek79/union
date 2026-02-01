@@ -23,7 +23,7 @@
             .students-card h5 {
                 font-size: 0.95rem; 
                 margin-bottom: 2px;
-                word-wrap: break-word; /* Prevent overflow */
+                word-wrap: break-word;
             }
             .students-card h6 {
                 font-size: 0.8rem;
@@ -210,7 +210,7 @@
                 return;
             }
 
-            currentBooksList = books || []; // Save to local variable
+            currentBooksList = books || []; // Store globally for edit function
             renderBooks(currentBooksList);
         }
 
@@ -218,14 +218,16 @@
             const list = document.getElementById('booksList');
             list.innerHTML = '';
 
-            if (books.length === 0) {
+            if (!books || books.length === 0) {
                 document.getElementById('noBooksMessage').style.display = 'block';
                 return;
             }
             document.getElementById('noBooksMessage').style.display = 'none';
 
             books.forEach((book, index) => {
-                // Mobile View: Stacked, Desktop View: Row
+                // Formatting date safely
+                const displayDate = book.date ? book.date.split('T')[0] : '-';
+
                 list.innerHTML += `
                 <div class="col-12 mb-3">
                     <div class="card students-card">
@@ -251,7 +253,7 @@
                                 </div>
                                 
                                 <div class="col-3 col-md-2 text-center mb-2 mb-md-0">
-                                    <h6 class="text-muted">${book.date || '-'}</h6>
+                                    <h6 class="text-muted">${displayDate}</h6>
                                     <small class="d-md-none text-muted">Date</small>
                                 </div>
                                 
@@ -272,16 +274,27 @@
             });
         }
 
-        // 3. Edit Logic
+        // 3. Edit Logic (Corrected Date Parsing)
         window.editBook = function(id) {
+            console.log("Editing Book ID:", id);
             const book = currentBooksList.find(b => b.id === id);
-            if(!book) return;
+            
+            if(!book) {
+                console.error("Book data not found locally.");
+                return;
+            }
 
             // Populate Form
             document.getElementById('bookName').value = book.name;
             document.getElementById('poetName').value = book.poet;
             document.getElementById('numPages').value = book.pages;
-            document.getElementById('bookDate').value = book.date;
+            
+            // Safe Date Formatting for Input
+            if(book.date) {
+                document.getElementById('bookDate').value = book.date.split('T')[0];
+            } else {
+                document.getElementById('bookDate').value = "";
+            }
 
             // Change UI State
             editingBookId = id;
@@ -294,7 +307,7 @@
             submitBtn.classList.add('btn-success');
 
             document.getElementById('cancelEditBtn').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to form
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top
         };
 
         window.resetForm = function() {
@@ -330,6 +343,7 @@
 
             if (editingBookId) {
                 // UPDATE Existing
+                console.log("Updating book...");
                 const { error: updateError } = await supabaseClient
                     .from('books')
                     .update({ name, poet, pages, date })
@@ -337,6 +351,7 @@
                 error = updateError;
             } else {
                 // INSERT New
+                console.log("Inserting book...");
                 const { error: insertError } = await supabaseClient
                     .from('books')
                     .insert([{
@@ -353,6 +368,7 @@
 
             if (error) {
                 alert("Error saving: " + error.message);
+                console.error(error);
             } else {
                 resetForm();
                 loadBooks();
