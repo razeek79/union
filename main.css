@@ -31,9 +31,9 @@ body {
 
 /* Inner Content */
 .ramadan-content h2 {
-  font-family: Almarai, sans-serif;
+  font-family: 'KultumRamadhan', sans-serif;
   color: #ffffff;
-  font-size: 32px;
+  font-size: 38px;
   margin-bottom: 10px;
 }
 
@@ -69,10 +69,17 @@ body {
   }
 
   .ramadan-content h2 {
-    font-size: 40px;
+    font-size: 60px;
   }
 
   .ramadan-content p {
     font-size: 20px;
   }
+}
+
+@font-face {
+    font-family: 'KultumRamadhan';
+    src: url('fonts/kultum-ramadhan.regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
 }

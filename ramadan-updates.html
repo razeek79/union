@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ramadan Special Progress</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script src="config.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #4A148C;
+            --primary-light: #7c43bd;
+            --accent: #FFD700;
+            --bg-gradient: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            --card-bg: #ffffff;
+            --text-main: #2d3436;
+            --text-light: #636e72;
+            --success: #00b894;
+            --danger: #d63031;
+            --shadow: 0 10px 20px rgba(74, 20, 140, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Almarai', sans-serif; }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: var(--text-main);
+            padding-bottom: 50px;
+        }
+
+        /* --- Header --- */
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header .title-area { flex: 1; text-align: center; }
+        header h1 { font-weight: 800; font-size: 1.8rem; margin-bottom: 0.2rem; }
+        header p { opacity: 0.9; font-weight: 300; font-size: 0.9rem; }
+        
+        header::before {
+            content: "\f674"; font-family: "Font Awesome 6 Free";
+            position: absolute; top: -20px; right: -20px;
+            font-size: 8rem; opacity: 0.05; transform: rotate(-15deg);
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2); border: none; color: white;
+            padding: 8px 15px; border-radius: 10px; cursor: pointer;
+            transition: 0.2s; font-weight: bold; position: relative; z-index: 10;
+        }
+        .logout-btn:hover { background: rgba(255,255,255,0.4); }
+
+        /* --- Container --- */
+        .container { max-width: 800px; margin: -30px auto 0; padding: 0 15px; position: relative; z-index: 10; }
+
+        /* --- Login Section --- */
+        #login-section { max-width: 400px; margin: 80px auto; background: white; padding: 30px; border-radius: 20px; box-shadow: var(--shadow); }
+        .role-switch { display: flex; gap: 10px; margin-bottom: 20px; }
+        .role-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; background: #f1f2f6; cursor: pointer; font-weight: bold; color: var(--text-light); transition: 0.3s; }
+        .role-btn.active { background: var(--primary); color: white; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
+        .form-group input { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; outline: none; }
+        .form-group input:focus { border-color: var(--primary); }
+        .login-btn { width: 100%; padding: 12px; border: none; border-radius: 10px; background: var(--primary); color: white; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; }
+
+        /* --- App Section --- */
+        #app-section { display: none; }
+
+        /* Mentor Controls */
+        #mentor-controls { background: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; box-shadow: var(--shadow); text-align: center; }
+        #mentor-controls select { width: 100%; max-width: 400px; padding: 12px; border-radius: 10px; border: 2px solid #eee; outline: none; font-size: 1rem; }
+
+        /* --- Dashboard UI --- */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .summary-card { background: white; padding: 1.5rem; border-radius: 20px; box-shadow: var(--shadow); text-align: center; }
+        .summary-icon { font-size: 1.5rem; color: var(--primary); margin-bottom: 10px; }
+        .summary-value { font-size: 1.8rem; font-weight: 800; color: var(--text-main); }
+        .summary-label { font-size: 0.85rem; color: var(--text-light); }
+
+        /* Extra Summary Banner (Full Width) */
+        .extra-summary-card {
+            background: white; padding: 12px 20px; border-radius: 15px; box-shadow: var(--shadow);
+            margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;
+            border-left: 5px solid var(--accent);
+        }
+        .extra-summary-content { display: flex; align-items: center; gap: 10px; }
+        .extra-summary-content i { font-size: 1.5rem; }
+        .extra-summary-text { font-weight: 700; color: var(--text-main); font-size: 1rem; }
+        .extra-summary-badge { padding: 5px 12px; border-radius: 20px; font-weight: 800; font-size: 0.9rem; }
+
+        .section-card { background: var(--card-bg); border-radius: 25px; padding: 2rem; margin-bottom: 25px; box-shadow: var(--shadow); }
+        .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+        .section-title { font-size: 1.3rem; color: var(--primary); font-weight: 700; }
+
+        .input-group { display: flex; gap: 10px; margin-bottom: 1rem; }
+        input.action-input { flex: 1; padding: 12px 20px; border: 2px solid #eee; border-radius: 12px; outline: none; }
+        
+        .btn { padding: 12px 20px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-danger { background: #ffebee; color: var(--danger); }
+
+        .quran-control { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 1.5rem; }
+        .btn-circle { width: 45px; height: 45px; border-radius: 50%; border: none; background: var(--primary-light); color: white; font-size: 1.2rem; cursor: pointer; display: grid; place-items: center; }
+        .juz-display { font-size: 3rem; font-weight: 800; color: var(--primary); min-width: 80px; text-align: center; border: none; background: transparent; outline: none; }
+        
+        .khatm-badge { background: #e8f5e9; color: #2e7d32; padding: 15px; border-radius: 15px; text-align: center; font-weight: 600; margin-top: 10px; border: 1px solid #c8e6c9; }
+        .khatm-highlight { color: #d35400; font-weight: 800; }
+
+        .item-list { list-style: none; margin-top: 1rem; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid var(--primary); }
+        .item-content h4 { font-size: 1rem; margin-bottom: 4px; }
+        .item-meta { font-size: 0.85rem; color: var(--text-light); }
+        .action-btn { background: none; border: none; cursor: pointer; padding: 5px; opacity: 0.6; color: var(--danger); }
+        .action-btn:hover { opacity: 1; }
+
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 24px; border-radius: 30px; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 1000; }
+        .toast.show { opacity: 1; bottom: 30px; }
+
+        /* Readonly mode for mentors */
+        .mentor-mode .input-group, .mentor-mode .quran-control button, .mentor-mode .action-btn, .mentor-mode #reset-btn-container { display: none !important; }
+        .mentor-mode .juz-display { pointer-events: none; }
+        
+        /* Loading Overlay */
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: bold; color: var(--primary); }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 600px) {
+            .summary-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
+            .summary-card { padding: 12px 4px; border-radius: 12px; }
+            .summary-icon { font-size: 1.1rem; margin-bottom: 5px; }
+            .summary-value { font-size: 1.2rem; }
+            .summary-label { font-size: 0.65rem; line-height: 1.2; word-wrap: break-word; }
+
+            .extra-summary-card { margin-bottom: 15px; padding: 10px 15px; }
+            .extra-summary-text { font-size: 0.85rem; }
+            .extra-summary-content i { font-size: 1.2rem; }
+            .extra-summary-badge { font-size: 0.8rem; padding: 4px 8px;}
+
+            .input-group { flex-direction: column; gap: 8px; }
+            .input-group input, .input-group button { width: 100%; }
+            .quran-control { gap: 10px; }
+            .juz-display { font-size: 2.2rem; min-width: 60px; }
+            .section-card { padding: 1.5rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loading-overlay">Loading...</div>
+
+    <div id="login-section">
+        <h2 style="text-align: center; color: var(--primary); margin-bottom: 20px;">Welcome Back</h2>
+        
+        <div class="role-switch">
+            <button class="role-btn active" onclick="switchLoginRole('student')" id="btn-login-student">Student</button>
+            <button class="role-btn" onclick="switchLoginRole('mentor')" id="btn-login-mentor">Mentor</button>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label id="lbl-username">CIC Number</label>
+                <input type="text" id="loginUsername" required placeholder="Enter here...">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" required placeholder="Enter password...">
+            </div>
+            <button type="submit" class="login-btn" id="loginSubmitBtn">Login</button>
+        </form>
+    </div>
+
+    <div id="app-section">
+        <header>
+            <div style="width: 80px;"></div>
+            <div class="title-area">
+                <h1><i class="fas fa-moon"></i> Ramadan Tracker</h1>
+                <p id="user-welcome-msg">Loading user...</p>
+            </div>
+            <div style="width: 80px; text-align: right;">
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </header>
+
+        <div class="container" id="main-container">
+            
+            <div id="mentor-controls" style="display: none;">
+                <h3 style="color: var(--primary); margin-bottom: 10px;"><i class="fas fa-users"></i> Mentor Dashboard</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 10px;">Select a student to view their progress.</p>
+                <select id="mentor-student-selector" onchange="loadStudentForMentor(this.value)">
+                    <option value="">-- Choose a Student --</option>
+                </select>
+            </div>
+
+            <div class="summary-grid">
+                <div class="summary-card"><div class="summary-icon"><i class="fas fa-quran"></i></div><div class="summary-value" id="sum-khatm">0</div><div class="summary-label">Total Khatm</div></div>
+                <div class="summary-card"><div class="summary-icon"><i class="fas fa-book-open"></i></div><div class="summary-value" id="sum-books">0</div><div class="summary-label">Books Read</div></div>
+                <div class="summary-card"><div class="summary-icon"><i class="fas fa-video"></i></div><div class="summary-value" id="sum-video">0</div><div class="summary-label">Video Mins</div></div>
+                <div class="summary-card"><div class="summary-icon"><i class="fas fa-headphones"></i></div><div class="summary-value" id="sum-audio">0</div><div class="summary-label">Audio Mins</div></div>
+            </div>
+
+            <div class="extra-summary-card" style="border-left-color: #27ae60;">
+                <div class="extra-summary-content">
+                    <i class="fas fa-envelope-open-text" style="color: #27ae60;"></i>
+                    <span class="extra-summary-text">Letters Distributed:</span>
+                </div>
+                <div class="extra-summary-badge" style="background: #e8f5e9; color: #2e7d32;" id="sum-fund">0 / 20</div>
+            </div>
+
+            <div id="extra-summary-container" style="display: none; margin-bottom: 30px;">
+                <div class="extra-summary-card" style="border-left-color: #d35400;">
+                    <div class="extra-summary-content">
+                        <i class="fas fa-award" style="color: #d35400;"></i>
+                        <span class="extra-summary-text">Extra Course Activities:</span>
+                    </div>
+                    <div class="extra-summary-badge" style="background: #fff3cd; color: #856404;" id="sum-extra">0</div>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 30px;"></div> <div class="section-card">
+                <div class="section-header"><div class="section-title"><i class="fas fa-star-and-crescent"></i> Qur'an Progress</div></div>
+                <div class="quran-control">
+                    <button class="btn-circle" onclick="adjustJuz(-1)"><i class="fas fa-minus"></i></button>
+                    <input type="number" id="juz-input" class="juz-display" value="0" min="0" onchange="updateJuzFromInput(this.value)">
+                    <button class="btn-circle" onclick="adjustJuz(1)"><i class="fas fa-plus"></i></button>
+                </div>
+                <div id="khatm-message" class="khatm-badge">Start your journey! 0 Khatm and 0 Juz completed.</div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-header"><div class="section-title"><i class="fas fa-book"></i> Book Reading</div></div>
+                <div class="input-group">
+                    <input type="text" id="book-name" class="action-input" placeholder="Book Name">
+                    <input type="number" id="book-pages" class="action-input" placeholder="Pages" style="flex: 0.4;">
+                    <button class="btn btn-primary" onclick="addItem('book')">Add</button>
+                </div>
+                <ul class="item-list" id="book-list"></ul>
+            </div>
+
+            <div class="section-card">
+                <div class="section-header"><div class="section-title"><i class="fas fa-play-circle"></i> Informative Videos</div></div>
+                <div class="input-group">
+                    <input type="text" id="video-title" class="action-input" placeholder="Video Title">
+                    <input type="number" id="video-mins" class="action-input" placeholder="Mins" style="flex: 0.4;">
+                    <button class="btn btn-primary" onclick="addItem('video')">Add</button>
+                </div>
+                <ul class="item-list" id="video-list"></ul>
+            </div>
+
+            <div class="section-card">
+                <div class="section-header"><div class="section-title"><i class="fas fa-podcast"></i> Audio Listening</div></div>
+                <div class="input-group">
+                    <input type="text" id="audio-topic" class="action-input" placeholder="Audio Topic">
+                    <input type="number" id="audio-mins" class="action-input" placeholder="Mins" style="flex: 0.4;">
+                    <button class="btn btn-primary" onclick="addItem('audio')">Add</button>
+                </div>
+                <ul class="item-list" id="audio-list"></ul>
+            </div>
+
+            <div class="section-card">
+                <div class="section-header"><div class="section-title"><i class="fas fa-award"></i> Extra Course Activity</div></div>
+                <div class="input-group">
+                    <input type="text" id="extra-title" class="action-input" placeholder="Activity Name (e.g. Tajweed)">
+                    <input type="text" id="extra-desc" class="action-input" placeholder="Details or Duration" style="flex: 0.4;">
+                    <button class="btn btn-primary" onclick="addItem('extra')">Add</button>
+                </div>
+                <ul class="item-list" id="extra-list"></ul>
+            </div>
+
+            <div class="section-card">
+                <div class="section-header"><div class="section-title"><i class="fas fa-envelope-open-text"></i> Fund Collection</div></div>
+                <p style="text-align: center; color: var(--text-light); margin-bottom: 15px; font-size: 0.9rem;">Track your 20 assigned letters.</p>
+                <div class="quran-control">
+                    <button class="btn-circle" style="background: #27ae60;" onclick="adjustFund(-1)"><i class="fas fa-minus"></i></button>
+                    <input type="number" id="fund-input" class="juz-display" style="color: #27ae60;" value="0" min="0" max="20" onchange="updateFundFromInput(this.value)">
+                    <button class="btn-circle" style="background: #27ae60;" onclick="adjustFund(1)"><i class="fas fa-plus"></i></button>
+                </div>
+                <div id="fund-message" class="khatm-badge" style="background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9;">
+                    0 out of 20 letters distributed.
+                </div>
+            </div>
+
+            <div id="reset-btn-container" style="text-align: center; margin-bottom: 30px;">
+                <button class="btn btn-danger" onclick="resetProgress()"><i class="fas fa-trash-alt"></i> Reset All Progress</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Saved Successfully</div>
+
+    <script>
+        const PASSWORD_SUFFIX = "_ALABTHAL";
+        
+        let sessionData = { role: null, userId: null, userName: null };
+
+        let currentData = {
+            totalJuz: 0,
+            books: [],
+            videos: [],
+            audios: [],
+            extras: [],
+            fundLetters: 0 // New fund tracking variable
+        };
+
+        let activeLoginRole = 'student';
+
+        // --- Initialization & Session Checking ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!window.supabaseClient) console.error("Supabase Client is missing!");
+
+            const savedUser = localStorage.getItem('ramadanUser');
+            const savedRole = localStorage.getItem('ramadanRole');
+            const savedName = localStorage.getItem('ramadanName');
+
+            if (savedUser && savedRole) {
+                const { data: { session } } = await window.supabaseClient.auth.getSession();
+                if (session) setupApp(savedRole, savedUser, savedName);
+                else showLogin();
+            } else {
+                showLogin();
+            }
+        });
+
+        function showLogin() {
+            document.getElementById('loading-overlay').style.display = 'none';
+            document.getElementById('login-section').style.display = 'block';
+            document.getElementById('app-section').style.display = 'none';
+        }
+
+        // --- Login Logic ---
+        function switchLoginRole(role) {
+            activeLoginRole = role;
+            document.getElementById('btn-login-student').classList.remove('active');
+            document.getElementById('btn-login-mentor').classList.remove('active');
+            document.getElementById(`btn-login-${role}`).classList.add('active');
+            document.getElementById('lbl-username').innerText = role === 'student' ? 'CIC Number' : 'Official Username';
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('loginSubmitBtn');
+            btn.innerText = 'Logging in...';
+            btn.disabled = true;
+
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const cleanName = username.replace(/\s+/g, '').toLowerCase();
+
+            try {
+                if (activeLoginRole === 'student') {
+                    let { error } = await window.supabaseClient.auth.signInWithPassword({ email: cleanName + '@student.com', password: password + PASSWORD_SUFFIX });
+                    if (error) throw error;
+                    
+                    const { data: student } = await window.supabaseClient.from('students').select('full_name').eq('cic_no', username).single();
+                    finishLogin('student', username, student ? student.full_name : username);
+                } else {
+                    let { data, error } = await window.supabaseClient.auth.signInWithPassword({ email: cleanName + '@official.com', password: password });
+                    if (error) throw error;
+
+                    const { data: official } = await window.supabaseClient.from('officials').select('role, username').eq('id', data.user.id).single();
+                    if (official && (official.role === 'mentor' || official.role === 'chief_admin')) {
+                        finishLogin('mentor', official.username, official.username);
+                    } else {
+                        await window.supabaseClient.auth.signOut();
+                        throw new Error("Access denied. You are not assigned as a Mentor.");
+                    }
+                }
+            } catch (err) {
+                alert("Login Failed: " + err.message);
+                btn.innerText = 'Login';
+                btn.disabled = false;
+            }
+        }
+
+        function finishLogin(role, userId, userName) {
+            localStorage.setItem('ramadanUser', userId);
+            localStorage.setItem('ramadanRole', role);
+            localStorage.setItem('ramadanName', userName);
+            setupApp(role, userId, userName);
+        }
+
+        async function logout() {
+            await window.supabaseClient.auth.signOut();
+            localStorage.removeItem('ramadanUser');
+            localStorage.removeItem('ramadanRole');
+            localStorage.removeItem('ramadanName');
+            location.reload();
+        }
+
+        // --- App Setup & Data Loading ---
+        async function setupApp(role, userId, userName) {
+            document.getElementById('loading-overlay').style.display = 'none';
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('app-section').style.display = 'block';
+
+            sessionData = { role, userId, userName };
+
+            if (role === 'student') {
+                document.getElementById('user-welcome-msg').innerText = `Welcome, ${userName}`;
+                document.getElementById('main-container').classList.remove('mentor-mode');
+                document.getElementById('mentor-controls').style.display = 'none';
+                
+                loadLocalData();
+                await fetchProgressFromDB(userId);
+                renderAll();
+            } else {
+                document.getElementById('user-welcome-msg').innerText = `Mentor Panel: ${userName}`;
+                document.getElementById('main-container').classList.add('mentor-mode');
+                document.getElementById('mentor-controls').style.display = 'block';
+                
+                resetVisualData();
+                await loadStudentsListForMentor();
+            }
+        }
+
+        async function loadStudentsListForMentor() {
+            const select = document.getElementById('mentor-student-selector');
+            select.innerHTML = '<option value="">Loading students...</option>';
+            
+            const { data: students, error } = await window.supabaseClient.from('students').select('cic_no, full_name').order('cic_no');
+            if (error) { select.innerHTML = '<option value="">Error loading students</option>'; return; }
+            
+            select.innerHTML = '<option value="">-- Select a Student to view --</option>';
+            students.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.cic_no;
+                opt.textContent = `${s.cic_no} - ${s.full_name}`;
+                select.appendChild(opt);
+            });
+        }
+
+        async function loadStudentForMentor(studentId) {
+            if (!studentId) { resetVisualData(); return; }
+            resetVisualData();
+            document.getElementById('user-welcome-msg').innerText = `Viewing: ${studentId}`;
+            await fetchProgressFromDB(studentId);
+            renderAll();
+        }
+
+        async function fetchProgressFromDB(targetId) {
+            const { data, error } = await window.supabaseClient.from('ramadan_progress').select('*').eq('student_id', targetId).single();
+
+            if (data) {
+                currentData.totalJuz = data.total_juz || 0;
+                currentData.books = data.books_read || [];
+                currentData.videos = data.videos_watched || [];
+                currentData.audios = data.audios_listened || [];
+                currentData.extras = data.extra_activities || [];
+                currentData.fundLetters = data.fund_letters || 0;
+            } else {
+                currentData = { totalJuz: 0, books: [], videos: [], audios: [], extras: [], fundLetters: 0 };
+            }
+
+            if (sessionData.role === 'student') {
+                localStorage.setItem('ramadan_data', JSON.stringify(currentData));
+            }
+        }
+
+        function loadLocalData() {
+            const local = localStorage.getItem('ramadan_data');
+            if (local) currentData = JSON.parse(local);
+            if (!currentData.extras) currentData.extras = []; 
+            if (!currentData.fundLetters) currentData.fundLetters = 0; 
+        }
+
+        // --- Data Manipulation (Student Only) ---
+        function checkAccess() {
+            if (sessionData.role !== 'student') { alert("Mentors cannot edit student progress."); return false; }
+            return true;
+        }
+
+        // Quran Adjustments
+        function adjustJuz(amount) {
+            if (!checkAccess()) return;
+            let newVal = parseInt(currentData.totalJuz) + amount;
+            if (newVal < 0) newVal = 0;
+            currentData.totalJuz = newVal;
+            saveAndRender();
+        }
+
+        function updateJuzFromInput(val) {
+            if (!checkAccess()) { renderAll(); return; }
+            let v = parseInt(val);
+            if (isNaN(v) || v < 0) v = 0;
+            currentData.totalJuz = v;
+            saveAndRender();
+        }
+
+        // Fund Collection Adjustments
+        function adjustFund(amount) {
+            if (!checkAccess()) return;
+            let newVal = parseInt(currentData.fundLetters) + amount;
+            if (newVal < 0) newVal = 0;
+            if (newVal > 20) newVal = 20; // Maximum of 20 Letters
+            currentData.fundLetters = newVal;
+            saveAndRender();
+        }
+
+        function updateFundFromInput(val) {
+            if (!checkAccess()) { renderAll(); return; }
+            let v = parseInt(val);
+            if (isNaN(v) || v < 0) v = 0;
+            if (v > 20) v = 20; // Maximum of 20 Letters
+            currentData.fundLetters = v;
+            saveAndRender();
+        }
+
+        function addItem(type) {
+            if (!checkAccess()) return;
+            const getId = (id) => document.getElementById(id).value;
+            const clear = (id) => document.getElementById(id).value = '';
+
+            if (type === 'book') {
+                const name = getId('book-name'), pages = getId('book-pages');
+                if (!name || !pages) return alert("Please fill all fields");
+                currentData.books.push({ id: Date.now(), name, pages: parseInt(pages) });
+                clear('book-name'); clear('book-pages');
+            } else if (type === 'video') {
+                const title = getId('video-title'), mins = getId('video-mins');
+                if (!title || !mins) return alert("Please fill all fields");
+                currentData.videos.push({ id: Date.now(), title, duration: parseInt(mins) });
+                clear('video-title'); clear('video-mins');
+            } else if (type === 'audio') {
+                const topic = getId('audio-topic'), mins = getId('audio-mins');
+                if (!topic || !mins) return alert("Please fill all fields");
+                currentData.audios.push({ id: Date.now(), topic, duration: parseInt(mins) });
+                clear('audio-topic'); clear('audio-mins');
+            } else if (type === 'extra') {
+                const title = getId('extra-title'), desc = getId('extra-desc');
+                if (!title) return alert("Please enter the activity name");
+                currentData.extras.push({ id: Date.now(), title, duration: desc || 'Completed' });
+                clear('extra-title'); clear('extra-desc');
+            }
+            saveAndRender();
+        }
+
+        function deleteItem(type, id) {
+            if (!checkAccess()) return;
+            if (!confirm("Delete this item?")) return;
+            if (type === 'book') currentData.books = currentData.books.filter(i => i.id !== id);
+            if (type === 'video') currentData.videos = currentData.videos.filter(i => i.id !== id);
+            if (type === 'audio') currentData.audios = currentData.audios.filter(i => i.id !== id);
+            if (type === 'extra') currentData.extras = currentData.extras.filter(i => i.id !== id);
+            saveAndRender();
+        }
+
+        function resetProgress() {
+            if (!checkAccess()) return;
+            if (confirm("Are you sure you want to reset all your progress?")) {
+                currentData = { totalJuz: 0, books: [], videos: [], audios: [], extras: [], fundLetters: 0 };
+                saveAndRender();
+            }
+        }
+
+        async function saveAndRender() {
+            renderAll();
+            localStorage.setItem('ramadan_data', JSON.stringify(currentData));
+            showToast("Saving...");
+
+            const { error } = await window.supabaseClient.from('ramadan_progress').upsert({ 
+                student_id: sessionData.userId,
+                total_juz: currentData.totalJuz,
+                books_read: currentData.books,
+                videos_watched: currentData.videos,
+                audios_listened: currentData.audios,
+                extra_activities: currentData.extras,
+                fund_letters: currentData.fundLetters,
+                last_updated: new Date()
+            });
+
+            if (error) { console.error("Save Error:", error); alert("Error saving to database."); } 
+            else { showToast("Saved Successfully"); }
+        }
+
+        // --- UI Rendering ---
+        function resetVisualData() {
+            currentData = { totalJuz: 0, books: [], videos: [], audios: [], extras: [], fundLetters: 0 };
+            renderAll();
+        }
+
+        function renderAll() {
+            renderQuran();
+            renderFund();
+            renderList('book-list', currentData.books, 'book');
+            renderList('video-list', currentData.videos, 'video');
+            renderList('audio-list', currentData.audios, 'audio');
+            renderList('extra-list', currentData.extras, 'extra');
+            renderSummary();
+        }
+
+        function renderQuran() {
+            const total = parseInt(currentData.totalJuz);
+            document.getElementById('juz-input').value = total;
+            
+            const khatms = Math.floor(total / 30);
+            const remainder = total % 30;
+            
+            let msg = `Completed <span class="khatm-highlight">${khatms} Khatm</span> and <span class="khatm-highlight">${remainder} Juz</span>.`;
+            if (total > 0 && remainder === 0) msg += " <br>🎉 MashaAllah! Full Khatm Completed!";
+            else if (khatms === 0 && total > 0) msg += " Keep going!";
+
+            document.getElementById('khatm-message').innerHTML = msg;
+        }
+
+        function renderFund() {
+            const total = parseInt(currentData.fundLetters || 0);
+            document.getElementById('fund-input').value = total;
+            
+            let msg = `Distributed <span class="khatm-highlight" style="color: #27ae60;">${total}</span> out of 20 letters.`;
+            if (total === 20) msg += " <br>🎉 MashaAllah! All letters distributed!";
+            else if (total > 0) msg += " Keep going!";
+
+            document.getElementById('fund-message').innerHTML = msg;
+            document.getElementById('sum-fund').innerText = `${total} / 20`;
+        }
+
+        function renderList(elementId, data, type) {
+            const list = document.getElementById(elementId);
+            list.innerHTML = '';
+            data.forEach(item => {
+                let title = item.name || item.title || item.topic;
+                let sub = item.pages ? `${item.pages} Pages` : (type === 'extra' ? item.duration : `${item.duration} Mins`);
+                
+                const li = document.createElement('li');
+                li.className = 'list-item';
+                li.innerHTML = `
+                    <div class="item-content">
+                        <h4>${title}</h4><span class="item-meta">${sub}</span>
+                    </div>
+                    <button class="action-btn" onclick="deleteItem('${type}', ${item.id})"><i class="fas fa-trash"></i></button>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        function renderSummary() {
+            document.getElementById('sum-khatm').innerText = Math.floor(currentData.totalJuz / 30);
+            document.getElementById('sum-books').innerText = currentData.books.length;
+            document.getElementById('sum-video').innerText = currentData.videos.reduce((a, c) => a + (c.duration || 0), 0);
+            document.getElementById('sum-audio').innerText = currentData.audios.reduce((a, c) => a + (c.duration || 0), 0);
+
+            // Handle the Extra Summary Banner visibility
+            const extraContainer = document.getElementById('extra-summary-container');
+            if (currentData.extras && currentData.extras.length > 0) {
+                extraContainer.style.display = 'block';
+                document.getElementById('sum-extra').innerText = currentData.extras.length + (currentData.extras.length === 1 ? ' Activity' : ' Activities');
+            } else {
+                extraContainer.style.display = 'none';
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+    </script>
+</body>
+</html>
