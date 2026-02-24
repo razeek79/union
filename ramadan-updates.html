@@ -129,8 +129,11 @@
         .list-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid var(--primary); }
         .item-content h4 { font-size: 1rem; margin-bottom: 4px; }
         .item-meta { font-size: 0.85rem; color: var(--text-light); }
-        .action-btn { background: none; border: none; cursor: pointer; padding: 5px; opacity: 0.6; color: var(--danger); }
-        .action-btn:hover { opacity: 1; }
+        .action-btn { background: none; border: none; cursor: pointer; padding: 5px 8px; opacity: 0.6; transition: 0.2s; font-size: 1rem;}
+        .action-btn:hover { opacity: 1; transform: scale(1.1); }
+        .btn-delete { color: var(--danger); }
+        .btn-edit { color: var(--primary-light); }
+        .item-actions { display: flex; gap: 8px; }
 
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 24px; border-radius: 30px; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 1000; }
         .toast.show { opacity: 1; bottom: 30px; }
@@ -149,7 +152,7 @@
             .summary-icon { font-size: 1.1rem; margin-bottom: 5px; }
             .summary-value { font-size: 1.2rem; }
             .summary-label { font-size: 0.65rem; line-height: 1.2; word-wrap: break-word; }
-
+            header h1 { font-size: 1.4rem; margin-bottom: 5px;}
             .extra-summary-card { margin-bottom: 15px; padding: 10px 15px; }
             .extra-summary-text { font-size: 0.85rem; }
             .extra-summary-content i { font-size: 1.2rem; }
@@ -192,7 +195,7 @@
         <header>
             <div style="width: 80px;"></div>
             <div class="title-area">
-                <h1><i class="fas fa-moon"></i> Ramadan Tracker</h1>
+                <h1><i class="fas fa-moon moonpic"></i> Ramadan Tracker</h1>
                 <p id="user-welcome-msg">Loading user...</p>
             </div>
             <div style="width: 80px; text-align: right;">
@@ -236,7 +239,7 @@
             </div>
             
             <div style="margin-bottom: 30px;"></div> <div class="section-card">
-                <div class="section-header"><div class="section-title"><i class="fas fa-star-and-crescent"></i> Qur'an Progress</div></div>
+                <div class="section-header"><div class="section-title"><i class="fas fa-book-open"></i> Qur'an Progress</div></div>
                 <div class="quran-control">
                     <button class="btn-circle" onclick="adjustJuz(-1)"><i class="fas fa-minus"></i></button>
                     <input type="number" id="juz-input" class="juz-display" value="0" min="0" onchange="updateJuzFromInput(this.value)">
@@ -553,9 +556,47 @@
             saveAndRender();
         }
 
+        function editItem(type, id) {
+            if (!checkAccess()) return;
+            
+            // Find item, place values in input box, and remove it from the list
+            if (type === 'book') {
+                const item = currentData.books.find(i => i.id === id);
+                if (item) {
+                    document.getElementById('book-name').value = item.name;
+                    document.getElementById('book-pages').value = item.pages;
+                    currentData.books = currentData.books.filter(i => i.id !== id);
+                }
+            } else if (type === 'video') {
+                const item = currentData.videos.find(i => i.id === id);
+                if (item) {
+                    document.getElementById('video-title').value = item.title;
+                    document.getElementById('video-mins').value = item.duration;
+                    currentData.videos = currentData.videos.filter(i => i.id !== id);
+                }
+            } else if (type === 'audio') {
+                const item = currentData.audios.find(i => i.id === id);
+                if (item) {
+                    document.getElementById('audio-topic').value = item.topic;
+                    document.getElementById('audio-mins').value = item.duration;
+                    currentData.audios = currentData.audios.filter(i => i.id !== id);
+                }
+            } else if (type === 'extra') {
+                const item = currentData.extras.find(i => i.id === id);
+                if (item) {
+                    document.getElementById('extra-title').value = item.title;
+                    document.getElementById('extra-desc').value = item.duration === 'Completed' ? '' : item.duration;
+                    currentData.extras = currentData.extras.filter(i => i.id !== id);
+                }
+            }
+            saveAndRender();
+            showToast("Item ready to edit");
+        }
+
         function deleteItem(type, id) {
             if (!checkAccess()) return;
             if (!confirm("Delete this item?")) return;
+            
             if (type === 'book') currentData.books = currentData.books.filter(i => i.id !== id);
             if (type === 'video') currentData.videos = currentData.videos.filter(i => i.id !== id);
             if (type === 'audio') currentData.audios = currentData.audios.filter(i => i.id !== id);
@@ -646,7 +687,10 @@
                     <div class="item-content">
                         <h4>${title}</h4><span class="item-meta">${sub}</span>
                     </div>
-                    <button class="action-btn" onclick="deleteItem('${type}', ${item.id})"><i class="fas fa-trash"></i></button>
+                    <div class="item-actions">
+                        <button class="action-btn btn-edit" onclick="editItem('${type}', ${item.id})" title="Edit"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn btn-delete" onclick="deleteItem('${type}', ${item.id})" title="Delete"><i class="fas fa-trash"></i></button>
+                    </div>
                 `;
                 list.appendChild(li);
             });
