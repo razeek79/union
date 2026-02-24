@@ -12,3 +12,67 @@ body {
     radial-gradient(circle at top left, #e0e7ff, transparent 55%),
     #ffffff;
 }
+
+.ramadan-card {
+  background-image: url("/council-images/ramadan-cardimd.png");
+  background-size: cover;
+  background-position: center;
+  border-radius: 24px;
+  padding: 40px 20px;
+  min-height: 320px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Inner Content */
+.ramadan-content h2 {
+  font-family: Almarai, sans-serif;
+  color: #ffffff;
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.ramadan-content p {
+  font-family: Almarai, sans-serif;
+  color: #ffffff;
+  font-size: 18px;
+  margin-bottom: 25px;
+}
+
+/* Button */
+.ram-btn {
+  background-color: #ffffff;
+  color: #230252;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 30px;
+  font-family: Almarai, sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ram-btn:hover {
+  background-color: #f2f2f2;
+  transform: translateY(-2px);
+}
+
+@media (min-width: 992px) {
+  .ramadan-card {
+    min-height: 420px;
+    padding: 60px;
+  }
+
+  .ramadan-content h2 {
+    font-size: 40px;
+  }
+
+  .ramadan-content p {
+    font-size: 20px;
+  }
+}
