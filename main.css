@@ -33,6 +33,7 @@ body {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
+/* SECOND BACKGROUND IMAGE (fade) */
 .ramadan-card::before {
   content: "";
   position: absolute;
@@ -48,10 +49,31 @@ body {
   z-index: 0;
 }
 
+/* DARK OVERLAY + STARS */
+.ramadan-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background:
+    rgba(0,0,0,0.25),
+    radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.8), transparent),
+    radial-gradient(2px 2px at 70% 60%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1.5px 1.5px at 40% 80%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2px 2px at 90% 20%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1.5px 1.5px at 10% 70%, rgba(255,255,255,0.6), transparent);
+
+  animation: starMove 30s linear infinite;
+
+  opacity: 0.6;
+  z-index: 1;
+  pointer-events: none;
+}
+
 /* keep text above background */
 .ramadan-content {
   position: relative;
-  z-index: 2;
+  z-index: 3;
 }
 
 /* animation */
@@ -60,6 +82,36 @@ body {
   40% { opacity: 1; }
   60% { opacity: 1; }
   100% { opacity: 0; }
+}
+
+/* star movement */
+@keyframes starMove {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-60px); }
+}
+
+/* MOON */
+.moon {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+
+  width: 70px;
+  height: 70px;
+
+  background: radial-gradient(circle at 30% 30%, #fff, #f9d976);
+  border-radius: 50%;
+
+  box-shadow: -20px 0 0 0 #230252;
+
+  animation: moonGlow 4s ease-in-out infinite alternate;
+
+  z-index: 2;
+}
+
+@keyframes moonGlow {
+  from { filter: drop-shadow(0 0 5px #fff); }
+  to { filter: drop-shadow(0 0 20px #ffd86b); }
 }
 
 /* Inner Content */
@@ -111,8 +163,40 @@ body {
 }
 
 @font-face {
-    font-family: 'KultumRamadhan';
-    src: url('fonts/kultum-ramadhan.regular.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'KultumRamadhan';
+  src: url('fonts/kultum-ramadhan.regular.otf') format('opentype');
+}
+
+/* Light sweep effect */
+.ramadan-card .light-sweep{
+  position:absolute;
+  top:0;
+  left:-150%;
+  width:60%;
+  height:100%;
+
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.35),
+    transparent
+  );
+
+  transform: skewX(-20deg);
+  animation: lightSweepMove 8s linear infinite;
+
+  z-index:2;
+  pointer-events:none;
+}
+
+@keyframes lightSweepMove{
+  0%{
+    left:-150%;
+  }
+  50%{
+    left:150%;
+  }
+  100%{
+    left:150%;
+  }
 }
