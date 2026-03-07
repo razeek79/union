@@ -90,30 +90,6 @@ body {
   100% { transform: translateY(-60px); }
 }
 
-/* MOON */
-.moon {
-  position: absolute;
-  top: 30px;
-  right: 40px;
-
-  width: 70px;
-  height: 70px;
-
-  background: radial-gradient(circle at 30% 30%, #fff, #f9d976);
-  border-radius: 50%;
-
-  box-shadow: -20px 0 0 0 #230252;
-
-  animation: moonGlow 4s ease-in-out infinite alternate;
-
-  z-index: 2;
-}
-
-@keyframes moonGlow {
-  from { filter: drop-shadow(0 0 5px #fff); }
-  to { filter: drop-shadow(0 0 20px #ffd86b); }
-}
-
 /* Inner Content */
 .ramadan-content h2 {
   font-family: 'KultumRamadhan', sans-serif;
